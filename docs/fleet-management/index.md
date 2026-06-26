@@ -1,13 +1,15 @@
 # Fleet Management
 
-For fleet management, we recommend starting with a Single Node OpenShift (SNO) installation using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters). Once completed, install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) (ACM) to use it as your cluster management hub.
+For fleet management, we recommend starting with a Single Node OpenShift (SNO) installation as the hub cluster, then installing Red Hat Advanced Cluster Management (ACM) to manage your cluster fleet at scale.
 
 ## Process Overview
 
 1. Complete all [prerequisites](../prerequisites/index.md)
-2. Install a Single Node OpenShift cluster via the [Assisted Installer](../standalone/assisted-installer.md)
-3. Install Red Hat Advanced Cluster Management on the hub cluster
-4. Use ACM to provision and manage additional spoke clusters
+2. Set up the [installation host](../prerequisites/installation-host.md)
+3. Install the [SNO hub cluster](sno-hub.md)
+4. Install [storage on the hub](hub-storage.md)
+5. Install [Advanced Cluster Management](acm.md)
+6. Use ACM to provision and manage spoke clusters
 
 ## Architecture
 
@@ -29,6 +31,11 @@ For fleet management, we recommend starting with a Single Node OpenShift (SNO) i
 │ (Dev)    │ │ (Test)   │ │ (Prod)   │
 └──────────┘ └──────────┘ └──────────┘
 ```
+
+## Hardware Requirements
+
+- Single box for the hub. Recommend 24 cores, 64 GB RAM and two disks — OS disk 120 GB, data disk 2 TB
+- Can be bare metal or virtualized. No OpenShift Virtualization on the hub.
 
 ## Why Fleet Management?
 

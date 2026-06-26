@@ -1,24 +1,25 @@
 # Advanced Cluster Management
 
-After installing the SNO hub cluster, install Red Hat Advanced Cluster Management for Kubernetes (ACM) to enable fleet management capabilities.
+Red Hat Advanced Cluster Management (ACM) provides multicluster lifecycle management, governance, and observability. Installing ACM also automatically installs the multicluster engine operator.
 
-## Steps
+[Red Hat ACM Documentation](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest)
 
-1. Install the ACM operator
-2. Create the MultiClusterHub resource
-3. Wait for ACM to become available
-4. Access the ACM console
+!!! note
+    Only one ACM hub cluster can exist per OpenShift cluster.
+
+## Prerequisites
+
+- Hub cluster is installed and storage is configured
+- Cluster administrator privileges
+
+## Install the Operator
 
 ```bash
-export KUBECONFIG=~/hub-cluster/auth/kubeconfig
-
-oc apply -f - <<EOF
+cat <<EOF | oc apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
   name: open-cluster-management
-  labels:
-    openshift.io/cluster-monitoring: "true"
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
@@ -32,14 +33,14 @@ spec:
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
-  name: advanced-cluster-management
+  name: acm-operator-subscription
   namespace: open-cluster-management
 spec:
+  sourceNamespace: openshift-marketplace
+  source: redhat-operators
   channel: release-2.12
   installPlanApproval: Automatic
   name: advanced-cluster-management
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
 EOF
 ```
 
@@ -49,10 +50,12 @@ Wait for the operator to install:
 oc get csv -n open-cluster-management -w
 ```
 
-Create the MultiClusterHub:
+The `PHASE` should show `Succeeded`.
+
+## Create the MultiClusterHub
 
 ```bash
-oc apply -f - <<EOF
+cat <<EOF | oc apply -f -
 apiVersion: operator.open-cluster-management.io/v1
 kind: MultiClusterHub
 metadata:
@@ -62,59 +65,110 @@ spec: {}
 EOF
 ```
 
-Wait for ACM to be ready:
+!!! note
+    It can take up to 10 minutes for the hub to finish deploying all components.
+
+Monitor the status:
 
 ```bash
-oc get multiclusterhub -n open-cluster-management -w
+oc get mch -n open-cluster-management -w
 ```
 
-Access the ACM console:
+The status should show `Running`.
+
+## Verify the Installation
 
 ```bash
+oc get pods -n open-cluster-management
 oc get route multicloud-console -n open-cluster-management -o jsonpath='{.spec.host}'
 ```
 
----
+## Add Provisioning
 
-## Details
-
-### What ACM Provides
-
-| Capability               | Description                                                    |
-| ------------------------ | -------------------------------------------------------------- |
-| Cluster lifecycle        | Create, import, upgrade, and destroy clusters                  |
-| Governance               | Apply policies and enforce compliance across the fleet         |
-| Application management   | Deploy applications across multiple clusters                   |
-| Observability            | Centralized monitoring and alerting for all clusters           |
-| Infrastructure provisioning | Provision clusters on bare metal, vSphere, and cloud       |
-
-### Provisioning Spoke Clusters
-
-Once ACM is running, you can provision additional clusters from the hub using:
-
-- **Central Infrastructure Management (CIM)** — bare metal provisioning integrated with the Assisted Installer
-- **Hosted Control Planes** — lightweight clusters with control planes running on the hub
-- **Hive** — full cluster provisioning on supported platforms
-
-### Importing Existing Clusters
-
-If you already have clusters running, you can import them into ACM for centralized management:
+Enable bare metal provisioning for spoke cluster deployment:
 
 ```bash
-# Generate the import command from the ACM console, or:
-oc apply -f - <<EOF
+cat <<EOF | oc apply -f -
+apiVersion: metal3.io/v1alpha1
+kind: Provisioning
+metadata:
+  name: provisioning-configuration
+spec:
+  provisioningNetwork: "Disabled"
+  watchAllNamespaces: true
+EOF
+```
+
+## Create InfraEnv
+
+```bash
+cat <<EOF | oc apply -f -
+apiVersion: agent-install.openshift.io/v1beta1
+kind: InfraEnv
+metadata:
+  name: lab
+  namespace: lab
+spec:
+  agentLabels:
+    agentclusterinstalls.extensions.hive.openshift.io/location: ktown
+  cpuArchitecture: x86_64
+  ipxeScriptType: DiscoveryImageAlways
+  nmStateConfigLabelSelector:
+    matchLabels:
+      infraenvs.agent-install.openshift.io: lab
+  pullSecretRef:
+    name: pullsecret-lab
+  sshAuthorizedKey: <public-key>
+EOF
+```
+
+## Adding Host Inventory via Redfish
+
+Create the BMC secret:
+
+```bash
+oc create secret generic <hostname>-bmc-secret \
+  --from-literal=username=admin \
+  --from-literal=password=your-bmc-password \
+  -n <InfraEnv-namespace>
+```
+
+Create the BareMetalHost:
+
+```yaml
+apiVersion: metal3.io/v1alpha1
+kind: BareMetalHost
+metadata:
+  name: <hostname>-bmh
+  namespace: <InfraEnv-namespace>
+  labels:
+    infraenvs.agent-install.openshift.io: <InfraEnv-namespace>
+spec:
+  bmc:
+    address: redfish-virtualmedia://<bmc-ip>/redfish/v1/
+    credentialsName: "<hostname>-bmc-secret"
+    disableCertificateVerification: true
+  bootMACAddress: "aa:bb:cc:dd:ee:ff"
+  online: false
+```
+
+## Import a Managed Cluster
+
+To import an existing cluster into ACM:
+
+```bash
+cat <<EOF | oc apply -f -
 apiVersion: cluster.open-cluster-management.io/v1
 kind: ManagedCluster
 metadata:
-  name: spoke-cluster-1
+  name: my-cluster
 spec:
   hubAcceptsClient: true
 EOF
 ```
 
-### Next Steps After ACM Installation
+Then retrieve the import command to run on the target cluster:
 
-1. Configure identity provider on the hub (see [Day 2 Operations](../post-installation/day2.md))
-2. Set up OpenShift GitOps for fleet-wide configuration
-3. Define governance policies for the fleet
-4. Provision spoke clusters for development, test, and production workloads
+```bash
+oc get secret my-cluster-import -n my-cluster -o jsonpath='{.data.import\.yaml}' | base64 -d | oc apply -f - --kubeconfig=<managed-cluster-kubeconfig>
+```

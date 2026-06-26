@@ -1,26 +1,20 @@
 # DNS
 
-OpenShift requires specific DNS records for the API, ingress, and etcd services. All records must be resolvable before installation begins.
+OpenShift requires specific DNS records for the API and ingress services. All records must be resolvable before installation begins.
 
 ## Required DNS Records
 
-| Record                                    | Type  | Value                          |
-| ----------------------------------------- | ----- | ------------------------------ |
-| api.{cluster_name}.{base_domain}          | A     | Load balancer VIP (API)        |
-| api-int.{cluster_name}.{base_domain}      | A     | Load balancer VIP (API)        |
-| *.apps.{cluster_name}.{base_domain}       | A     | Load balancer VIP (Ingress)    |
-| etcd-{index}.{cluster_name}.{base_domain} | A     | Control plane node IP          |
-| _etcd-server-ssl._tcp.{cluster_name}.{base_domain} | SRV | etcd node records    |
+| A Record                                  | Value                       | Description                        |
+| ----------------------------------------- | --------------------------- | ---------------------------------- |
+| api.{cluster_name}.{base_domain}          | API VIP or node IP (SNO)    | Virtual IP for the API endpoint    |
+| api-int.{cluster_name}.{base_domain}      | API VIP or node IP (SNO)    | Internal VIP for the API endpoint  |
+| *.apps.{cluster_name}.{base_domain}       | Ingress VIP or node IP (SNO)| Virtual IP for the ingress endpoint|
+
+Validate the DNS using dig:
 
 ```bash
-# Verify API DNS resolution
-dig +short api.<cluster_name>.<base_domain>
-
-# Verify wildcard ingress DNS
-dig +short test.apps.<cluster_name>.<base_domain>
-
-# Verify reverse DNS
-dig +short -x <node-ip>
+dig +noall +answer @<nameserver_ip> api.<cluster_name>.<base_domain>
+dig +noall +answer @<nameserver_ip> test.apps.<cluster_name>.<base_domain>
 ```
 
 ---
@@ -33,22 +27,31 @@ Use Cloudflare (1.1.1.1) as the upstream DNS forwarder for external resolution.
 
 ### API Records
 
-The `api` record is used by external clients (developers, CI/CD) to reach the Kubernetes API. The `api-int` record is used by cluster nodes internally. Both should resolve to the same API load balancer VIP.
+The `api` record is used by external clients (developers, CI/CD) to reach the Kubernetes API. The `api-int` record is used by cluster nodes internally. Both should resolve to the same API VIP.
 
 ### Wildcard Ingress
 
-The `*.apps` wildcard record routes all application traffic through the OpenShift router. This must resolve to the ingress load balancer VIP.
+The `*.apps` wildcard record routes all application traffic through the OpenShift router. This must resolve to the ingress VIP.
 
-### etcd SRV Records
+### Single Node OpenShift (SNO)
 
-SRV records for etcd are required for IPI installations. Each SRV record points to the corresponding `etcd-{index}` A record with priority 0, weight 10, and port 2380.
+For SNO, all three DNS records point to the single node's IP address. No VIPs are needed.
 
-Example SRV record:
+### Optional Helpful DNS Entries
 
-```
-_etcd-server-ssl._tcp.ocp.example.com. 86400 IN SRV 0 10 2380 etcd-0.ocp.example.com.
-```
+These are not required but make administration easier:
 
-### Reverse DNS (PTR)
+| A Record                                       | IP Address | Description          |
+| ---------------------------------------------- | ---------- | -------------------- |
+| installation.{cluster_name}.{base_domain}      | 10.1.0.2   | Installation host    |
+| openshift-control-plane-1.{cluster_name}.{base_domain} | 10.1.0.11 | Control plane 1 |
+| openshift-control-plane-2.{cluster_name}.{base_domain} | 10.1.0.12 | Control plane 2 |
+| openshift-control-plane-3.{cluster_name}.{base_domain} | 10.1.0.13 | Control plane 3 |
+| openshift-worker-1.{cluster_name}.{base_domain} | 10.1.0.21 | Worker 1            |
+| openshift-worker-2.{cluster_name}.{base_domain} | 10.1.0.22 | Worker 2            |
+| openshift-worker-3.{cluster_name}.{base_domain} | 10.1.0.23 | Worker 3            |
 
-Reverse DNS records are required for all cluster nodes. The PTR record for each IP must resolve to the node's FQDN.
+### Documentation
+
+- [DNS Requirements](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_on_bare_metal/index#installation-dns-user-infra_installing-bare-metal-network-customizations)
+- [Validating DNS resolution](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_on_bare_metal/index#installation-user-provisioned-validating-dns_installing-bare-metal-network-customizations)

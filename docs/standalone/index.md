@@ -1,24 +1,22 @@
 # Standalone Cluster
 
-For a standalone cluster installation, we recommend using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available in the [Red Hat Hybrid Cloud Console](https://console.redhat.com).
-
-The Assisted Installer is a guided, web-based experience that handles the complexity of OpenShift installation while giving you full control over your cluster configuration.
+For a standalone cluster installation, we use the agent-based installer from the installation host. This is for organizations who want to look at OpenShift as an application platform and/or to run virtual machines, without the complexity of fleet management.
 
 ## Process Overview
 
 1. Complete all [prerequisites](../prerequisites/index.md)
-2. Access the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters)
-3. Configure cluster details
-4. Generate and boot the discovery ISO
-5. Configure networking
-6. Complete installation
+2. Set up the [installation host](../prerequisites/installation-host.md)
+3. Create the install configurations
+4. Generate the agent ISO
+5. Boot all nodes from the ISO
+6. Monitor and complete installation
 
-## Why Assisted Installer?
+## Why Agent-Based Install?
 
 | Benefit                | Description                                                      |
 | ---------------------- | ---------------------------------------------------------------- |
-| Guided experience      | Step-by-step wizard with validation at each stage                |
-| Pre-flight checks      | Validates hardware, networking, and DNS before installation      |
-| No external services   | No need for PXE, DHCP, or TFTP infrastructure                   |
-| Flexible topologies    | Supports multi-node, compact (3-node), and single node clusters  |
-| Bare metal & vSphere   | Works with physical servers and virtual machines                  |
+| No external services   | No PXE, DHCP, or TFTP infrastructure required                    |
+| Static IP support      | Network configuration built into the ISO                         |
+| Single bootable ISO    | One artifact for all nodes                                       |
+| Bare metal native      | Designed for on-premise bare metal environments                  |
+| Bond/VLAN support      | Full NMState networking configuration                            |

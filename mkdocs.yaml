@@ -48,6 +48,7 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - attr_list
+  - def_list
   - md_in_html
   - tables
   - toc:
@@ -62,13 +63,25 @@ nav:
       - DNS: prerequisites/dns.md
       - Load Balancer: prerequisites/load-balancer.md
       - Storage: prerequisites/storage.md
+      - Installation Host: prerequisites/installation-host.md
   - Standalone Cluster:
       - Overview: standalone/index.md
-      - Assisted Installer: standalone/assisted-installer.md
+      - Agent-Based Install: standalone/agent-based-install.md
+      - Troubleshooting: standalone/troubleshooting.md
   - Fleet Management:
       - Overview: fleet-management/index.md
-      - Single Node Hub: fleet-management/sno-hub.md
+      - Hub Install (SNO): fleet-management/sno-hub.md
+      - Hub Storage: fleet-management/hub-storage.md
       - Advanced Cluster Management: fleet-management/acm.md
   - Post-Installation:
       - Overview: post-installation/index.md
-      - Day 2 Operations: post-installation/day2.md
+      - Registry: post-installation/registry.md
+      - OpenShift GitOps: post-installation/openshift-gitops.md
+      - External Secrets Operator: post-installation/external-secrets-operator.md
+      - Workload Availability: post-installation/workload-availability.md
+      - POC Banner: post-installation/poc-banner.md
+      - Add Worker Node: post-installation/add-worker-node.md
+      - Rotate SSH Keys: post-installation/rotate-ssh-keys.md
+      - Machine Config: post-installation/machine-config.md
+      - Networking: post-installation/networking.md
+      - Virtualization: post-installation/virtualization.md
