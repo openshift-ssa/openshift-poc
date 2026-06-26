@@ -7,7 +7,7 @@ After the OpenShift cluster is installed, complete the following operations to p
 Install and configure in this order to avoid dependency issues:
 
 1. **Kubernetes NMState Operator** — Install first if you need advanced networking (bonds, VLANs, OVS bridges)
-2. **Storage** — Install your CSI driver and create StorageClasses
+2. **[Storage](storage.md)** — Install your CSI driver and create StorageClasses
 3. **[Registry](registry.md)** — Configure persistent storage for the internal image registry
 4. **[OpenShift GitOps](openshift-gitops.md)** — Install ArgoCD for GitOps workflows
 5. **[External Secrets Operator](external-secrets-operator.md)** — Integrate external secret management

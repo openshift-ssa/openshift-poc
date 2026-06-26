@@ -34,8 +34,8 @@ This usually happens when you are using a web proxy and the certificate being pr
 
 ### DNS Validation Fails
 
-- Verify `api.<cluster>.<domain>` and `*.apps.<cluster>.<domain>` A records exist
-- Test resolution from the same network: `dig +short api.<cluster>.<domain>`
+- Verify `api.{{ cluster_name }}.{{ base_domain }}` and `*.apps.{{ cluster_name }}.{{ base_domain }}` A records exist
+- Test resolution from the same network: `dig +short api.{{ cluster_name }}.{{ base_domain }}`
 
 ### NTP Validation Fails
 

@@ -15,7 +15,7 @@ spec:
   resources:
     requests:
       storage: 100Gi
-  storageClassName: <storage_class>
+  storageClassName: {{ storage_class }}
 EOF
 ```
 

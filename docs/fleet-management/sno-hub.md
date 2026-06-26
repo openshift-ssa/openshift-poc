@@ -10,11 +10,11 @@ Complete the [prerequisites](../prerequisites/index.md) and set up the [installa
 
 All DNS records point to the single node's IP address. No load balancer is required.
 
-| Record                               | Value       |
-| ------------------------------------ | ----------- |
-| `api.<cluster_name>.<base_domain>`   | `<node_ip>` |
-| `api-int.<cluster_name>.<base_domain>` | `<node_ip>` |
-| `*.apps.<cluster_name>.<base_domain>` | `<node_ip>` |
+| Record                                         | Value           |
+| ---------------------------------------------- | --------------- |
+| `api.{{ cluster_name }}.{{ base_domain }}`     | `{{ node_ip }}` |
+| `api-int.{{ cluster_name }}.{{ base_domain }}` | `{{ node_ip }}` |
+| `*.apps.{{ cluster_name }}.{{ base_domain }}`  | `{{ node_ip }}` |
 
 A reverse PTR record for the node IP is also required.
 
@@ -67,8 +67,8 @@ networking:
     - 172.30.0.0/16
 platform:
   none: {}
-pullSecret: 'value from ~/.pull-secret'
-sshKey: 'value from ~/.ssh/ocp_ed25519.pub'
+pullSecret: 'value from ~/pull-secret.txt'
+sshKey: 'value from ~/.ssh/ocp.pub'
 ```
 
 If your environment requires a proxy, append the `proxy` and `additionalTrustBundle` sections as described in the [standalone cluster install](../standalone/agent-based-install.md).
@@ -147,7 +147,7 @@ The kubeadmin credentials and kubeconfig are written to the `install` directory 
 ## Validate the Install
 
 ```bash
-oc login --server=https://api.hub.ocp.basedomain.com:6443 -u kubeadmin -p <password>
+oc login --server=https://api.hub.ocp.basedomain.com:6443 -u kubeadmin -p {{ password }}
 oc get nodes
 oc get clusterversion
 ```
@@ -155,7 +155,7 @@ oc get clusterversion
 Test connectivity:
 
 ```bash
-oc debug node/<node-name> -- chroot /host \
+oc debug node/{{ node_name }} -- chroot /host \
   podman pull registry.redhat.io/ubi9/ubi:latest
 ```
 

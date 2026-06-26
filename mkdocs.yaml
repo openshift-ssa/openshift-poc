@@ -63,7 +63,6 @@ nav:
       - Infrastructure: prerequisites/infrastructure.md
       - Networking: prerequisites/networking.md
       - DNS: prerequisites/dns.md
-      - Load Balancer: prerequisites/load-balancer.md
       - Storage: prerequisites/storage.md
       - Installation Host: prerequisites/installation-host.md
   - Standalone Cluster:
@@ -77,6 +76,7 @@ nav:
       - Advanced Cluster Management: fleet-management/acm.md
   - Post-Installation:
       - Overview: post-installation/index.md
+      - Storage: post-installation/storage.md
       - Registry: post-installation/registry.md
       - OpenShift GitOps: post-installation/openshift-gitops.md
       - External Secrets Operator: post-installation/external-secrets-operator.md

@@ -39,10 +39,10 @@ For fleet management, we recommend starting with a Single Node OpenShift (SNO) i
 
 ## Why Fleet Management?
 
-| Benefit              | Description                                                         |
-| -------------------- | ------------------------------------------------------------------- |
-| Centralized control  | Manage all clusters from a single pane of glass                     |
-| Consistent policy    | Enforce governance and security policies across the fleet           |
-| Scalable provisioning | Create new clusters on demand through ACM                          |
-| Lifecycle management | Upgrade and maintain clusters centrally                             |
-| Observability        | Unified view of cluster health and compliance                       |
+| Benefit               | Description                                                         |
+| --------------------- | ------------------------------------------------------------------- |
+| Centralized control   | Manage all clusters from a single pane of glass                     |
+| Consistent policy     | Enforce governance and security policies across the fleet           |
+| Scalable provisioning | Create new clusters on demand through ACM                           |
+| Lifecycle management  | Upgrade and maintain clusters centrally                             |
+| Observability         | Unified view of cluster health and compliance                       |

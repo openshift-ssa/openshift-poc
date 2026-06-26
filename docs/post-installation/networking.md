@@ -17,17 +17,17 @@ From a Linux configuration perspective:
 
 ## The Full Stack for Underlay Networking
 
-| Concept                              | Where   | Managed By |
-| ------------------------------------ | ------- | ---------- |
-| Switch                               | Physical | Switch    |
-| Ethernet                             | Linux   | NNCP       |
-| Bond                                 | Linux   | NNCP       |
-| OVS Bridge                           | Linux   | NNCP       |
-| OVN Bridge Mapping                   | OVN-K   | NNCP       |
-| Localnet                             | OVN-K   | NNCP       |
-| Cluster User Defined Network (CUDN)  | OVN-K   | —          |
-| Network Attachment Definition        | OVN-K   | CUDN       |
-| Virtual Ethernet Pair                | Kubernetes | CNI     |
+| Concept                              | Where      | Managed By |
+| ------------------------------------ | ---------- | ---------- |
+| Switch                               | Physical   | Switch     |
+| Ethernet                             | Linux      | NNCP       |
+| Bond                                 | Linux      | NNCP       |
+| OVS Bridge                           | Linux      | NNCP       |
+| OVN Bridge Mapping                   | OVN-K      | NNCP       |
+| Localnet                             | OVN-K      | NNCP       |
+| Cluster User Defined Network (CUDN)  | OVN-K      | —          |
+| Network Attachment Definition        | OVN-K      | CUDN       |
+| Virtual Ethernet Pair                | Kubernetes | CNI        |
 
 ## NodeNetworkConfigurationPolicy Examples
 
@@ -40,13 +40,13 @@ metadata:
   name: 2-eth-bond-lacp-vlan
 spec:
   nodeSelector:
-    kubernetes.io/hostname: <hostname>
+    kubernetes.io/hostname: {{ hostname }}
   desiredState:
     interfaces:
-      - name: <devicename>
+      - name: {{ device_name }}
         type: ethernet
         state: up
-        mac-address: <macaddress>
+        mac-address: {{ mac_address }}
         ipv4:
           enabled: false
         ipv6:
@@ -65,7 +65,7 @@ spec:
         link-aggregation:
           mode: 802.3ad
           port:
-            - <devicename>
+            - {{ device_name }}
             - <devicename2>
           options:
             miimon: "100"
@@ -74,16 +74,16 @@ spec:
           enabled: false
         ipv6:
           enabled: false
-      - name: bond1.<vlanid>
+      - name: bond1.{{ vlan_id }}
         type: vlan
         state: up
         vlan:
           base-iface: bond1
-          id: <vlanid>
+          id: {{ vlan_id }}
         ipv4:
           enabled: true
           address:
-            - ip: <ipaddress>
+            - ip: {{ ip_address }}
               prefix-length: 28
           dhcp: false
         ipv6:
@@ -99,13 +99,13 @@ metadata:
   name: 2-eth-bond-active-backup-vlan
 spec:
   nodeSelector:
-    kubernetes.io/hostname: <hostname>
+    kubernetes.io/hostname: {{ hostname }}
   desiredState:
     interfaces:
-      - name: <devicename>
+      - name: {{ device_name }}
         type: ethernet
         state: up
-        mac-address: <macaddress>
+        mac-address: {{ mac_address }}
         ipv4:
           enabled: false
         ipv6:
@@ -124,25 +124,25 @@ spec:
         link-aggregation:
           mode: active-backup
           port:
-            - <devicename>
+            - {{ device_name }}
             - <devicename2>
           options:
             miimon: "100"
-            primary: <devicename>
+            primary: {{ device_name }}
         ipv4:
           enabled: false
         ipv6:
           enabled: false
-      - name: bond1.<vlanid>
+      - name: bond1.{{ vlan_id }}
         type: vlan
         state: up
         vlan:
           base-iface: bond1
-          id: <vlanid>
+          id: {{ vlan_id }}
         ipv4:
           enabled: true
           address:
-            - ip: <ipaddress>
+            - ip: {{ ip_address }}
               prefix-length: 28
           dhcp: false
         ipv6:
@@ -193,7 +193,7 @@ spec:
     matchExpressions:
       - key: kubernetes.io/metadata.name
         operator: In
-        values: ["<namespace>", "<namespace2>"]
+        values: ["{{ namespace }}", "{{ namespace2 }}"]
   network:
     topology: Localnet
     localnet:
@@ -225,7 +225,7 @@ spec:
     matchExpressions:
       - key: kubernetes.io/metadata.name
         operator: In
-        values: ["<namespace>", "<namespace2>"]
+        values: ["{{ namespace }}", "{{ namespace2 }}"]
   network:
     topology: Localnet
     localnet:

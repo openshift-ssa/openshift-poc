@@ -55,8 +55,8 @@ platform:
     additionalNTPServers:
       - 0.us.pool.ntp.org
       - 1.us.pool.ntp.org
-pullSecret: 'value from ~/.pull-secret'
-sshKey: 'value from ~/.ssh/ocp_ed25519.pub'
+pullSecret: 'value from ~/pull-secret.txt'
+sshKey: 'value from ~/.ssh/ocp.pub'
 ```
 
 If your environment requires a proxy, append to the end of `install-config.yaml`:
@@ -65,7 +65,7 @@ If your environment requires a proxy, append to the end of `install-config.yaml`
 proxy:
   httpProxy: http://user:password@proxy.example.com:3128
   httpsProxy: http://user:password@proxy.example.com:3128
-  noProxy: basedomain.com,localhost,127.0.0.1,.cluster.local,.svc,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,<your node subnet>,<api VIP>,<ingress VIP>
+  noProxy: basedomain.com,localhost,127.0.0.1,.cluster.local,.svc,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,{{ node_subnet }},{{ api_vip }},{{ ingress_vip }}
 ```
 
 If your environment uses a MITM proxy, add the trust bundle:
@@ -251,7 +251,7 @@ podman run -d --name iso-http \
 Verify the ISO is accessible:
 
 ```bash
-wget http://<installation-host>:8080/agent.x86_64.iso
+wget http://{{ installation_host }}:8080/agent.x86_64.iso
 ```
 
 ## Boot and Install
@@ -268,7 +268,7 @@ At the end of the process, you will be presented with the URL for the cluster en
 ## Validate the Install
 
 ```bash
-oc login --server=https://api.poc.ocp.basedomain.com:6443 -u kubeadmin -p <password>
+oc login --server=https://api.poc.ocp.basedomain.com:6443 -u kubeadmin -p {{ password }}
 oc get nodes
 oc get clusterversion
 oc get clusteroperators
@@ -277,7 +277,7 @@ oc get clusteroperators
 Test container image pull connectivity:
 
 ```bash
-oc debug node/<worker-node-name> -- chroot /host \
+oc debug node/{{ worker_node_name }} -- chroot /host \
   podman pull registry.redhat.io/ubi9/ubi:latest
 ```
 

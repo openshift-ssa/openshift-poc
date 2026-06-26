@@ -4,26 +4,22 @@ OpenShift requires specific DNS records for the API and ingress services. All re
 
 ## Required DNS Records
 
-| A Record                                  | Value                       | Description                        |
-| ----------------------------------------- | --------------------------- | ---------------------------------- |
-| api.{cluster_name}.{base_domain}          | API VIP or node IP (SNO)    | Virtual IP for the API endpoint    |
-| api-int.{cluster_name}.{base_domain}      | API VIP or node IP (SNO)    | Internal VIP for the API endpoint  |
-| *.apps.{cluster_name}.{base_domain}       | Ingress VIP or node IP (SNO)| Virtual IP for the ingress endpoint|
+| A Record                                     | Value                        |
+| -------------------------------------------- | ---------------------------- | 
+| api.{{ cluster_name }}.{{ base_domain }}     | API VIP or node IP (SNO)     | 
+| api-int.{{ cluster_name }}.{{ base_domain }} | API VIP or node IP (SNO)     | 
+| *.apps.{{ cluster_name }}.{{ base_domain }}  | Ingress VIP or node IP (SNO) | 
 
 Validate the DNS using dig:
 
 ```bash
-dig +noall +answer @<nameserver_ip> api.<cluster_name>.<base_domain>
-dig +noall +answer @<nameserver_ip> test.apps.<cluster_name>.<base_domain>
+dig +noall +answer @{{ nameserver_ip }} api.{{ cluster_name }}.{{ base_domain }}
+dig +noall +answer @{{ nameserver_ip }} test.apps.{{ cluster_name }}.{{ base_domain }}
 ```
 
 ---
 
 ## Details
-
-### Upstream DNS
-
-Use Cloudflare (1.1.1.1) as the upstream DNS forwarder for external resolution.
 
 ### API Records
 
@@ -36,20 +32,6 @@ The `*.apps` wildcard record routes all application traffic through the OpenShif
 ### Single Node OpenShift (SNO)
 
 For SNO, all three DNS records point to the single node's IP address. No VIPs are needed.
-
-### Optional Helpful DNS Entries
-
-These are not required but make administration easier:
-
-| A Record                                       | IP Address | Description          |
-| ---------------------------------------------- | ---------- | -------------------- |
-| installation.{cluster_name}.{base_domain}      | 10.0.0.2   | Installation host    |
-| openshift-control-plane-1.{cluster_name}.{base_domain} | 10.0.0.4 | Control plane 1 |
-| openshift-control-plane-2.{cluster_name}.{base_domain} | 10.0.0.5 | Control plane 2 |
-| openshift-control-plane-3.{cluster_name}.{base_domain} | 10.0.0.6 | Control plane 3 |
-| openshift-worker-1.{cluster_name}.{base_domain} | 10.0.0.7 | Worker 1            |
-| openshift-worker-2.{cluster_name}.{base_domain} | 10.0.0.8 | Worker 2            |
-| openshift-worker-3.{cluster_name}.{base_domain} | 10.0.0.9 | Worker 3            |
 
 ### Documentation
 

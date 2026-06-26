@@ -3,7 +3,7 @@
 ## Generate a New Key
 
 ```bash
-ssh-keygen -t ed25519 -f ~/.ssh/new_ocp_key -C "ocp-key-rotation"
+ssh-keygen -t ed25519 -f ~/.ssh/ocp -C "ocp-key-rotation"
 ```
 
 ## Update the MachineConfig

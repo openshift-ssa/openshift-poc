@@ -12,7 +12,7 @@ Install via the OperatorHub in the OpenShift web console:
 Label the node as a storage node:
 
 ```bash
-oc label node <node-name> cluster.ocs.openshift.io/openshift-storage=
+oc label node {{ node_name }} cluster.ocs.openshift.io/openshift-storage=
 ```
 
 ## Create LVM Storage

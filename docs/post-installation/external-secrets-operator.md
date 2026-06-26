@@ -76,7 +76,7 @@ oc get pods -n external-secrets
 
 ```bash
 oc create secret generic vault-token \
-  --from-literal=token=<vault-token> \
+  --from-literal=token={{ vault_token }} \
   -n my-namespace
 ```
 
@@ -102,8 +102,8 @@ spec:
 
 ```bash
 oc create secret generic aws-credentials \
-  --from-literal=access-key=<access-key-id> \
-  --from-literal=secret-access-key=<secret-access-key> \
+  --from-literal=access-key={{ access_key_id }} \
+  --from-literal=secret-access-key={{ secret_access_key }} \
   -n my-namespace
 ```
 

@@ -118,7 +118,7 @@ spec:
       infraenvs.agent-install.openshift.io: lab
   pullSecretRef:
     name: pullsecret-lab
-  sshAuthorizedKey: <public-key>
+  sshAuthorizedKey: {{ public_key }}
 EOF
 ```
 
@@ -127,10 +127,10 @@ EOF
 Create the BMC secret:
 
 ```bash
-oc create secret generic <hostname>-bmc-secret \
+oc create secret generic {{ hostname }}-bmc-secret \
   --from-literal=username=admin \
   --from-literal=password=your-bmc-password \
-  -n <InfraEnv-namespace>
+  -n {{ infraenv_namespace }}
 ```
 
 Create the BareMetalHost:
@@ -139,14 +139,14 @@ Create the BareMetalHost:
 apiVersion: metal3.io/v1alpha1
 kind: BareMetalHost
 metadata:
-  name: <hostname>-bmh
-  namespace: <InfraEnv-namespace>
+  name: {{ hostname }}-bmh
+  namespace: {{ infraenv_namespace }}
   labels:
-    infraenvs.agent-install.openshift.io: <InfraEnv-namespace>
+    infraenvs.agent-install.openshift.io: {{ infraenv_namespace }}
 spec:
   bmc:
-    address: redfish-virtualmedia://<bmc-ip>/redfish/v1/
-    credentialsName: "<hostname>-bmc-secret"
+    address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/
+    credentialsName: "{{ hostname }}-bmc-secret"
     disableCertificateVerification: true
   bootMACAddress: "aa:bb:cc:dd:ee:ff"
   online: false
@@ -170,5 +170,5 @@ EOF
 Then retrieve the import command to run on the target cluster:
 
 ```bash
-oc get secret my-cluster-import -n my-cluster -o jsonpath='{.data.import\.yaml}' | base64 -d | oc apply -f - --kubeconfig=<managed-cluster-kubeconfig>
+oc get secret my-cluster-import -n my-cluster -o jsonpath='{.data.import\.yaml}' | base64 -d | oc apply -f - --kubeconfig={{ managed_cluster_kubeconfig }}
 ```

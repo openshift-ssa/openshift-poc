@@ -93,7 +93,7 @@ hosts:
 ## Create the ISO Image
 
 ```bash
-oc adm node-image create nodes-config.yaml --dir=add --registry-config=/path/to/pull-secret.txt
+oc adm node-image create nodes-config.yaml --dir=add --registry-config=~/pull-secret.txt
 ```
 
 Boot the node with the generated ISO image.
@@ -101,7 +101,7 @@ Boot the node with the generated ISO image.
 ## Monitor the Progress
 
 ```bash
-oc adm node-image monitor --ip-addresses <ip_addresses>
+oc adm node-image monitor --ip-addresses {{ ip_addresses }}
 ```
 
 ## Approve Pending CSRs

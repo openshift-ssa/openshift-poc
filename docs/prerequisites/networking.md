@@ -17,14 +17,14 @@ OpenShift requires specific network configurations and firewall rules between no
 
 Since there is no DHCP, every node requires a pre-assigned static IP. Gather the following for each node before installation:
 
-| Field          | Example        |
-| -------------- | -------------- |
-| IP Address     | 10.0.0.10      |
-| Subnet Mask    | 255.255.255.240|
-| Gateway        | 10.0.0.1       |
-| Primary DNS    | 10.0.0.2       |
-| Secondary DNS  | 1.1.1.1        |
-| NIC Interface  | eno1           |
+| Field          | Example           |
+| -------------- | ----------------- |
+| IP Address     | 10.0.0.10         |
+| Subnet Mask    | 255.255.255.240   |
+| Gateway        | 10.0.0.1          |
+| Primary DNS    | 10.0.0.2          |
+| Secondary DNS  | 1.1.1.1           |
+| NIC Interface  | eno1              |
 | MAC Address    | aa:bb:cc:dd:ee:00 |
 
 !!! tip
@@ -32,18 +32,18 @@ Since there is no DHCP, every node requires a pre-assigned static IP. Gather the
 
 ## Required Firewall Ports
 
-| Port        | Protocol | Source        | Destination   | Purpose                |
-| ----------- | -------- | ------------- | ------------- | ---------------------- |
-| 6443        | TCP      | All           | Control Plane | Kubernetes API         |
-| 22623       | TCP      | Nodes         | Control Plane | Machine Config Server  |
-| 2379-2380   | TCP      | Control Plane | Control Plane | etcd                   |
-| 10250       | TCP      | All nodes     | All nodes     | Kubelet                |
-| 4789        | UDP      | All nodes     | All nodes     | VXLAN (OVN-Kubernetes) |
-| 6081        | UDP      | All nodes     | All nodes     | Geneve (OVN-Kubernetes)|
-| 9000-9999   | TCP      | All nodes     | All nodes     | Node services          |
-| 500         | UDP      | All nodes     | All nodes     | IPsec IKE             |
-| 4500        | UDP      | All nodes     | All nodes     | IPsec NAT-T           |
-| 30000-32767 | TCP/UDP  | All nodes     | All nodes     | NodePort services      |
+| Port        | Protocol | Source        | Destination   | Purpose                 |
+| ----------- | -------- | ------------- | ------------- | ----------------------- |
+| 6443        | TCP      | All           | Control Plane | Kubernetes API          |
+| 22623       | TCP      | Nodes         | Control Plane | Machine Config Server   |
+| 2379-2380   | TCP      | Control Plane | Control Plane | etcd                    |
+| 10250       | TCP      | All nodes     | All nodes     | Kubelet                 |
+| 4789        | UDP      | All nodes     | All nodes     | VXLAN (OVN-Kubernetes)  |
+| 6081        | UDP      | All nodes     | All nodes     | Geneve (OVN-Kubernetes) |
+| 9000-9999   | TCP      | All nodes     | All nodes     | Node services           |
+| 500         | UDP      | All nodes     | All nodes     | IPsec IKE               |
+| 4500        | UDP      | All nodes     | All nodes     | IPsec NAT-T             |
+| 30000-32767 | TCP/UDP  | All nodes     | All nodes     | NodePort services       |
 
 ## Outbound Access
 
@@ -51,22 +51,22 @@ The following external endpoints must be reachable from all cluster nodes:
 
 **Container Registries**
 
-| Destination                    | Port | Purpose                              |
-| ------------------------------ | ---- | ------------------------------------ |
-| registry.redhat.io             | 443  | Core container images                |
+| Destination                    | Port | Purpose                                |
+| ------------------------------ | ---- | -------------------------------------- |
+| registry.redhat.io             | 443  | Core container images                  |
 | access.redhat.com              | 443  | Signature store for image verification |
-| quay.io                        | 443  | Core container images                |
-| cdn.quay.io                    | 443  | Core container images (CDN)          |
+| quay.io                        | 443  | Core container images                  |
+| cdn.quay.io                    | 443  | Core container images (CDN)            |
 
 !!! tip
     You can use `*.quay.io` instead of individually listing `cdn.quay.io` and `cdn0[1-6].quay.io`.
 
 **Cluster Access, Authentication, and Updates**
 
-| Destination                    | Port | Purpose                              |
-| ------------------------------ | ---- | ------------------------------------ |
-| api.openshift.com              | 443  | Cluster tokens and update checks     |
-| console.redhat.com             | 443  | Assisted Installer, telemetry        |
+| Destination                    | Port | Purpose                               |
+| ------------------------------ | ---- | ------------------------------------- |
+| api.openshift.com              | 443  | Cluster tokens and update checks      |
+| console.redhat.com             | 443  | Assisted Installer, telemetry         |
 | sso.redhat.com                 | 443  | Authentication for console.redhat.com |
 
 **Installation and Release Artifacts**
@@ -88,8 +88,8 @@ The following external endpoints must be reachable from all cluster nodes:
 
 **Optional**
 
-| Destination                    | Port | Purpose                              |
-| ------------------------------ | ---- | ------------------------------------ |
+| Destination                    | Port | Purpose                               |
+| ------------------------------ | ---- | ------------------------------------- |
 | registry.connect.redhat.com    | 443  | Third-party certified operator images |
 
 ```bash
@@ -131,13 +131,13 @@ Example `noProxy` value:
 | Entry              | Reason                                    |
 | ------------------ | ----------------------------------------- |
 | `.basedomain.com`  | Internal domain — do not proxy            |
-| `10.0.0.0/28`     | Machine network (node-to-node traffic)    |
-| `10.128.0.0/14`   | Cluster network (pod-to-pod traffic)      |
-| `172.30.0.0/16`   | Service network (ClusterIP services)      |
+| `10.0.0.0/28`      | Machine network (node-to-node traffic)    |
+| `10.128.0.0/14`    | Cluster network (pod-to-pod traffic)      |
+| `172.30.0.0/16`    | Service network (ClusterIP services)      |
 | `localhost`        | Loopback                                  |
-| `127.0.0.1`       | Loopback                                  |
-| `.cluster.local`  | In-cluster DNS                            |
-| `.svc`            | In-cluster service DNS                    |
+| `127.0.0.1`        | Loopback                                  |
+| `.cluster.local`   | In-cluster DNS                            |
+| `.svc`             | In-cluster service DNS                    |
 
 !!! warning
     Do not include the API or Ingress VIPs in the `noProxy` list with a wildcard. Use explicit CIDRs or domains. The installer will automatically add the API and Ingress VIPs to the no-proxy configuration.
@@ -171,7 +171,7 @@ Contact your network security or infrastructure team and request the root CA cer
 | Security / Network team   | Request the CA cert directly                                 |
 | Corporate PKI portal      | Download from your organization's certificate portal         |
 | Browser export            | Visit an HTTPS site, inspect the cert chain, export the root |
-| From the proxy itself     | Some proxies publish their CA at a known internal URL         |
+| From the proxy itself     | Some proxies publish their CA at a known internal URL        |
 
 You can also extract it directly from the connection:
 

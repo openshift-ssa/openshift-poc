@@ -62,7 +62,7 @@ oc extract secret/openshift-gitops-cluster -n openshift-gitops --to=-
 ## Grant Argo CD Access to a Namespace
 
 ```bash
-oc label namespace <namespace> argocd.argoproj.io/managed-by=openshift-gitops
+oc label namespace {{ namespace }} argocd.argoproj.io/managed-by=openshift-gitops
 ```
 
 ## Create an Application
