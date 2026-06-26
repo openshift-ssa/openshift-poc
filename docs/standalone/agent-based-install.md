@@ -44,14 +44,14 @@ networking:
   - cidr: 10.128.0.0/14
     hostPrefix: 23
   machineNetwork:
-  - cidr: 10.1.0.0/24
+  - cidr: 10.0.0.0/28
   networkType: OVNKubernetes
   serviceNetwork:
   - 172.30.0.0/16
 platform:
   baremetal:
-    apiVIP: 10.1.0.9
-    ingressVIP: 10.1.0.10
+    apiVIP: 10.0.0.2
+    ingressVIP: 10.0.0.3
     additionalNTPServers:
       - 0.us.pool.ntp.org
       - 1.us.pool.ntp.org
@@ -88,7 +88,7 @@ apiVersion: v1alpha1
 kind: AgentConfig
 metadata:
   name: poc
-rendezvousIP: 10.1.0.11
+rendezvousIP: 10.0.0.4
 additionalNtpSources:
   - 0.us.pool.ntp.org
   - 1.us.pool.ntp.org
@@ -128,8 +128,8 @@ hosts:
           ipv4:
             enabled: true
             address:
-              - ip: 10.1.0.11
-                prefix-length: 24
+              - ip: 10.0.0.4
+                prefix-length: 28
             dhcp: false
           ipv6:
             enabled: false
@@ -141,7 +141,7 @@ hosts:
       routes:
         config:
           - destination: 0.0.0.0/0
-            next-hop-address: 10.1.0.1
+            next-hop-address: 10.0.0.1
             next-hop-interface: bond0.3
             table-id: 254
 ```
@@ -180,8 +180,8 @@ If your environment uses active-backup bonding instead of LACP:
           ipv4:
             enabled: true
             address:
-              - ip: 10.1.0.11
-                prefix-length: 24
+              - ip: 10.0.0.4
+                prefix-length: 28
             dhcp: false
           link-aggregation:
             mode: active-backup
@@ -196,11 +196,11 @@ If your environment uses active-backup bonding instead of LACP:
       dns-resolver:
         config:
           server:
-            - 10.1.0.2
+            - 10.0.0.2
       routes:
         config:
           - destination: 0.0.0.0/0
-            next-hop-address: 10.1.0.1
+            next-hop-address: 10.0.0.1
             next-hop-interface: bond0
             table-id: 254
 ```

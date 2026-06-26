@@ -84,7 +84,7 @@ spec:
           enabled: true
           address:
             - ip: <ipaddress>
-              prefix-length: 24
+              prefix-length: 28
           dhcp: false
         ipv6:
           enabled: false
@@ -143,7 +143,7 @@ spec:
           enabled: true
           address:
             - ip: <ipaddress>
-              prefix-length: 24
+              prefix-length: 28
           dhcp: false
         ipv6:
           enabled: false

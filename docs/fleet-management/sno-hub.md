@@ -61,7 +61,7 @@ networking:
     - cidr: 10.128.0.0/14
       hostPrefix: 23
   machineNetwork:
-    - cidr: 10.1.0.0/24
+    - cidr: 10.0.0.0/28
   networkType: OVNKubernetes
   serviceNetwork:
     - 172.30.0.0/16
@@ -82,7 +82,7 @@ apiVersion: v1alpha1
 kind: AgentConfig
 metadata:
   name: hub
-rendezvousIP: 10.1.0.3
+rendezvousIP: 10.0.0.3
 additionalNtpSources:
   - 0.us.pool.ntp.org
   - 1.us.pool.ntp.org
@@ -103,8 +103,8 @@ hosts:
           ipv4:
             enabled: true
             address:
-              - ip: 10.1.0.3
-                prefix-length: 24
+              - ip: 10.0.0.3
+                prefix-length: 28
             dhcp: false
           ipv6:
             enabled: false
@@ -116,7 +116,7 @@ hosts:
       routes:
         config:
           - destination: 0.0.0.0/0
-            next-hop-address: 10.1.0.1
+            next-hop-address: 10.0.0.1
             next-hop-interface: eno1
             table-id: 254
 ```

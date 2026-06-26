@@ -6,9 +6,12 @@ OpenShift requires specific network configurations and firewall rules between no
 
 | Network         | Purpose                        | CIDR Example  |
 | --------------- | ------------------------------ | ------------- |
-| Machine Network | Node-to-node communication     | 10.0.0.0/24   |
-| Cluster Network | Pod-to-pod communication (SDN) | 10.128.0.0/14 |
+| Machine Network | Node-to-node communication     | 10.0.0.0/28   |
+| Pod Network     | Pod-to-pod communication (SDN) | 10.128.0.0/14 |
 | Service Network | Kubernetes service IPs         | 172.30.0.0/16 |
+
+!!! info
+    Do you have to use these values for the Pod network and Service network? No. But for the POC, just keep the defaults. 
 
 ## Static IP Assignments
 
@@ -17,7 +20,7 @@ Since there is no DHCP, every node requires a pre-assigned static IP. Gather the
 | Field          | Example        |
 | -------------- | -------------- |
 | IP Address     | 10.0.0.10      |
-| Subnet Mask    | 255.255.255.0  |
+| Subnet Mask    | 255.255.255.240|
 | Gateway        | 10.0.0.1       |
 | Primary DNS    | 10.0.0.2       |
 | Secondary DNS  | 1.1.1.1        |
@@ -46,20 +49,58 @@ Since there is no DHCP, every node requires a pre-assigned static IP. Gather the
 
 The following external endpoints must be reachable from all cluster nodes:
 
-| Destination                    | Port | Purpose                       |
-| ------------------------------ | ---- | ----------------------------- |
-| console.redhat.com             | 443  | Assisted Installer, telemetry |
-| quay.io                        | 443  | Container images              |
-| registry.redhat.io             | 443  | Red Hat container images      |
-| mirror.openshift.com           | 443  | Release images                |
-| sso.redhat.com                 | 443  | Authentication                |
+**Container Registries**
+
+| Destination                    | Port | Purpose                              |
+| ------------------------------ | ---- | ------------------------------------ |
+| registry.redhat.io             | 443  | Core container images                |
+| access.redhat.com              | 443  | Signature store for image verification |
+| quay.io                        | 443  | Core container images                |
+| cdn.quay.io                    | 443  | Core container images (CDN)          |
+
+!!! tip
+    You can use `*.quay.io` instead of individually listing `cdn.quay.io` and `cdn0[1-6].quay.io`.
+
+**Cluster Access, Authentication, and Updates**
+
+| Destination                    | Port | Purpose                              |
+| ------------------------------ | ---- | ------------------------------------ |
+| api.openshift.com              | 443  | Cluster tokens and update checks     |
+| console.redhat.com             | 443  | Assisted Installer, telemetry        |
+| sso.redhat.com                 | 443  | Authentication for console.redhat.com |
+
+**Installation and Release Artifacts**
+
+| Destination                                | Port | Purpose                              |
+| ------------------------------------------ | ---- | ------------------------------------ |
+| mirror.openshift.com                       | 443  | Mirrored install content and images  |
+| quayio-production-s3.s3.amazonaws.com      | 443  | Quay image content in AWS            |
+| rhcos.mirror.openshift.com                 | 443  | RHCOS images                         |
+| storage.googleapis.com/openshift-release   | 443  | Release image signatures             |
+
+**Telemetry (if not disabled)**
+
+| Destination                    | Port | Purpose                              |
+| ------------------------------ | ---- | ------------------------------------ |
+| cert-api.access.redhat.com     | 443  | Telemetry                            |
+| api.access.redhat.com          | 443  | Telemetry                            |
+| infogw.api.openshift.com       | 443  | Telemetry                            |
+
+**Optional**
+
+| Destination                    | Port | Purpose                              |
+| ------------------------------ | ---- | ------------------------------------ |
+| registry.connect.redhat.com    | 443  | Third-party certified operator images |
 
 ```bash
 # Verify connectivity from a node to required endpoints
 curl -s -o /dev/null -w "%{http_code}" https://console.redhat.com
 curl -s -o /dev/null -w "%{http_code}" https://quay.io
 curl -s -o /dev/null -w "%{http_code}" https://registry.redhat.io
+curl -s -o /dev/null -w "%{http_code}" https://mirror.openshift.com
 ```
+
+[Configuring your firewall](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/installation_configuration/configuring-firewall)
 
 ---
 
@@ -71,21 +112,35 @@ All cluster nodes must reside on the same Layer 2 network or have Layer 3 routin
 
 ### NTP
 
-All nodes must have synchronized time. Since there is no DHCP to distribute NTP server addresses, ensure chrony is configured with a reachable NTP source:
-
-```bash
-sudo dnf install -y chrony
-sudo systemctl enable --now chronyd
-chronyc tracking
-```
+All cluster nodes must have synchronized time. Provide an NTP server that is reachable from the cluster hosts. This will be configured in the `agent-config.yaml` during installation.
 
 ### Proxy Configuration
 
-If your environment requires an HTTP proxy for outbound traffic, configure proxy settings in the Assisted Installer UI during cluster creation. Provide:
+If your environment requires an HTTP proxy for outbound traffic, configure proxy settings during cluster creation. Provide:
 
 - HTTP Proxy URL
 - HTTPS Proxy URL
 - No Proxy list (include machine network, cluster network, service network, and internal domains)
+
+Example `noProxy` value:
+
+```
+.basedomain.com,10.0.0.0/28,10.128.0.0/14,172.30.0.0/16,localhost,127.0.0.1,.cluster.local,.svc
+```
+
+| Entry              | Reason                                    |
+| ------------------ | ----------------------------------------- |
+| `.basedomain.com`  | Internal domain — do not proxy            |
+| `10.0.0.0/28`     | Machine network (node-to-node traffic)    |
+| `10.128.0.0/14`   | Cluster network (pod-to-pod traffic)      |
+| `172.30.0.0/16`   | Service network (ClusterIP services)      |
+| `localhost`        | Loopback                                  |
+| `127.0.0.1`       | Loopback                                  |
+| `.cluster.local`  | In-cluster DNS                            |
+| `.svc`            | In-cluster service DNS                    |
+
+!!! warning
+    Do not include the API or Ingress VIPs in the `noProxy` list with a wildcard. Use explicit CIDRs or domains. The installer will automatically add the API and Ingress VIPs to the no-proxy configuration.
 
 ### TLS-Intercepting (MITM) Proxy
 

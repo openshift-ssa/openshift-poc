@@ -16,6 +16,22 @@
   --md-typeset-a-color: #ee0000;
 }
 
+.md-typeset a {
+  color: #ee0000;
+}
+
+.md-typeset a:hover {
+  color: #a30000;
+}
+
+.md-typeset .task-list-indicator::before {
+  background-color: #ee0000;
+}
+
+.md-typeset [type="checkbox"]:checked {
+  accent-color: #ee0000;
+}
+
 .md-header {
   border-bottom: 3px solid #ee0000;
 }

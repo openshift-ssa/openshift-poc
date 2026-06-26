@@ -48,9 +48,9 @@ backend api_backend
     balance roundrobin
     option httpchk GET /readyz HTTP/1.0
     option log-health-checks
-    server control-plane-0 10.0.0.10:6443 check check-ssl verify none
-    server control-plane-1 10.0.0.11:6443 check check-ssl verify none
-    server control-plane-2 10.0.0.12:6443 check check-ssl verify none
+    server control-plane-0 10.0.0.4:6443 check check-ssl verify none
+    server control-plane-1 10.0.0.5:6443 check check-ssl verify none
+    server control-plane-2 10.0.0.6:6443 check check-ssl verify none
 
 frontend ingress_https
     bind *:443
@@ -58,9 +58,9 @@ frontend ingress_https
 
 backend ingress_https_backend
     balance roundrobin
-    server worker-0 10.0.0.20:443 check
-    server worker-1 10.0.0.21:443 check
-    server worker-2 10.0.0.22:443 check
+    server worker-0 10.0.0.7:443 check
+    server worker-1 10.0.0.8:443 check
+    server worker-2 10.0.0.9:443 check
 
 frontend ingress_http
     bind *:80
@@ -68,9 +68,9 @@ frontend ingress_http
 
 backend ingress_http_backend
     balance roundrobin
-    server worker-0 10.0.0.20:80 check
-    server worker-1 10.0.0.21:80 check
-    server worker-2 10.0.0.22:80 check
+    server worker-0 10.0.0.7:80 check
+    server worker-1 10.0.0.8:80 check
+    server worker-2 10.0.0.9:80 check
 
 frontend machine_config
     bind *:22623
@@ -79,9 +79,9 @@ frontend machine_config
 backend machine_config_backend
     balance roundrobin
     option httpchk GET /healthz HTTP/1.0
-    server control-plane-0 10.0.0.10:22623 check check-ssl verify none
-    server control-plane-1 10.0.0.11:22623 check check-ssl verify none
-    server control-plane-2 10.0.0.12:22623 check check-ssl verify none
+    server control-plane-0 10.0.0.4:22623 check check-ssl verify none
+    server control-plane-1 10.0.0.5:22623 check check-ssl verify none
+    server control-plane-2 10.0.0.6:22623 check check-ssl verify none
 ```
 
 ```bash

@@ -43,13 +43,13 @@ These are not required but make administration easier:
 
 | A Record                                       | IP Address | Description          |
 | ---------------------------------------------- | ---------- | -------------------- |
-| installation.{cluster_name}.{base_domain}      | 10.1.0.2   | Installation host    |
-| openshift-control-plane-1.{cluster_name}.{base_domain} | 10.1.0.11 | Control plane 1 |
-| openshift-control-plane-2.{cluster_name}.{base_domain} | 10.1.0.12 | Control plane 2 |
-| openshift-control-plane-3.{cluster_name}.{base_domain} | 10.1.0.13 | Control plane 3 |
-| openshift-worker-1.{cluster_name}.{base_domain} | 10.1.0.21 | Worker 1            |
-| openshift-worker-2.{cluster_name}.{base_domain} | 10.1.0.22 | Worker 2            |
-| openshift-worker-3.{cluster_name}.{base_domain} | 10.1.0.23 | Worker 3            |
+| installation.{cluster_name}.{base_domain}      | 10.0.0.2   | Installation host    |
+| openshift-control-plane-1.{cluster_name}.{base_domain} | 10.0.0.4 | Control plane 1 |
+| openshift-control-plane-2.{cluster_name}.{base_domain} | 10.0.0.5 | Control plane 2 |
+| openshift-control-plane-3.{cluster_name}.{base_domain} | 10.0.0.6 | Control plane 3 |
+| openshift-worker-1.{cluster_name}.{base_domain} | 10.0.0.7 | Worker 1            |
+| openshift-worker-2.{cluster_name}.{base_domain} | 10.0.0.8 | Worker 2            |
+| openshift-worker-3.{cluster_name}.{base_domain} | 10.0.0.9 | Worker 3            |
 
 ### Documentation
 

@@ -15,18 +15,6 @@ For the installation, the documentation assumes a bare metal environment in an o
 
 ## Red Hat Account
 
-- Evaluation subscriptions are required for any proof of concept using Red Hat software
-- You need a Red Hat account associated with your organization. Do not use personal Red Hat accounts for business purposes
+- Evaluation subscriptions are required for any proof of concept using Red Hat products
+- You need a [Red Hat account](https://www.redhat.com/wapps/ugc/register.html) associated with your organization. Do not use personal Red Hat accounts for business purposes
 - The pull secret is available at [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret)
-
-## Acronyms
-
-| Acronym | Definition                                              |
-| ------- | ------------------------------------------------------- |
-| OCP     | OpenShift Container Platform                            |
-| OVE     | OpenShift Virtualization Engine                         |
-| OKE     | OpenShift Kubernetes Engine                             |
-| OPP     | OpenShift Platform Plus                                 |
-| SNO     | Single Node OpenShift                                   |
-| ACM     | Red Hat Advanced Cluster Management for Kubernetes      |
-| ODF     | OpenShift Data Foundation                               |

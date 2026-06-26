@@ -72,8 +72,8 @@ hosts:
           ipv4:
             enabled: true
             address:
-              - ip: 10.1.0.24
-                prefix-length: 24
+              - ip: 10.0.0.10
+                prefix-length: 28
             dhcp: false
           ipv6:
             enabled: false
@@ -85,7 +85,7 @@ hosts:
       routes:
         config:
           - destination: 0.0.0.0/0
-            next-hop-address: 10.1.0.1
+            next-hop-address: 10.0.0.1
             next-hop-interface: bond0
             table-id: 254
 ```
