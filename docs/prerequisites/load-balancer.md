@@ -1,15 +1,15 @@
 # Load Balancer
 
-OpenShift requires load balancers for the Kubernetes API and application ingress traffic.
+OpenShift requires load balancers for the Kubernetes API and application ingress traffic. This applies to multi-node clusters only — Single Node OpenShift does not require a load balancer.
 
 ## Load Balancer Configuration
 
-| Service     | Frontend Port | Backend Port | Backend Targets          | Health Check          |
-| ----------- | ------------- | ------------ | ------------------------ | --------------------- |
-| API         | 6443          | 6443         | Control plane nodes      | HTTPS /readyz         |
-| API (int)   | 22623         | 22623        | Control plane nodes      | HTTPS /healthz        |
-| Ingress HTTP  | 80          | 80           | Worker/Infra nodes       | TCP                   |
-| Ingress HTTPS | 443         | 443          | Worker/Infra nodes       | TCP                   |
+| Service       | Frontend Port | Backend Port | Backend Targets     | Health Check   |
+| ------------- | ------------- | ------------ | ------------------- | -------------- |
+| API           | 6443          | 6443         | Control plane nodes | HTTPS /readyz  |
+| API (int)     | 22623         | 22623        | Control plane nodes | HTTPS /healthz |
+| Ingress HTTP  | 80            | 80           | Worker/Infra nodes  | TCP            |
+| Ingress HTTPS | 443           | 443          | Worker/Infra nodes  | TCP            |
 
 ```bash
 # Test API load balancer
@@ -25,7 +25,7 @@ curl -I http://test.apps.<cluster_name>.<base_domain>
 
 ### API Load Balancer
 
-The API load balancer distributes traffic to all control plane nodes on ports 6443 (Kubernetes API) and 22623 (Machine Config Server). During bootstrap, the bootstrap node must also be included as a backend target and removed after bootstrap completes.
+The API load balancer distributes traffic to all control plane nodes on ports 6443 (Kubernetes API) and 22623 (Machine Config Server).
 
 ### Ingress Load Balancer
 
@@ -89,3 +89,6 @@ sudo systemctl enable --now haproxy
 sudo firewall-cmd --permanent --add-port={6443,22623,80,443}/tcp
 sudo firewall-cmd --reload
 ```
+
+!!! note
+    If your organization has existing load balancer infrastructure (F5, NSX, etc.), use that instead of HAProxy. The configuration requirements (ports, backends, health checks) remain the same.

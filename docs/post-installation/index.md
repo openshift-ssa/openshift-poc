@@ -9,7 +9,7 @@ After the OpenShift cluster is installed, complete the following day 2 operation
 ## Verify Cluster Health
 
 ```bash
-export KUBECONFIG=~/ocp-install/auth/kubeconfig
+export KUBECONFIG=~/ocp-poc/auth/kubeconfig
 oc get nodes
 oc get clusteroperators
 oc get clusterversion
@@ -23,11 +23,7 @@ All nodes should be in `Ready` status and all cluster operators should be `Avail
 
 ### kubeadmin Credentials
 
-The installer creates a temporary `kubeadmin` user. The password is located at:
-
-```
-~/ocp-install/auth/kubeadmin-password
-```
+The installer creates a temporary `kubeadmin` user. After installation, the password is available in the Assisted Installer UI or downloaded with the kubeconfig.
 
 Access the web console:
 

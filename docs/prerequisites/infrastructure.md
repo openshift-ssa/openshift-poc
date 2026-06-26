@@ -1,6 +1,6 @@
 # Infrastructure
 
-Provision compute resources that meet or exceed the minimum requirements for each node type.
+All nodes are bare metal servers in an on-premise environment. Provision compute resources that meet or exceed the minimum requirements for each node type.
 
 ## Minimum Resource Requirements
 
@@ -33,17 +33,23 @@ Worker nodes run your application workloads. Scale the count and resources based
 
 Infrastructure nodes are optional but recommended. They isolate cluster services (ingress router, internal registry, monitoring stack) from application workloads. In a PoC environment, these services can run on worker nodes instead.
 
-### Supported Platforms
+### BMC / Out-of-Band Management
 
-- VMware vSphere 7.0+
-- Red Hat OpenStack Platform
-- Bare Metal (IPMI/BMC or Redfish)
-- Red Hat Virtualization (RHV)
+Each bare metal server must have out-of-band management access for remote operations:
+
+| Management Type | Protocol | Purpose                          |
+| --------------- | -------- | -------------------------------- |
+| IPMI            | IPMI     | Power control, virtual media     |
+| Redfish         | HTTPS    | Modern BMC API, virtual media    |
+| iLO / iDRAC    | HTTPS    | Vendor-specific BMC              |
+
+Virtual media (mounting the discovery ISO remotely) is the recommended method for booting nodes during installation.
 
 ### BIOS/Firmware Settings
 
 Ensure the following on all nodes:
 
-- Virtualization extensions enabled (VT-x / AMD-V)
-- Boot order set to network (PXE) or local disk depending on install method
-- UEFI Secure Boot supported (optional but recommended)
+- Boot mode set to UEFI
+- Secure Boot supported (optional but recommended)
+- Boot order set to local disk (the discovery ISO is mounted via virtual media)
+- Hardware clock set to UTC

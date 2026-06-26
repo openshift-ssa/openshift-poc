@@ -31,6 +31,12 @@ theme:
 extra_css:
   - assets/stylesheets/extra.css
 
+plugins:
+  - search
+  - privacy:
+      links_attr_map:
+        target: _blank
+
 markdown_extensions:
   - admonition
   - pymdownx.details
@@ -56,11 +62,13 @@ nav:
       - DNS: prerequisites/dns.md
       - Load Balancer: prerequisites/load-balancer.md
       - Storage: prerequisites/storage.md
-  - Installation:
-      - Overview: installation/index.md
-      - Installer Provisioned: installation/ipi.md
-      - User Provisioned: installation/upi.md
-      - Agent Based: installation/agent-based.md
+  - Standalone Cluster:
+      - Overview: standalone/index.md
+      - Assisted Installer: standalone/assisted-installer.md
+  - Fleet Management:
+      - Overview: fleet-management/index.md
+      - Single Node Hub: fleet-management/sno-hub.md
+      - Advanced Cluster Management: fleet-management/acm.md
   - Post-Installation:
       - Overview: post-installation/index.md
       - Day 2 Operations: post-installation/day2.md
