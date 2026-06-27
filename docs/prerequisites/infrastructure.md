@@ -2,13 +2,19 @@
 
 All nodes are bare metal servers in an on-premise environment. Provision compute resources that meet or exceed the minimum requirements for each node type.
 
+!!! info "OpenShift Terminology"
+    A quick note on terminology. In OpenShift, the same server can be described at three layers:  
+    - **Host** (`BareMetalHost`, managed by the Bare Metal Operator) is the physical box and its BMC, answering how to power and provision the hardware  
+    - **Machine** (`Machine`, managed by the Machine API and grouped into a `MachineSet`) is the infrastructure instance that backs a node and is the unit you scale which can be a physical box or a virtual machine  
+    - **Node** (`Node`) is the Kubernetes-level member that runs a kubelet and that the scheduler places pods onto. 
+
 ## Required Hardware
 
-Consider these minimum values — the more the better. Disks must be SSD/NVMe.
+Consider these minimum values — the more the better. 
 
 ### Standalone Cluster
 
-| Host          | Count | CPU | Memory | Install Disk | Secondary Disk |
+| Host Type     | Count | CPU | Memory | Install Disk | Secondary Disk |
 | ------------- | ----- | --- | ------ | ------------ | -------------- |
 | Installation  | 1     | 4   | 16 GB  | 60 GB        | ---            |
 | Control Plane | 3     | 16  | 32 GB  | 120 GB       | ---            |
@@ -16,61 +22,355 @@ Consider these minimum values — the more the better. Disks must be SSD/NVMe.
 
 ### Fleet Management (Hub + Spoke)
 
-| Host          | Count | CPU | Memory | Install Disk | Secondary Disk |
-| ------------- | ----- | --- | ------ | ------------ | -------------- |
-| Installation  | 1     | 4   | 16 GB  | 60 GB        | ---            |
-| Hub (SNO)     | 1     | 16  | 64 GB  | 120 GB       | 1 TB           |
-| Spoke CP      | 3     | 16  | 32 GB  | 120 GB       | ---            |
-| Spoke Worker  | 3     | 16  | 64 GB  | 120 GB       | 1 TB (opt)     |
+| Host Type             | Count | CPU | Memory | Install Disk | Secondary Disk |
+| -------------         | ----- | --- | ------ | ------------ | -------------- |
+| Installation          | 1     | 4   | 16 GB  | 60 GB        | ---            |
+| Hub (SNO)             | 1     | 16  | 64 GB  | 120 GB       | 1 TB           |
+| Spoke Control Plane   | 3     | 16  | 32 GB  | 120 GB       | ---            |
+| Spoke Worker          | 3     | 16  | 64 GB  | 120 GB       | 1 TB (opt)     |
 
-The installation host and hub host can be either a virtual machine or a bare metal host.
+!!! note "Machine Types"
+    The installation and hub machine can be either a virtual machine or bare metal host. They just need network access to the other hosts. 
 
-!!! note
-    Prefer the same vendor and generation CPU architectures across all machines. Worker node sizing dictates workload max sizing.
+!!! note "CPU Architecture" 
+    For the POC, prefer the same vendor and generation CPU architectures across all machines. 
 
 !!! warning "etcd Disk Requirements"
-    Run etcd on a block device that can write at least 50 IOPS of 8KB sequentially, including fdatasync, in under 10ms.
+    For the install disk, run etcd on a block device that can write at least 50 IOPS of 8KB sequentially, including fdatasync, in under 10ms.
 
 ## Network Interface Requirements
 
-1 x 10 GbE is required for the hosts. To perform more advanced networking, 4 x 10 GbE is recommended for bond0/bond1.
+Only a single NIC is required for OpenShift. To perform more advanced networking, 4 x 10 GbE is recommended for bond0/bond1.
 
 ## Machine Information
 
 Collect the interface names, MAC addresses for ALL NICs, and the install disk location on the machines. Below is an example table of values needed.
 
-| Hostname     | Interface | MAC Address       | Bond  | IP        | Disk Hint | BMC IP    |
-| ------------ | --------- | ----------------- | ----- | --------- | --------- | --------- |
-| installation | eno1      | A0:B1:C2:D3:E4:E0 | ---   | 10.0.0.2  | /dev/sda  | ---       |
-| hub          | eno1      | A0:B1:C2:D3:E4:E1 | ---   | 10.0.0.3  | /dev/sda  | 10.2.0.3  |
-| spoke-cp01   | eno1      | A0:B1:C2:D3:E4:E1 | bond0 | 10.0.0.4  | /dev/sda  | 10.2.0.4  |
-|              | eno2      | A0:B1:C2:D3:E4:E2 | bond0 |           |           |           |
-|              | eno3      | A0:B1:C2:D3:E4:E3 | bond1 |           |           |           |
-|              | eno4      | A0:B1:C2:D3:E4:E4 | bond1 |           |           |           |
-| spoke-cp02   | eno1      | A0:B1:C2:D3:E4:E5 | bond0 | 10.0.0.5  | /dev/sda  | 10.2.0.5  |
-|              | eno2      | A0:B1:C2:D3:E4:E6 | bond0 |           |           |           |
-|              | eno3      | A0:B1:C2:D3:E4:E7 | bond1 |           |           |           |
-|              | eno4      | A0:B1:C2:D3:E4:E8 | bond1 |           |           |           |
-| spoke-cp03   | eno1      | A0:B1:C2:D3:E4:E9 | bond0 | 10.0.0.6  | /dev/sda  | 10.2.0.6  |
-|              | eno2      | A0:B1:C2:D3:E4:EA | bond0 |           |           |           |
-|              | eno3      | A0:B1:C2:D3:E4:EB | bond1 |           |           |           |
-|              | eno4      | A0:B1:C2:D3:E4:EC | bond1 |           |           |           |
-| spoke-w01    | eno1      | A0:B1:C2:D3:E4:F1 | bond0 | 10.0.0.7  | /dev/sda  | 10.2.0.7  |
-|              | eno2      | A0:B1:C2:D3:E4:F2 | bond0 |           |           |           |
-|              | eno3      | A0:B1:C2:D3:E4:F3 | bond1 |           |           |           |
-|              | eno4      | A0:B1:C2:D3:E4:F4 | bond1 |           |           |           |
-| spoke-w02    | eno1      | A0:B1:C2:D3:E4:F5 | bond0 | 10.0.0.8  | /dev/sda  | 10.2.0.8  |
-|              | eno2      | A0:B1:C2:D3:E4:F6 | bond0 |           |           |           |
-|              | eno3      | A0:B1:C2:D3:E4:F7 | bond1 |           |           |           |
-|              | eno4      | A0:B1:C2:D3:E4:F8 | bond1 |           |           |           |
-| spoke-w03    | eno1      | A0:B1:C2:D3:E4:F9 | bond0 | 10.0.0.9  | /dev/sda  | 10.2.0.9  |
-|              | eno2      | A0:B1:C2:D3:E4:FA | bond0 |           |           |           |
-|              | eno3      | A0:B1:C2:D3:E4:FB | bond1 |           |           |           |
-|              | eno4      | A0:B1:C2:D3:E4:FC | bond1 |           |           |           |
+<table class="host-info">
+  <tr>
+    <td class="label">Hostname</td>
+    <td>hl01ocpinstall</td>
+    <td class="label">Disk Hint</td>
+    <td>/dev/sda</td>
+  </tr>
+  <tr>
+    <td class="label">BMC IP</td>
+    <td></td>
+    <td class="label">BMC Credentials</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="label">Interface</td>
+    <td class="label">MAC Address</td>
+    <td class="label">Bond</td>
+    <td class="label">IP Address</td>
+  </tr>
+  <tr>
+    <td>eno1</td>
+    <td>A0:B1:C2:D3:E4:E0</td>
+    <td>-</td>
+    <td>10.0.0.2</td>
+  </tr>
+</table>
 
----
+<table class="host-info">
+  <tr>
+    <td class="label">Hostname</td>
+    <td>hl01ocphub</td>
+    <td class="label">Disk Hint</td>
+    <td>/dev/sda</td>
+  </tr>
+  <tr>
+    <td class="label">BMC IP</td>
+    <td></td>
+    <td class="label">BMC Credentials</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="label">Interface</td>
+    <td class="label">MAC Address</td>
+    <td class="label">Bond</td>
+    <td class="label">IP Address</td>
+  </tr>
+  <tr>
+    <td>eno1</td>
+    <td>A0:B1:C2:D3:E4:E1</td>
+    <td>-</td>
+    <td>10.0.0.3</td>
+  </tr>
+</table>
 
-## Details
+<table class="host-info">
+  <tr>
+    <td class="label">Hostname</td>
+    <td>hl01ocpcp01</td>
+    <td class="label">Disk Hint</td>
+    <td>/dev/sda</td>
+  </tr>
+  <tr>
+    <td class="label">BMC IP</td>
+    <td></td>
+    <td class="label">BMC Credentials</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="label">Interface</td>
+    <td class="label">MAC Address</td>
+    <td class="label">Bond</td>
+    <td class="label">IP Address</td>
+  </tr>
+  <tr>
+    <td>eno1</td>
+    <td>A0:B1:C2:D3:E4:E1</td>
+    <td>bond0</td>
+    <td>10.0.0.4</td>
+  </tr>
+  <tr>
+    <td>eno2</td>
+    <td>A0:B1:C2:D3:E4:E2</td>
+    <td>bond0</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno3</td>
+    <td>A0:B1:C2:D3:E4:E3</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno4</td>
+    <td>A0:B1:C2:D3:E4:E4</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+</table>
+
+<table class="host-info">
+  <tr>
+    <td class="label">Hostname</td>
+    <td>hl01ocpcp02</td>
+    <td class="label">Disk Hint</td>
+    <td>/dev/sda</td>
+  </tr>
+  <tr>
+    <td class="label">BMC IP</td>
+    <td></td>
+    <td class="label">BMC Credentials</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="label">Interface</td>
+    <td class="label">MAC Address</td>
+    <td class="label">Bond</td>
+    <td class="label">IP Address</td>
+  </tr>
+  <tr>
+    <td>eno1</td>
+    <td>A0:B1:C2:D3:E4:E5</td>
+    <td>bond0</td>
+    <td>10.0.0.5</td>
+  </tr>
+  <tr>
+    <td>eno2</td>
+    <td>A0:B1:C2:D3:E4:E6</td>
+    <td>bond0</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno3</td>
+    <td>A0:B1:C2:D3:E4:E7</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno4</td>
+    <td>A0:B1:C2:D3:E4:E8</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+</table>
+
+<table class="host-info">
+  <tr>
+    <td class="label">Hostname</td>
+    <td>hl01ocpcp03</td>
+    <td class="label">Disk Hint</td>
+    <td>/dev/sda</td>
+  </tr>
+  <tr>
+    <td class="label">BMC IP</td>
+    <td></td>
+    <td class="label">BMC Credentials</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="label">Interface</td>
+    <td class="label">MAC Address</td>
+    <td class="label">Bond</td>
+    <td class="label">IP Address</td>
+  </tr>
+  <tr>
+    <td>eno1</td>
+    <td>A0:B1:C2:D3:E4:E9</td>
+    <td>bond0</td>
+    <td>10.0.0.6</td>
+  </tr>
+  <tr>
+    <td>eno2</td>
+    <td>A0:B1:C2:D3:E4:EA</td>
+    <td>bond0</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno3</td>
+    <td>A0:B1:C2:D3:E4:EB</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno4</td>
+    <td>A0:B1:C2:D3:E4:EC</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+</table>
+
+<table class="host-info">
+  <tr>
+    <td class="label">Hostname</td>
+    <td>hl01ocpw01</td>
+    <td class="label">Disk Hint</td>
+    <td>/dev/sda</td>
+  </tr>
+  <tr>
+    <td class="label">BMC IP</td>
+    <td></td>
+    <td class="label">BMC Credentials</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="label">Interface</td>
+    <td class="label">MAC Address</td>
+    <td class="label">Bond</td>
+    <td class="label">IP Address</td>
+  </tr>
+  <tr>
+    <td>eno1</td>
+    <td>A0:B1:C2:D3:E4:F1</td>
+    <td>bond0</td>
+    <td>10.0.0.7</td>
+  </tr>
+  <tr>
+    <td>eno2</td>
+    <td>A0:B1:C2:D3:E4:F2</td>
+    <td>bond0</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno3</td>
+    <td>A0:B1:C2:D3:E4:F3</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno4</td>
+    <td>A0:B1:C2:D3:E4:F4</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+</table>
+
+<table class="host-info">
+  <tr>
+    <td class="label">Hostname</td>
+    <td>hl01ocpw02</td>
+    <td class="label">Disk Hint</td>
+    <td>/dev/sda</td>
+  </tr>
+  <tr>
+    <td class="label">BMC IP</td>
+    <td></td>
+    <td class="label">BMC Credentials</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="label">Interface</td>
+    <td class="label">MAC Address</td>
+    <td class="label">Bond</td>
+    <td class="label">IP Address</td>
+  </tr>
+  <tr>
+    <td>eno1</td>
+    <td>A0:B1:C2:D3:E4:F5</td>
+    <td>bond0</td>
+    <td>10.0.0.8</td>
+  </tr>
+  <tr>
+    <td>eno2</td>
+    <td>A0:B1:C2:D3:E4:F6</td>
+    <td>bond0</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno3</td>
+    <td>A0:B1:C2:D3:E4:F7</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno4</td>
+    <td>A0:B1:C2:D3:E4:F8</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+</table>
+
+<table class="host-info">
+  <tr>
+    <td class="label">Hostname</td>
+    <td>hl01ocpw03</td>
+    <td class="label">Disk Hint</td>
+    <td>/dev/sda</td>
+  </tr>
+  <tr>
+    <td class="label">BMC IP</td>
+    <td></td>
+    <td class="label">BMC Credentials</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td class="label">Interface</td>
+    <td class="label">MAC Address</td>
+    <td class="label">Bond</td>
+    <td class="label">IP Address</td>
+  </tr>
+  <tr>
+    <td>eno1</td>
+    <td>A0:B1:C2:D3:E4:F9</td>
+    <td>bond0</td>
+    <td>10.0.0.9</td>
+  </tr>
+  <tr>
+    <td>eno2</td>
+    <td>A0:B1:C2:D3:E4:FA</td>
+    <td>bond0</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno3</td>
+    <td>A0:B1:C2:D3:E4:FB</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>eno4</td>
+    <td>A0:B1:C2:D3:E4:FC</td>
+    <td>bond1</td>
+    <td></td>
+  </tr>
+</table>
+
+## Machine Details
 
 ### NIC Naming
 
@@ -82,7 +382,7 @@ On modern RHEL (RHEL CoreOS included), NICs use predictable network interface na
 - `enx` — fallback to MAC address if nothing else matches
 
 !!! warning
-    If you don't know what the values will be (disk name, NIC names), boot the boxes with a [RHEL ISO](https://developers.redhat.com/products/rhel/download) and find out. Don't guess.
+    If you don't know what the values will be (disk name, NIC names), boot the boxes with a [RHEL ISO Boot iso](https://developers.redhat.com/products/rhel/download) and find out. Don't guess. You don't even need to install, just start the installer and you can see the information. 
 
 ### BMC / Out-of-Band Management
 
