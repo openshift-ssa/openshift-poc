@@ -23,7 +23,7 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 
 -> Click Next
 
-## Static network configurations
+### Static network configurations
 
 - Select IPv4
 - If you are using a vlan, click "Use VLAN" checkbox, and enter the Machine Subnet VLAN value. 
@@ -33,23 +33,23 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 
 -> Click Next
 
-## Host specific configurations
+### Host specific configurations
 
 - If using a bond, click the "Use bond" checkbox
-- Bond type is typically 802.3ad (LACP)
+    - Bond type is typically 802.3ad (LACP)
 - Enter the mac addresses for the NICs in the bond using the Host NICs - MAC Address values
 - Enter the IP address for the host
 - If you are doing a full cluster install, repeat this process for all the hosts by using the "Add another host configuration" button. 
 
 --> Click Next
 
-## Operators
+### Operators
 
 Don't preinstall any operators. 
 
 --> Click Next
 
-## Host discovery
+### Host discovery
 
 - Click on the "Add hosts" button at the top of the page
 - For "Provisioning type", select "Full image file - Download a self-contained ISO"
@@ -63,31 +63,68 @@ Don't preinstall any operators.
 - If you are using a BMC web interface to create the cluster, save the ISO file locally and attach it. 
 - The web interfaces for BMC installs of this nature can be finicky. If you have a web server somewhere, host it there. Or use the Discovery ISO URL. 
 
-#### Waiting for host
+### Waiting for host
 
 - Boot the host(s) with the ISO
     - for a SNO install, wait for the single host to present itself
-    - for a full cluster install, wait for all hosts to come up in the list. 
+    - for a full cluster install, wait for all hosts to come up in the list
+- Update the Hostname(s) and Role for all the hosts
+- Wait for all the status on the host to be "Ready"
 
 --> Click Next
 
+### Storage
 
-Installation typically takes 30-45 minutes for a multi-node cluster.
+- For each host in the list, ensure the correct disk is selected for the installation disk. 
+- Deselect format for any network based storage
+
+--> Click Next
+
+### Networking
+
+- Select Cluster-managed networking
+- Select Network type of Open Virtual Networking (OVN)
+- Select the correct machine network
+- Fill in the API VIP IP
+- Fill in the Ingress VIP IP
+- Use advanced networking is only used to change the pod and service network. Leave it. 
+- Leave "Use the same host discovery SSH key" checkbox selected
+- In the Host Inventory, you should be able to see all kinds of host information. Check it out. 
+
+--> Next
+
+### Custom Manifests
+
+- No custom manifests
+
+--> Next
+
+### Review and Create
+
+--> Install cluster
+
+### Watch Progress
+
+- Installation progress will show the steps being taken
+- You can view the hosts activity in the host inventory table
+- The cluster summary provides all the cluster information
+- Installation typically takes 30-45 minutes for a multi-node cluster
+
+Wait for it...
+
+- Copy the Web Console URL
+- User name is kubeadmin
+- Copy the Password
+- Login to the Web Console
+- Wait for the Operators to finish updating and everything to be green. 
 
 ## Validate the Install
 
 ```bash
-oc login --server=https://api.poc.ocp.basedomain.com:6443 -u kubeadmin -p {{ password }}
+oc login --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443 -u kubeadmin -p {{ password }}
 oc get nodes
 oc get clusterversion
 oc get clusteroperators
-```
-
-Test container image pull connectivity:
-
-```bash
-oc debug node/{{ worker_node_name }} -- chroot /host \
-  podman pull registry.redhat.io/ubi9/ubi:latest
 ```
 
 Cleanup leftover pods:
