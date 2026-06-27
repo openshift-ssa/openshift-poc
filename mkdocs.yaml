@@ -1,4 +1,4 @@
-site_name: OpenShift PoC
+site_name: OpenShift POC
 site_description: Prerequisites and installation instructions for OpenShift on-premise environments
 site_url: https://openshift-ssa.github.io/openshift-poc
 
@@ -40,7 +40,11 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.highlight:
@@ -67,7 +71,8 @@ nav:
       - Installation Host: prerequisites/installation-host.md
   - Standalone Cluster:
       - Overview: standalone/index.md
-      - Agent-Based Install: standalone/agent-based-install.md
+      - Assisted Installer: standalone/assisted-installer.md
+      - Agent-Based Installer: standalone/agent-based.md
       - Troubleshooting: standalone/troubleshooting.md
   - Fleet Management:
       - Overview: fleet-management/index.md
@@ -76,6 +81,7 @@ nav:
       - Advanced Cluster Management: fleet-management/acm.md
   - Post-Installation:
       - Overview: post-installation/index.md
+      - NMState Operator: post-installation/nmstate.md
       - Storage: post-installation/storage.md
       - Registry: post-installation/registry.md
       - OpenShift GitOps: post-installation/openshift-gitops.md

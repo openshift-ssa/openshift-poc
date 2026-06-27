@@ -13,23 +13,12 @@ For fleet management, we recommend starting with a Single Node OpenShift (SNO) i
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────┐
-│           Hub Cluster (SNO)             │
-│                                         │
-│  ┌─────────┐  ┌─────────┐  ┌────────┐  │
-│  │   ACM   │  │  GitOps │  │  ACS   │  │
-│  └─────────┘  └─────────┘  └────────┘  │
-│                                         │
-└────────────────┬────────────────────────┘
-                 │
-      ┌──────────┼──────────┐
-      │          │          │
-      ▼          ▼          ▼
-┌──────────┐ ┌──────────┐ ┌──────────┐
-│  Spoke 1 │ │  Spoke 2 │ │  Spoke N │
-│ (Dev)    │ │ (Test)   │ │ (Prod)   │
-└──────────┘ └──────────┘ └──────────┘
+```mermaid
+graph TD
+    Hub["Hub Cluster (SNO)"]
+    Spoke["Spoke (POC)"]
+
+    Hub --> Spoke
 ```
 
 ## Hardware Requirements

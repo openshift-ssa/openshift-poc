@@ -1,6 +1,6 @@
-# Hub Agent-Based Install (SNO)
+# Hub Install (SNO)
 
-A Single Node OpenShift (SNO) cluster runs the control plane and workloads on a single host. It serves as the management hub for the fleet.
+A Single Node OpenShift (SNO) cluster runs the control plane and workloads on a single host. It serves as the management hub for the fleet. We use the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) to provision this cluster.
 
 ## Prerequisites
 
@@ -18,131 +18,67 @@ All DNS records point to the single node's IP address. No load balancer is requi
 
 A reverse PTR record for the node IP is also required.
 
-## Create the Configurations
+## Create the Cluster in the Assisted Installer
 
-### Create the Working Directory
+1. Navigate to [console.redhat.com/openshift/assisted-installer/clusters](https://console.redhat.com/openshift/assisted-installer/clusters)
+2. Click **Create Cluster**
+3. Configure the cluster details:
+    - **Cluster name**: `hub`
+    - **Base domain**: `ocp.basedomain.com`
+    - **OpenShift version**: Latest stable
+    - **Install single node OpenShift (SNO)**: Enabled
+4. If your environment uses a proxy, configure the proxy settings:
+    - HTTP Proxy
+    - HTTPS Proxy
+    - No Proxy list
+    - Additional trust bundle (for MITM proxies)
 
-```bash
-mkdir -p sno && cd sno
-git init
-echo "install/" > .gitignore
-touch install-config.yaml
-touch agent-config.yaml
-git add -A
-git commit -m "repo initialized"
-```
+## Generate and Boot the Discovery ISO
 
-### Create the Install Config
-
-Key differences from a multi-node install:
-
-- `controlPlane.replicas` must be `1`
-- `compute[0].replicas` must be `0`
-- `platform` must be `none: {}`
-- No `apiVIP` or `ingressVIP` fields
-
-```yaml
-apiVersion: v1
-baseDomain: ocp.basedomain.com
-metadata:
-  name: hub
-controlPlane:
-  name: master
-  architecture: amd64
-  hyperthreading: Enabled
-  replicas: 1
-compute:
-  - name: worker
-    architecture: amd64
-    hyperthreading: Enabled
-    replicas: 0
-networking:
-  clusterNetwork:
-    - cidr: 10.128.0.0/14
-      hostPrefix: 23
-  machineNetwork:
-    - cidr: 10.0.0.0/28
-  networkType: OVNKubernetes
-  serviceNetwork:
-    - 172.30.0.0/16
-platform:
-  none: {}
-pullSecret: 'value from ~/pull-secret.txt'
-sshKey: 'value from ~/.ssh/ocp.pub'
-```
-
-If your environment requires a proxy, append the `proxy` and `additionalTrustBundle` sections as described in the [standalone cluster install](../standalone/agent-based-install.md).
-
-### Create the Agent Config
-
-The agent-config has a single host entry. The `rendezvousIP` is the node's IP address.
-
-```yaml
-apiVersion: v1alpha1
-kind: AgentConfig
-metadata:
-  name: hub
-rendezvousIP: 10.0.0.3
-additionalNtpSources:
-  - 0.us.pool.ntp.org
-  - 1.us.pool.ntp.org
-hosts:
-  - hostname: hub
-    role: master
-    rootDeviceHints:
-      deviceName: "/dev/sda"
-    interfaces:
-      - name: eno1
-        macAddress: A1:B2:3C:4D:5E:01
-    networkConfig:
-      interfaces:
-        - name: eno1
-          type: ethernet
-          state: up
-          mac-address: A1:B2:3C:4D:5E:01
-          ipv4:
-            enabled: true
-            address:
-              - ip: 10.0.0.3
-                prefix-length: 28
-            dhcp: false
-          ipv6:
-            enabled: false
-      dns-resolver:
-        config:
-          server:
-            - dns1.basedomain.com
-            - dns2.basedomain.com
-      routes:
-        config:
-          - destination: 0.0.0.0/0
-            next-hop-address: 10.0.0.1
-            next-hop-interface: eno1
-            table-id: 254
-```
-
-## Generate the ISO
+1. On the **Host discovery** step, click **Generate Discovery ISO**
+2. Configure the ISO:
+    - **SSH public key**: Contents of `~/.ssh/ocp.pub`
+    - **Proxy settings** (if applicable)
+3. Download the discovery ISO or copy the download URL
+4. Serve the ISO from the installation host:
 
 ```bash
-#!/bin/bash
-rm -rf install
-mkdir install
-cp install-config.yaml agent-config.yaml install
-openshift-install agent create image --dir=install
+podman run -d --name iso-http \
+  -p 8080:8080 \
+  -v ~/discovery-iso.iso:/var/www/html/discovery-iso.iso:Z \
+  registry.redhat.io/rhel9/httpd-24:9.6
 ```
 
-## Boot and Install
+5. Boot the host from the ISO via BMC virtual media (Redfish, iLO, iDRAC)
+6. Wait for the host to appear in the Assisted Installer UI
 
-Boot the host from the generated ISO via BMC virtual media. Since there is only one node, it serves as both the rendezvous host and the bootstrap host.
+## Configure Networking
 
-Monitor the install:
+Once the host is discovered, configure its network settings:
+
+1. Click on the host in the UI
+2. Configure static networking:
+    - **IP Address**: `10.0.0.3`
+    - **Subnet mask**: `255.255.255.240`
+    - **Gateway**: `10.0.0.1`
+    - **DNS**: Your DNS server(s)
+    - **NTP**: Your NTP server
+3. Confirm the machine network is `10.0.0.0/28`
+
+## Start the Installation
+
+1. Review the cluster configuration
+2. Click **Install Cluster**
+3. Monitor progress in the UI or from the installation host:
 
 ```bash
-openshift-install agent wait-for bootstrap-complete --dir=install
-openshift-install agent wait-for install-complete --dir=install
+# Download kubeconfig from the UI once available
+export KUBECONFIG=~/hub/kubeconfig
+oc get nodes
+oc get clusterversion
 ```
 
-The kubeadmin credentials and kubeconfig are written to the `install` directory on completion. Installation typically takes 20-30 minutes for SNO.
+Installation typically takes 20-30 minutes for SNO.
 
 ## Validate the Install
 
@@ -150,6 +86,7 @@ The kubeadmin credentials and kubeconfig are written to the `install` directory 
 oc login --server=https://api.hub.ocp.basedomain.com:6443 -u kubeadmin -p {{ password }}
 oc get nodes
 oc get clusterversion
+oc get clusteroperators
 ```
 
 Test connectivity:

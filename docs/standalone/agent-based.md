@@ -1,15 +1,10 @@
-# Cluster Agent-Based Install
+# Agent-Based Installer
 
-This guide covers the agent-based installation for a standalone multi-node cluster. This should all be done from the installation host.
+The agent-based installer is an alternative to the Assisted Installer that generates a bootable ISO locally using `openshift-install`. It is ideal for environments with limited or no connectivity to console.redhat.com, or when you need full control over the installation artifacts.
 
-## Create the Configurations
+This guide covers installing a standalone multi-node cluster. All steps should be performed from the installation host.
 
-The agent-based install requires two configuration files:
-
-- `install-config.yaml` — cluster-level information
-- `agent-config.yaml` — host-level configurations
-
-### Create the Working Directory
+## Create the Working Directory
 
 ```bash
 mkdir -p ocp && cd ocp
@@ -22,7 +17,9 @@ git add -A
 git commit -m "repo initialized"
 ```
 
-### Create the Install Config
+## install-config.yaml
+
+The `install-config.yaml` defines cluster-level settings.
 
 ```yaml
 apiVersion: v1
@@ -59,16 +56,20 @@ pullSecret: 'value from ~/pull-secret.txt'
 sshKey: 'value from ~/.ssh/ocp.pub'
 ```
 
+### Proxy Configuration
+
 If your environment requires a proxy, append to the end of `install-config.yaml`:
 
 ```yaml
 proxy:
   httpProxy: http://user:password@proxy.example.com:3128
   httpsProxy: http://user:password@proxy.example.com:3128
-  noProxy: basedomain.com,localhost,127.0.0.1,.cluster.local,.svc,10.0.0.0/8,192.168.0.0/16,172.16.0.0/12,{{ node_subnet }},{{ api_vip }},{{ ingress_vip }}
+  noProxy: .basedomain.com,10.0.0.0/28,10.128.0.0/14,172.30.0.0/16,localhost,127.0.0.1,.cluster.local,.svc
 ```
 
-If your environment uses a MITM proxy, add the trust bundle:
+### Additional Trust Bundle (MITM Proxy)
+
+If your environment uses a TLS-intercepting proxy, add the trust bundle:
 
 ```yaml
 additionalTrustBundlePolicy: Always
@@ -79,9 +80,13 @@ additionalTrustBundle: |
   -----END CERTIFICATE-----
 ```
 
-### Create the Agent Config
+### Compact 3-Node Cluster (No Workers)
 
-The `agent-config.yaml` is a list of hosts' information. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN.
+For a compact cluster where control plane nodes are schedulable and also run workloads, set `compute[0].replicas` to `0`. The three control plane nodes will handle both control plane and worker duties.
+
+## agent-config.yaml
+
+The `agent-config.yaml` defines host-level configurations. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN.
 
 ```yaml
 apiVersion: v1alpha1
@@ -151,7 +156,7 @@ Repeat the host entry for each control plane and worker node, updating hostname,
 !!! note
     Notice the inconsistent labels and spellings in the OpenShift configs: `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza. `additionalNtpSources` is used in agent-config, but `additionalNTPServers` in install-config.
 
-### Agent Config with Active-Backup Bond (no VLAN)
+### Active-Backup Bond (No VLAN)
 
 If your environment uses active-backup bonding instead of LACP:
 
@@ -205,17 +210,44 @@ If your environment uses active-backup bonding instead of LACP:
             table-id: 254
 ```
 
-### Compact 3-Node Cluster (No Workers)
+### Single NIC (No Bond)
 
-For a compact cluster where control plane nodes are schedulable and also run workloads, set `compute[0].replicas` to `0` in `install-config.yaml`. The three control plane nodes will handle both control plane and worker duties.
+For hosts with a single network interface:
 
-### Cluster Manifests
+```yaml
+    networkConfig:
+      interfaces:
+        - name: eno1
+          type: ethernet
+          state: up
+          mac-address: A1:B2:3C:4D:1E:11
+          ipv4:
+            enabled: true
+            address:
+              - ip: 10.0.0.4
+                prefix-length: 28
+            dhcp: false
+          ipv6:
+            enabled: false
+      dns-resolver:
+        config:
+          server:
+            - dns1.basedomain.com
+            - dns2.basedomain.com
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: 10.0.0.1
+            next-hop-interface: eno1
+            table-id: 254
+```
 
-If you have additional manifests to apply at install time (e.g., MachineConfigs, NMState configs), place them in a folder named `cluster-manifests` at the same level as `install-config.yaml` and `agent-config.yaml`.
+## Cluster Manifests
+
+If you have additional manifests to apply at install time (e.g., MachineConfigs, NMState configs), place them in a `cluster-manifests` folder at the same level as `install-config.yaml` and `agent-config.yaml`.
 
 ```bash
 mkdir -p ocp/cluster-manifests
-# Add any manifests to apply during installation
 ```
 
 ## Generate the ISO
@@ -226,7 +258,8 @@ Create a script `create-iso.sh` in your working directory:
 #!/bin/bash
 rm -rf install
 mkdir install
-cp -r install-config.yaml agent-config.yaml cluster-manifests install
+cp install-config.yaml agent-config.yaml install
+[ -d cluster-manifests ] && cp -r cluster-manifests install
 openshift-install agent create image --dir=install --log-level=debug
 ```
 
@@ -289,3 +322,7 @@ oc delete pods --all-namespaces --field-selector=status.phase=Failed
 ```
 
 For troubleshooting, see [Troubleshooting](troubleshooting.md).
+
+## Documentation
+
+- [Agent-Based Installer](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index)

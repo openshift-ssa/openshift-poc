@@ -18,11 +18,11 @@ For either method, it is important for you to fully complete and verify the prer
 
 ### Standalone Cluster
 
-For a standalone cluster installation, we recommend using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). 
+For a [standalone cluster](standalone/index.md) installation, we recommend using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). 
 
 ### Fleet Management 
 
-For fleet management, we recommend starting with a single node OpenShift installation using the using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). Once completed, you can then install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) and use it as your cluster installation hub. 
+For [fleet management](fleet-management/index.md), we recommend starting with a single node OpenShift installation using the using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). Once completed, you can then install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) and use it as your cluster installation hub. 
 
 ## Important First Steps
 
