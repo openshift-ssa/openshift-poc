@@ -1,79 +1,76 @@
 # Assisted Installer
 
-This guide covers installing a standalone multi-node cluster using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters). This should all be done from the installation host.
+[Assisted Installer for OpenShift Container Platform Official Documentation](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/latest/html/installing_openshift_container_platform_with_the_assisted_installer/index)
+
+This guide covers installing a standalone multi-node cluster using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters). This should all be done from the installation host. You should have completed the [prerequisites](../prerequisites/index.md) and you should have that information handy. You should also have a valid ssh key available. 
 
 ## Create the Cluster in the Assisted Installer
 
-1. Navigate to [console.redhat.com/openshift/assisted-installer/clusters](https://console.redhat.com/openshift/assisted-installer/clusters)
-2. Click **Create Cluster**
-3. Configure the cluster details:
-    - **Cluster name**: `poc`
-    - **Base domain**: `ocp.basedomain.com`
-    - **OpenShift version**: Latest stable
-4. If your environment uses a proxy, configure the proxy settings:
-    - HTTP Proxy
-    - HTTPS Proxy
-    - No Proxy list (see [Proxy Configuration](../prerequisites/networking.md#proxy-configuration))
-    - Additional trust bundle (for MITM proxies)
-5. Set the machine network to `10.0.0.0/28`
+To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud Console](https://console.redhat.com/openshift/assisted-installer/clusters). Click on "Create Cluster". If an item in the details below isn't specifically referenced, that means to leave the default. 
 
-## Generate and Boot the Discovery ISO
+### Cluster details
 
-1. On the **Host discovery** step, click **Generate Discovery ISO**
-2. Configure the ISO:
-    - **SSH public key**: Contents of `~/.ssh/ocp.pub`
-    - **Proxy settings** (if applicable)
-3. Download the discovery ISO or copy the download URL
-4. Serve the ISO from the installation host:
+- Put in the cluster name
+- Put in the Base domain
+- Choose the OpenShift Version (ensure compatibility, especially with storage CSI driver)
+- Choose your CPU architecture (x86_64 is typical)
+- Choose No platform integration
+- Number of control plane nodes should be selected based on the install type you are doing: 
+    - 1 (Single Node OpenShift)
+    - 3 (highly available cluster)
+- Choose Hosts' network configuration to be "Static IP, bridges and bonds" (unless you allow DHCP, which is rare)
+- No Encryption
 
-```bash
-podman run -d --name iso-http \
-  -p 8080:8080 \
-  -v ~/discovery-iso.iso:/var/www/html/discovery-iso.iso:Z \
-  registry.redhat.io/rhel9/httpd-24:9.6
-```
+-> Click Next
 
-5. Boot all hosts from the ISO via BMC virtual media (Redfish, iLO, iDRAC)
-6. Wait for all hosts to appear in the Assisted Installer UI
+## Static network configurations
 
-## Configure Hosts
+- Select IPv4
+- If you are using a vlan, click "Use VLAN" checkbox, and enter the Machine Subnet VLAN value. 
+- Enter DNS values
+- Enter the Machine Subnet values
+- Enter the Default gateway
 
-Once all hosts are discovered:
+-> Click Next
 
-1. Assign roles to each host:
-    - 3 hosts as **Control Plane**
-    - Remaining hosts as **Worker**
-2. Configure static networking for each host:
-    - IP Address (from your planned IP assignments)
-    - Subnet mask: `255.255.255.240`
-    - Gateway: `10.0.0.1`
-    - DNS: Your DNS server(s)
-    - NTP: Your NTP server
-3. For bonded interfaces, configure the bond in the host's network settings:
-    - Bond mode (LACP or active-backup)
-    - Bond interfaces
-    - VLAN (if applicable)
+## Host specific configurations
 
-## Configure Cluster Networking
+- If using a bond, click the "Use bond" checkbox
+- Bond type is typically 802.3ad (LACP)
+- Enter the mac addresses for the NICs in the bond using the Host NICs - MAC Address values
+- Enter the IP address for the host
+- If you are doing a full cluster install, repeat this process for all the hosts by using the "Add another host configuration" button. 
 
-1. Set the **API VIP**: `10.0.0.2`
-2. Set the **Ingress VIP**: `10.0.0.3`
-3. Confirm the machine network is `10.0.0.0/28`
-4. Cluster network: `10.128.0.0/14` (default)
-5. Service network: `172.30.0.0/16` (default)
+--> Click Next
 
-## Start the Installation
+## Operators
 
-1. Review the cluster configuration
-2. Click **Install Cluster**
-3. Monitor progress in the UI or from the installation host:
+Don't preinstall any operators. 
 
-```bash
-# Download kubeconfig from the UI once available
-export KUBECONFIG=~/poc/kubeconfig
-oc get nodes
-oc get clusterversion
-```
+--> Click Next
+
+## Host discovery
+
+- Click on the "Add hosts" button at the top of the page
+- For "Provisioning type", select "Full image file - Download a self-contained ISO"
+- Add the SSH public key 
+- If you have a specific [proxy](../prerequisites/networking.md#proxy-configuration) configuration, use the "Show proxy settings" checkbox to enable the view and enter the information. 
+- If you have a [MITM proxy](../prerequisites/networking.md#how-to-determine-if-you-have-a-mitm-proxy) which reencrypts traffic, click the "Configure cluster-wide trusted certificates" and add the MITM root/intermediate cert. 
+- Click "Generate Discovery ISO" and save the ISO file. 
+
+#### BMC Install
+
+- If you are using a BMC web interface to create the cluster, save the ISO file locally and attach it. 
+- The web interfaces for BMC installs of this nature can be finicky. If you have a web server somewhere, host it there. Or use the Discovery ISO URL. 
+
+#### Waiting for host
+
+- Boot the host(s) with the ISO
+    - for a SNO install, wait for the single host to present itself
+    - for a full cluster install, wait for all hosts to come up in the list. 
+
+--> Click Next
+
 
 Installation typically takes 30-45 minutes for a multi-node cluster.
 

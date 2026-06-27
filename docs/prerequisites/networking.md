@@ -112,7 +112,7 @@ All cluster nodes must reside on the same Layer 2 network or have Layer 3 routin
 
 ### NTP
 
-All cluster nodes must have synchronized time. Provide an NTP server that is reachable from the cluster hosts. This will be configured in the `agent-config.yaml` during installation.
+All cluster nodes must have synchronized time. Provide an NTP server that is reachable from the cluster hosts. 
 
 ### Proxy Configuration
 
