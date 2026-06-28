@@ -1,8 +1,10 @@
 # Adding a Worker Node
 
+[Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/nodes/adding-node-image)
+
 ## Create the YAML Configuration File
 
-Create a file named `nodes-config.yaml`. This is similar to the `agent-config.yaml` used during installation.
+1. Create a file named `nodes-config.yaml`. This is similar to the `agent-config.yaml` used during installation.
 
 ### Simple Example (Single NIC)
 
@@ -92,21 +94,32 @@ hosts:
 
 ## Create the ISO Image
 
-```bash
-oc adm node-image create nodes-config.yaml --dir=add --registry-config=~/pull-secret.txt
-```
+2. Generate the node image ISO:
 
-Boot the node with the generated ISO image.
+  ```bash
+  oc adm node-image create nodes-config.yaml --dir=add --registry-config=~/pull-secret.txt
+  ```
 
-## Monitor the Progress
+## Boot and Monitor
 
-```bash
-oc adm node-image monitor --ip-addresses {{ ip_addresses }}
-```
+3. Boot the node with the generated ISO image (via BMC virtual media or physical media)
+4. Monitor the progress:
+
+  ```bash
+  oc adm node-image monitor --ip-addresses {{ ip_addresses }}
+  ```
 
 ## Approve Pending CSRs
 
-```bash
-oc get csr
-oc get csr | awk '{print $1}' | grep -v NAME | xargs oc adm certificate approve
-```
+5. Once the node appears, approve the pending certificate signing requests:
+
+  ```bash
+  oc get csr
+  oc get csr | awk '{print $1}' | grep -v NAME | xargs oc adm certificate approve
+  ```
+
+6. Verify the node has joined the cluster:
+
+  ```bash
+  oc get nodes
+  ```

@@ -1,5 +1,7 @@
 # OpenShift Virtualization
 
+[Red Hat OpenShift Virtualization Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_virtualization/latest)
+
 !!! warning "Workload Availability Required for Live Migration Testing"
     If you plan to test any scenarios related to node loss and live migrations, you **must** install and configure [Workload Availability](workload-availability.md) prior to installing the OpenShift Virtualization Operator. The Descheduler and Node Health Check operators are what trigger live migrations when nodes become unhealthy.
 
@@ -11,9 +13,73 @@
 - NMState Operator installed and underlay networks created
 - Optional but recommended: dedicated network for live migration
 
-## Install
+## Install the Operator via WebUI
 
-Install the OpenShift Virtualization Operator via the web console OperatorHub.
+1. Go to Ecosystem -> Software Catalog -> filter for "OpenShift Virtualization" -> click the tile
+2. Click Install
+3. Leave all the defaults and click Install
+4. Wait for the Operator to install
+5. Go to Ecosystem -> Installed Operators -> click "OpenShift Virtualization"
+6. Click on the "HyperConverged" tab and then click "Create HyperConverged"
+7. Leave all the defaults and click Create
+8. Wait for the deployment to complete — the Virtualization menu item will appear in the left navigation
+
+## Install the Operator via YAML
+
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: openshift-cnv
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: kubevirt-hyperconverged-group
+  namespace: openshift-cnv
+spec:
+  targetNamespaces:
+    - openshift-cnv
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: hco-operatorhub
+  namespace: openshift-cnv
+spec:
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  name: kubevirt-hyperconverged
+  channel: stable
+  installPlanApproval: Automatic
+```
+
+```bash
+oc apply -f virt-operator.yaml
+```
+
+Wait for the operator, then create the HyperConverged instance:
+
+```yaml
+apiVersion: hco.kubevirt.io/v1beta1
+kind: HyperConverged
+metadata:
+  name: kubevirt-hyperconverged
+  namespace: openshift-cnv
+spec: {}
+```
+
+```bash
+oc apply -f hyperconverged.yaml
+```
+
+## Verify
+
+```bash
+oc get csv -n openshift-cnv
+oc get hyperconverged -n openshift-cnv
+oc get pods -n openshift-cnv
+```
 
 ## Example cloud-init for Static IP
 

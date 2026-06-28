@@ -1,16 +1,22 @@
 # External Secrets Operator
 
-The External Secrets Operator integrates external secret management systems (AWS Secrets Manager, HashiCorp Vault, Azure Key Vault, Google Secret Manager, IBM Cloud Secrets Manager) with OpenShift. It fetches secrets from external providers and provisions them as native Kubernetes `Secret` resources.
-
 [Red Hat Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/security_and_compliance/external-secrets-operator-for-red-hat-openshift)
+
+The External Secrets Operator integrates external secret management systems (AWS Secrets Manager, HashiCorp Vault, Azure Key Vault, Google Secret Manager, IBM Cloud Secrets Manager) with OpenShift. It fetches secrets from external providers and provisions them as native Kubernetes `Secret` resources.
 
 !!! warning
     Do not run more than one External Secrets Operator in a cluster. If you have the community operator installed, uninstall it first.
 
-## Install the Operator
+## Install the Operator via WebUI
 
-```bash
-cat <<EOF | oc apply -f -
+1. Go to Ecosystem -> Software Catalog -> filter for "External Secrets" -> click the "External Secrets Operator" tile (the Red Hat one, not community)
+2. Click Install
+3. Leave all the defaults and click Install
+4. Wait for the Operator to install
+
+## Install the Operator via YAML
+
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -35,7 +41,10 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Automatic
-EOF
+```
+
+```bash
+oc apply -f external-secrets-operator.yaml
 ```
 
 Wait for the operator:
@@ -48,8 +57,14 @@ oc get csv -n external-secrets-operator -w
 
 The operator does not deploy the external-secrets pods automatically. Create an `ExternalSecretsConfig` resource:
 
-```bash
-cat <<EOF | oc apply -f -
+1. Go to Ecosystem -> Installed Operators -> External Secrets Operator
+2. Click on the "ExternalSecretsConfig" tab
+3. Click "Create ExternalSecretsConfig"
+4. Leave all the defaults and click Create
+
+Or via YAML:
+
+```yaml
 apiVersion: operator.openshift.io/v1alpha1
 kind: ExternalSecretsConfig
 metadata:
@@ -61,7 +76,10 @@ spec:
         egress:
           - {}
         name: allow-external-secrets-egress
-EOF
+```
+
+```bash
+oc apply -f external-secrets-config.yaml
 ```
 
 Verify the operand pods are running:
@@ -151,7 +169,7 @@ spec:
         property: password
 ```
 
-Verify:
+## Verify
 
 ```bash
 oc get secret my-k8s-secret -n my-namespace

@@ -2,10 +2,19 @@
 
 [Red Hat OpenShift GitOps Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_gitops/latest)
 
-## Install the Operator
+OpenShift GitOps provides ArgoCD for managing application deployments using GitOps workflows.
 
-```bash
-cat <<EOF | oc apply -f -
+## Install the Operator via WebUI
+
+1. Go to Ecosystem -> Software Catalog -> filter for "OpenShift GitOps" -> click the tile
+2. Click Install
+3. Leave all the defaults and click Install
+4. Wait for the Operator to install
+5. The operator automatically creates a default Argo CD instance in the `openshift-gitops` namespace
+
+## Install the Operator via YAML
+
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -30,7 +39,10 @@ spec:
   name: openshift-gitops-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-EOF
+```
+
+```bash
+oc apply -f gitops-operator.yaml
 ```
 
 Wait for the operator to install:
@@ -38,8 +50,6 @@ Wait for the operator to install:
 ```bash
 oc wait --for=condition=Ready pods --all -n openshift-gitops-operator --timeout=300s
 ```
-
-The operator automatically creates a default Argo CD instance in the `openshift-gitops` namespace.
 
 ## Verify the Installation
 
@@ -49,11 +59,9 @@ oc get pods -n openshift-gitops
 
 ## Access the Argo CD Console
 
-```bash
-oc get route openshift-gitops-server -n openshift-gitops -o jsonpath='{.spec.host}'
-```
-
-You can log in using OpenShift OAuth. To get the default `admin` password:
+1. In the WebUI, the Argo CD link will appear in the grid menu (top right) once the operator is installed
+2. You can log in using OpenShift OAuth
+3. To get the default `admin` password via CLI:
 
 ```bash
 oc extract secret/openshift-gitops-cluster -n openshift-gitops --to=-

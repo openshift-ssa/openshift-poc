@@ -47,10 +47,16 @@ Self Node Remediation now supports control plane nodes in addition to worker nod
 
 Monitors node conditions and creates remediation requests when nodes become unhealthy. Automatically installs the Self Node Remediation Operator as the default remediation provider.
 
-### Install
+### Install via WebUI
 
-```bash
-cat <<EOF | oc apply -f -
+1. Go to Ecosystem -> Software Catalog -> filter for "Node Health Check" -> click the tile
+2. Click Install
+3. Leave all the defaults (installs to `openshift-workload-availability` namespace) and click Install
+4. Wait for the Operator to install — it will also install the Self Node Remediation Operator automatically
+
+### Install via YAML
+
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -73,7 +79,10 @@ spec:
   name: node-health-check-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-EOF
+```
+
+```bash
+oc apply -f nhc-operator.yaml
 ```
 
 ### Configure NodeHealthCheck for Workers
@@ -207,10 +216,16 @@ Runs periodically and evicts pods that violate scheduling rules so the default s
 !!! note
     The descheduler does not schedule pods — it only evicts. The default scheduler then places them on better-fit nodes.
 
-### Install
+### Install via WebUI
 
-```bash
-cat <<EOF | oc apply -f -
+1. Go to Ecosystem -> Software Catalog -> filter for "Kube Descheduler" -> click the tile
+2. Click Install
+3. Leave all the defaults and click Install
+4. Wait for the Operator to install
+
+### Install via YAML
+
+```yaml
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -236,7 +251,10 @@ spec:
   name: cluster-kube-descheduler-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-EOF
+```
+
+```bash
+oc apply -f descheduler-operator.yaml
 ```
 
 ### Configure
