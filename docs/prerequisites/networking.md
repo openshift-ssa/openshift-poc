@@ -30,6 +30,45 @@ Since there is no DHCP, every node requires a pre-assigned static IP. Gather the
 !!! tip
     Document all static IP assignments in a spreadsheet or table before starting installation. The Assisted Installer will require this information for each host.
 
+## Network Architecture
+
+!!! info "Keep it Simple for POC"
+    For POC environments, keep the networking as simple as possible. A single bond (or even a single NIC) for all traffic is perfectly acceptable. The multi-bond architectures described below are highly beneficial in production for performance isolation and fault tolerance, but we won't be engaging in large-scale performance testing in POC environments. Implement only what the customer already has available on their switches.
+
+### Simple (POC Recommended)
+
+A single bond or NIC carrying all cluster traffic — management, storage, and VM data.
+
+| Bond  | Purpose        | Mode     | MTU  |
+| ----- | -------------- | -------- | ---- |
+| bond0 | All traffic    | 802.3ad  | 1500 |
+
+### Production Multi-Bond Architecture
+
+In production environments with OpenShift Virtualization, the recommended architecture separates traffic across two bonds:
+
+| Bond  | Purpose                  | Mode    | MTU  | Switch Config       |
+| ----- | ------------------------ | ------- | ---- | ------------------- |
+| bond0 | Management / Cluster     | 802.3ad | 1500 | Access port or VLAN |
+| bond1 | Data plane (trunk)       | 802.3ad | 9000 | Trunk port          |
+
+`bond1` carries a trunked connection with multiple VLANs for different traffic types:
+
+| VLAN on bond1 | Purpose              | MTU  | Notes                                      |
+| ------------- | -------------------- | ---- | ------------------------------------------ |
+| VLAN 100      | VM workload traffic  | 9000 | Underlay network for VM-to-external access |
+| VLAN 200      | Storage network      | 9000 | Dedicated path to storage array            |
+| VLAN 300      | Live migration       | 9000 | Dedicated path for VM live migrations      |
+
+This separation provides:
+
+- **Performance isolation** — Storage and live migration traffic don't compete with VM workload traffic
+- **Jumbo frames** — The data plane bond runs MTU 9000 for storage and migration performance
+- **Security** — Management traffic is isolated from tenant/VM traffic
+- **QoS** — Network team can apply different QoS policies per VLAN
+
+The post-installation [Networking](../post-installation/networking.md) page has NNCP examples for configuring these bonds and VLANs after the cluster is installed.
+
 ## Required Firewall Ports
 
 | Port        | Protocol | Source        | Destination   | Purpose                 |

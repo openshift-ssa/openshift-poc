@@ -36,18 +36,6 @@
   border-bottom: 3px solid #ee0000;
 }
 
-.md-typeset td.label {
-  font-weight: bold;
-}
-
-table.host-info {
-  width: 100%;
-  border-collapse: collapse;
-  display: table;
-  margin-bottom: 1.5em;
-}
-
-table.host-info td {
-  border: 1px solid var(--md-typeset-table-color);
-  padding: 0.5em;
+.md-footer-meta__inner {
+  display: none;
 }

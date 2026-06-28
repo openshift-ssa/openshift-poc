@@ -46,24 +46,24 @@ Only a single NIC is required for OpenShift. To perform more advanced networking
 
 Collect the interface names, MAC addresses for ALL NICs, and the install disk location on the machines. Below is an example table of values needed.
 
-<table class="host-info">
+<table>
   <tr>
-    <td class="label">Hostname</td>
+    <td><b>Hostname</b></td>
     <td>hl01ocpinstall</td>
-    <td class="label">Disk Hint</td>
+    <td><b>Disk Hint</b></td>
     <td>/dev/sda</td>
   </tr>
   <tr>
-    <td class="label">BMC IP</td>
+    <td><b>BMC IP</b></td>
     <td></td>
-    <td class="label">BMC Credentials</td>
+    <td><b>BMC Credentials</b></td>
     <td></td>
   </tr>
   <tr>
-    <td class="label">Interface</td>
-    <td class="label">MAC Address</td>
-    <td class="label">Bond</td>
-    <td class="label">IP Address</td>
+    <td><b>Interface</b></td>
+    <td><b>MAC Address</b></td>
+    <td><b>Bond</b></td>
+    <td><b>IP Address</b></td>
   </tr>
   <tr>
     <td>eno1</td>
@@ -73,24 +73,24 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
   </tr>
 </table>
 
-<table class="host-info">
+<table>
   <tr>
-    <td class="label">Hostname</td>
+    <td><b>Hostname</b></td>
     <td>hl01ocphub</td>
-    <td class="label">Disk Hint</td>
+    <td><b>Disk Hint</b></td>
     <td>/dev/sda</td>
   </tr>
   <tr>
-    <td class="label">BMC IP</td>
+    <td><b>BMC IP</b></td>
     <td></td>
-    <td class="label">BMC Credentials</td>
+    <td><b>BMC Credentials</b></td>
     <td></td>
   </tr>
   <tr>
-    <td class="label">Interface</td>
-    <td class="label">MAC Address</td>
-    <td class="label">Bond</td>
-    <td class="label">IP Address</td>
+    <td><b>Interface</b></td>
+    <td><b>MAC Address</b></td>
+    <td><b>Bond</b></td>
+    <td><b>IP Address</b></td>
   </tr>
   <tr>
     <td>eno1</td>
@@ -100,24 +100,24 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
   </tr>
 </table>
 
-<table class="host-info">
+<table>
   <tr>
-    <td class="label">Hostname</td>
+    <td><b>Hostname</b></td>
     <td>hl01ocpcp01</td>
-    <td class="label">Disk Hint</td>
+    <td><b>Disk Hint</b></td>
     <td>/dev/sda</td>
   </tr>
   <tr>
-    <td class="label">BMC IP</td>
+    <td><b>BMC IP</b></td>
     <td></td>
-    <td class="label">BMC Credentials</td>
+    <td><b>BMC Credentials</b></td>
     <td></td>
   </tr>
   <tr>
-    <td class="label">Interface</td>
-    <td class="label">MAC Address</td>
-    <td class="label">Bond</td>
-    <td class="label">IP Address</td>
+    <td><b>Interface</b></td>
+    <td><b>MAC Address</b></td>
+    <td><b>Bond</b></td>
+    <td><b>IP Address</b></td>
   </tr>
   <tr>
     <td>eno1</td>
@@ -145,24 +145,24 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
   </tr>
 </table>
 
-<table class="host-info">
+<table>
   <tr>
-    <td class="label">Hostname</td>
+    <td><b>Hostname</b></td>
     <td>hl01ocpcp02</td>
-    <td class="label">Disk Hint</td>
+    <td><b>Disk Hint</b></td>
     <td>/dev/sda</td>
   </tr>
   <tr>
-    <td class="label">BMC IP</td>
+    <td><b>BMC IP</b></td>
     <td></td>
-    <td class="label">BMC Credentials</td>
+    <td><b>BMC Credentials</b></td>
     <td></td>
   </tr>
   <tr>
-    <td class="label">Interface</td>
-    <td class="label">MAC Address</td>
-    <td class="label">Bond</td>
-    <td class="label">IP Address</td>
+    <td><b>Interface</b></td>
+    <td><b>MAC Address</b></td>
+    <td><b>Bond</b></td>
+    <td><b>IP Address</b></td>
   </tr>
   <tr>
     <td>eno1</td>
@@ -190,24 +190,24 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
   </tr>
 </table>
 
-<table class="host-info">
+<table>
   <tr>
-    <td class="label">Hostname</td>
+    <td><b>Hostname</b></td>
     <td>hl01ocpcp03</td>
-    <td class="label">Disk Hint</td>
+    <td><b>Disk Hint</b></td>
     <td>/dev/sda</td>
   </tr>
   <tr>
-    <td class="label">BMC IP</td>
+    <td><b>BMC IP</b></td>
     <td></td>
-    <td class="label">BMC Credentials</td>
+    <td><b>BMC Credentials</b></td>
     <td></td>
   </tr>
   <tr>
-    <td class="label">Interface</td>
-    <td class="label">MAC Address</td>
-    <td class="label">Bond</td>
-    <td class="label">IP Address</td>
+    <td><b>Interface</b></td>
+    <td><b>MAC Address</b></td>
+    <td><b>Bond</b></td>
+    <td><b>IP Address</b></td>
   </tr>
   <tr>
     <td>eno1</td>
@@ -235,24 +235,24 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
   </tr>
 </table>
 
-<table class="host-info">
+<table>
   <tr>
-    <td class="label">Hostname</td>
+    <td><b>Hostname</b></td>
     <td>hl01ocpw01</td>
-    <td class="label">Disk Hint</td>
+    <td><b>Disk Hint</b></td>
     <td>/dev/sda</td>
   </tr>
   <tr>
-    <td class="label">BMC IP</td>
+    <td><b>BMC IP</b></td>
     <td></td>
-    <td class="label">BMC Credentials</td>
+    <td><b>BMC Credentials</b></td>
     <td></td>
   </tr>
   <tr>
-    <td class="label">Interface</td>
-    <td class="label">MAC Address</td>
-    <td class="label">Bond</td>
-    <td class="label">IP Address</td>
+    <td><b>Interface</b></td>
+    <td><b>MAC Address</b></td>
+    <td><b>Bond</b></td>
+    <td><b>IP Address</b></td>
   </tr>
   <tr>
     <td>eno1</td>
@@ -280,24 +280,24 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
   </tr>
 </table>
 
-<table class="host-info">
+<table>
   <tr>
-    <td class="label">Hostname</td>
+    <td><b>Hostname</b></td>
     <td>hl01ocpw02</td>
-    <td class="label">Disk Hint</td>
+    <td><b>Disk Hint</b></td>
     <td>/dev/sda</td>
   </tr>
   <tr>
-    <td class="label">BMC IP</td>
+    <td><b>BMC IP</b></td>
     <td></td>
-    <td class="label">BMC Credentials</td>
+    <td><b>BMC Credentials</b></td>
     <td></td>
   </tr>
   <tr>
-    <td class="label">Interface</td>
-    <td class="label">MAC Address</td>
-    <td class="label">Bond</td>
-    <td class="label">IP Address</td>
+    <td><b>Interface</b></td>
+    <td><b>MAC Address</b></td>
+    <td><b>Bond</b></td>
+    <td><b>IP Address</b></td>
   </tr>
   <tr>
     <td>eno1</td>
@@ -325,24 +325,24 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
   </tr>
 </table>
 
-<table class="host-info">
+<table>
   <tr>
-    <td class="label">Hostname</td>
+    <td><b>Hostname</b></td>
     <td>hl01ocpw03</td>
-    <td class="label">Disk Hint</td>
+    <td><b>Disk Hint</b></td>
     <td>/dev/sda</td>
   </tr>
   <tr>
-    <td class="label">BMC IP</td>
+    <td><b>BMC IP</b></td>
     <td></td>
-    <td class="label">BMC Credentials</td>
+    <td><b>BMC Credentials</b></td>
     <td></td>
   </tr>
   <tr>
-    <td class="label">Interface</td>
-    <td class="label">MAC Address</td>
-    <td class="label">Bond</td>
-    <td class="label">IP Address</td>
+    <td><b>Interface</b></td>
+    <td><b>MAC Address</b></td>
+    <td><b>Bond</b></td>
+    <td><b>IP Address</b></td>
   </tr>
   <tr>
     <td>eno1</td>
