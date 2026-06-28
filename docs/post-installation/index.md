@@ -19,18 +19,8 @@ These are modular and can be installed in any order based on your needs but we u
 - [Workload Availability](workload-availability.md) — Node health checks and automatic remediation
 - [Virtualization](virtualization.md) — OpenShift Virtualization (requires workload availability first)
 - [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows
+- [MultiCluster Observability](multicluster-observability.md) — Centralized monitoring across managed clusters
 - [POC Banner](poc-banner.md) — Mark the UI as a PoC environment
-
-## Workloads
-
-- [Example Container Workloads](workload-containers.md) - some documented applications running as containers
-- [Example Virtual Machines](workload-virtual-machines.md) - some documented virtual machines
-
-## Operations
-
-- [Add Worker Node](add-worker-node.md) — Add a worker node to an existing cluster
-- [Rotate SSH Keys](rotate-ssh-keys.md) — Rotate SSH keys on cluster nodes
-- [Machine Config](machine-config.md) — Create machine configuration files
 
 ## Documentation
 

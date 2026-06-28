@@ -94,9 +94,14 @@ nav:
       - OpenShift GitOps: post-installation/openshift-gitops.md
       - MultiCluster Observability: post-installation/multicluster-observability.md
       - POC Banner: post-installation/poc-banner.md
-      # operations
-      - Add Worker Node: post-installation/add-worker-node.md
-      - Rotate SSH Keys: post-installation/rotate-ssh-keys.md
-      - Machine Config: post-installation/machine-config.md
+  - Workloads: 
+      - Overview: workloads/index.md
+      - Deploying Containers: workloads/workload-containers.md
+      - Deploying Virtual Machines: workloads/workload-virtual-machines.md
+  - Operations:
+      - Overview: operations/index.md
+      - Add Worker Node: operations/add-worker-node.md
+      - Rotate SSH Keys: operations/rotate-ssh-keys.md
+      - Machine Config: operations/machine-config.md
       
       

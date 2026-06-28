@@ -3,3 +3,4 @@ site/
 *.pyc
 __pycache__/
 .cache
+resume.txt
