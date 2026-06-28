@@ -19,6 +19,7 @@ These are modular and can be installed in any order based on your needs but we u
 - [Workload Availability](workload-availability.md) — Node health checks and automatic remediation
 - [Virtualization](virtualization.md) — OpenShift Virtualization (requires workload availability first)
 - [OADP](oadp.md) — Backup and restore for applications and virtual machines
+- [Service Mesh](service-mesh.md) — Istio ambient mode (sidecar-less mTLS and traffic management)
 - [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows
 - [MultiCluster Observability](multicluster-observability.md) — Centralized monitoring across managed clusters
 - [POC Banner](poc-banner.md) — Mark the UI as a PoC environment
