@@ -70,16 +70,16 @@ nav:
       - DNS: prerequisites/dns.md
       - Storage: prerequisites/storage.md
       - Installation Host: prerequisites/installation-host.md
-  - Standalone Cluster:
-      - Overview: standalone/index.md
-      - Assisted Installer: standalone/assisted-installer.md
-      - Agent-Based Installer: standalone/agent-based.md
-      - Troubleshooting: standalone/troubleshooting.md
   - Fleet Management:
       - Overview: fleet-management/index.md
       - Hub Install (SNO): fleet-management/sno-hub.md
       - Hub Storage: fleet-management/hub-storage.md
       - Advanced Cluster Management: fleet-management/acm.md
+  - Standalone Cluster:
+      - Overview: standalone/index.md
+      - Assisted Installer: standalone/assisted-installer.md
+      - Agent-Based Installer: standalone/agent-based.md
+      - Troubleshooting: standalone/troubleshooting.md
   - Post-Installation:
       - Overview: post-installation/index.md
       # required
@@ -92,6 +92,7 @@ nav:
       - Workload Availability: post-installation/workload-availability.md
       - Virtualization: post-installation/virtualization.md
       - OpenShift GitOps: post-installation/openshift-gitops.md
+      - MultiCluster Observability: post-installation/multicluster-observability.md
       - POC Banner: post-installation/poc-banner.md
       # operations
       - Add Worker Node: post-installation/add-worker-node.md

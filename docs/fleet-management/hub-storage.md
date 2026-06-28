@@ -92,87 +92,17 @@ ODF is used here specifically for object storage required by MultiClusterObserva
 
 8. Click Create
 
-## Install MultiClusterObservability
+## Verify
 
-Storage must be configured first (above).
+```bash
+oc get lvmcluster -n openshift-storage
+oc get storagecluster -n openshift-storage
+oc get storageclass
+oc get pods -n openshift-storage
+```
 
-1. Create the namespace and pull secret:
+Ensure the LVM StorageClass is set as default:
 
-  ```bash
-  oc create namespace open-cluster-management-observability
-  DOCKER_CONFIG_JSON=$(oc extract secret/pull-secret -n openshift-config --to=-)
-  oc create secret generic multiclusterhub-operator-pull-secret \
-      -n open-cluster-management-observability \
-      --from-literal=.dockerconfigjson="$DOCKER_CONFIG_JSON" \
-      --type=kubernetes.io/dockerconfigjson
-  ```
-
-2. Create the object bucket:
-
-  ```yaml
-  apiVersion: objectbucket.io/v1alpha1
-  kind: ObjectBucketClaim
-  metadata:
-    name: thanos-object-storage-obc
-    namespace: open-cluster-management-observability
-  spec:
-    bucketName: thanos-object-storage-bucket
-    storageClassName: openshift-storage.noobaa.io
-  ```
-
-3. Configure the Thanos secret:
-
-  ```bash
-  ACCESS_KEY=$(oc get secret thanos-object-storage-obc -n open-cluster-management-observability -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 -d)
-  SECRET_KEY=$(oc get secret thanos-object-storage-obc -n open-cluster-management-observability -o jsonpath='{.data.AWS_SECRET_ACCESS_KEY}' | base64 -d)
-  ```
-
-  ```yaml
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: thanos-object-storage
-    namespace: open-cluster-management-observability
-  type: Opaque
-  stringData:
-    thanos.yaml: |
-      type: s3
-      config:
-        bucket: thanos-object-storage-bucket
-        endpoint: s3.openshift-storage.svc:443
-        insecure: false
-        access_key: $ACCESS_KEY
-        secret_key: $SECRET_KEY
-  ```
-
-4. Create the MultiClusterObservability instance:
-
-  ```yaml
-  apiVersion: observability.open-cluster-management.io/v1beta2
-  kind: MultiClusterObservability
-  metadata:
-    name: multi-cluster-observability
-  spec:
-    enableDownsampling: true
-    imagePullPolicy: Always
-    imagePullSecret: multiclusterhub-operator-pull-secret
-    observabilityAddonSpec:
-      enableMetrics: true
-      interval: 300
-    storageConfig:
-      alertmanagerStorageSize: 1Gi
-      compactStorageSize: 100Gi
-      metricObjectStorage:
-        key: thanos.yaml
-        name: thanos-object-storage
-      receiveStorageSize: 100Gi
-      ruleStorageSize: 1Gi
-      storageClass: lvms-local-storage
-      storeStorageSize: 10Gi
-  ```
-
-5. Watch it deploy:
-
-  ```bash
-  oc get multiclusterobservability -w
-  ```
+```bash
+oc get storageclass | grep default
+```
