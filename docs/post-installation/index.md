@@ -14,6 +14,7 @@ These must be completed in order before deploying any workloads:
 
 These are modular and can be installed in any order based on your needs:
 
+- [POC Banner](poc-banner.md) — Mark the UI as a PoC environment
 - [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows
 - [External Secrets Operator](external-secrets-operator.md) — Integrate external secret management
 - [Workload Availability](workload-availability.md) — Node health checks and automatic remediation

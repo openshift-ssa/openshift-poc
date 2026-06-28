@@ -2,6 +2,9 @@
 
 Persistent storage for OpenShift will be provided by a third-party storage vendor with a supported CSI (Container Storage Interface) driver. etcd storage remains local to the control plane nodes.
 
+!!! warning "Storage Vendor Inclusion"
+    It is **highly recommend** to bring your storage vendor in to assist directly in the installation and configuration of their CSI driver. While the Red Hat sales engineers are multidisciplinary and bring tons of expertise, it is impossible for them to keep up with the nuances and best practices of every single storage provider in the market. 
+
 ## Storage Requirements
 
 | Component        | Access Mode | Minimum Size | Provider   |
@@ -26,7 +29,7 @@ Before installing OpenShift, coordinate with your storage vendor to ensure:
 
 ## etcd Storage
 
-etcd requires low-latency storage. Use locally-attached NVMe or SSD drives on control plane nodes. Do not use network-attached storage for etcd.
+etcd requires low-latency storage. Use locally-attached NVMe or SSD drives on control plane nodes if possible. Do not use network-attached storage for etcd unless it meets strict performance guarantees.
 
 Verify disk performance:
 

@@ -59,6 +59,7 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+  - mdx_truly_sane_lists
 
 nav:
   - Home: index.md
@@ -84,10 +85,10 @@ nav:
       - NMState Operator: post-installation/nmstate.md
       - Storage: post-installation/storage.md
       - Registry: post-installation/registry.md
+      - POC Banner: post-installation/poc-banner.md
       - OpenShift GitOps: post-installation/openshift-gitops.md
       - External Secrets Operator: post-installation/external-secrets-operator.md
       - Workload Availability: post-installation/workload-availability.md
-      - POC Banner: post-installation/poc-banner.md
       - Add Worker Node: post-installation/add-worker-node.md
       - Rotate SSH Keys: post-installation/rotate-ssh-keys.md
       - Machine Config: post-installation/machine-config.md

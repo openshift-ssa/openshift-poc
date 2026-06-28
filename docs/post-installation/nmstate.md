@@ -1,8 +1,22 @@
 # Kubernetes NMState Operator
 
+[Kubernetes NMState Operator Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/networking_operators/k8s-nmstate-about-the-k8s-nmstate-operator)
+
+
 The Kubernetes NMState Operator manages node network configuration on the cluster. It is required for configuring advanced networking such as bonds, VLANs, and OVS bridges on bare metal nodes.
 
-## Install the Operator
+## Install the Operator via WebUI
+
+1. Go to Ecosystem -> Software Catalog -> filter for "nmstate" -> click "Kubernetes NMState Operator" tile
+2. Click Install
+3. Leave all the defaults and click Install
+4. After the operator is installed, go to Ecosystem -> Installed Operators -> and click on "Kubernetes NMState Operator"
+5. Click on the NMState tab at the top and then click "Create NMState" button
+6. Don't change anything. Click "Create" button.
+7. The screen will refresh because of the updated console plugin for NMState. 
+8. Check the Networking menu item has been updated with a bunch of new options. click on "Node network configuration" to view your cluster network setup. 
+
+## Install the Operator via YAML
 
 ```yaml
 apiVersion: v1
@@ -69,7 +83,3 @@ All nodes should have a running NMState handler pod:
 ```bash
 oc get pods -n openshift-nmstate
 ```
-
-## Documentation
-
-- [Kubernetes NMState Operator](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/networking_operators/k8s-nmstate-about-the-k8s-nmstate-operator)
