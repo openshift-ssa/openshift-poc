@@ -82,15 +82,20 @@ nav:
       - Advanced Cluster Management: fleet-management/acm.md
   - Post-Installation:
       - Overview: post-installation/index.md
+      # required
       - NMState Operator: post-installation/nmstate.md
       - Storage: post-installation/storage.md
       - Registry: post-installation/registry.md
-      - POC Banner: post-installation/poc-banner.md
-      - OpenShift GitOps: post-installation/openshift-gitops.md
+      # optional
+      - Networking: post-installation/networking.md
       - External Secrets Operator: post-installation/external-secrets-operator.md
       - Workload Availability: post-installation/workload-availability.md
+      - Virtualization: post-installation/virtualization.md
+      - OpenShift GitOps: post-installation/openshift-gitops.md
+      - POC Banner: post-installation/poc-banner.md
+      # operations
       - Add Worker Node: post-installation/add-worker-node.md
       - Rotate SSH Keys: post-installation/rotate-ssh-keys.md
       - Machine Config: post-installation/machine-config.md
-      - Networking: post-installation/networking.md
-      - Virtualization: post-installation/virtualization.md
+      
+      

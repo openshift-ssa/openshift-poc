@@ -12,15 +12,19 @@ These must be completed in order before deploying any workloads:
 
 ## Optional
 
-These are modular and can be installed in any order based on your needs:
+These are modular and can be installed in any order based on your needs but we usually recommend this order. 
 
-- [POC Banner](poc-banner.md) — Mark the UI as a PoC environment
-- [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows
+- [Networking](networking.md) — NNCPs, OVS bridges, CUDNs, and underlay networking
 - [External Secrets Operator](external-secrets-operator.md) — Integrate external secret management
 - [Workload Availability](workload-availability.md) — Node health checks and automatic remediation
 - [Virtualization](virtualization.md) — OpenShift Virtualization (requires workload availability first)
-- [Networking](networking.md) — NNCPs, OVS bridges, CUDNs, and underlay networking
+- [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows
 - [POC Banner](poc-banner.md) — Mark the UI as a PoC environment
+
+## Workloads
+
+- [Example Container Workloads](workload-containers.md) - some documented applications running as containers
+- [Example Virtual Machines](workload-virtual-machines.md) - some documented virtual machines
 
 ## Operations
 
