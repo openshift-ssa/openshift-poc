@@ -183,6 +183,78 @@ spec:
           state: present
 ```
 
+### Storage Network Bond with Jumbo Frames (MTU 9000)
+
+This configures a dedicated storage bond with MTU 9000 and a VLAN for storage traffic. All interfaces in the path (ethernet, bond, VLAN) must have MTU set consistently.
+
+```yaml
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: storage-bond-mtu9000
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
+  desiredState:
+    interfaces:
+      - name: {{ storage_nic_1 }}
+        type: ethernet
+        state: up
+        mtu: 9000
+        mac-address: {{ storage_mac_1 }}
+        ipv4:
+          enabled: false
+        ipv6:
+          enabled: false
+      - name: {{ storage_nic_2 }}
+        type: ethernet
+        state: up
+        mtu: 9000
+        mac-address: {{ storage_mac_2 }}
+        ipv4:
+          enabled: false
+        ipv6:
+          enabled: false
+      - name: bond-storage
+        type: bond
+        state: up
+        mtu: 9000
+        link-aggregation:
+          mode: 802.3ad
+          port:
+            - {{ storage_nic_1 }}
+            - {{ storage_nic_2 }}
+          options:
+            miimon: "100"
+            lacp_rate: fast
+        ipv4:
+          enabled: false
+        ipv6:
+          enabled: false
+      - name: bond-storage.{{ storage_vlan_id }}
+        type: vlan
+        state: up
+        mtu: 9000
+        vlan:
+          base-iface: bond-storage
+          id: {{ storage_vlan_id }}
+        ipv4:
+          enabled: true
+          address:
+            - ip: {{ storage_ip }}
+              prefix-length: 24
+          dhcp: false
+        ipv6:
+          enabled: false
+```
+
+!!! note
+    The MTU must be set on every layer — ethernet interfaces, bond, and VLAN. If any layer is missing the `mtu: 9000` setting, jumbo frames will not work end-to-end. Verify after applying with:
+
+    ```bash
+    oc debug node/{{ node_name }} -- chroot /host ip link show bond-storage
+    ```
+
 ## ClusterUserDefinedNetwork
 
 ### CUDN with IPAM

@@ -15,11 +15,27 @@ Persistent storage for OpenShift will be provided by a third-party storage vendo
 | Logging          | RWO         | 200 GB       | CSI driver |
 | Application PVCs | RWO/RWX     | Varies       | CSI driver |
 
+## Storage Network
+
+The storage network must support jumbo frames (MTU 9000) for optimal performance. This applies to every network hop between the cluster nodes and the storage array — switches, NICs, and the storage array ports must all be configured consistently.
+
+- [ ] All switch ports on the storage VLAN/network configured for MTU 9000
+- [ ] Storage array network ports configured for MTU 9000
+- [ ] Cluster node NICs (or bond/VLAN interfaces used for storage) configured for MTU 9000
+
+!!! warning
+    If any single hop in the path does not support jumbo frames, packets will be fragmented or dropped, causing severe performance degradation or connectivity failures. Verify end-to-end with a ping test from a cluster node to the storage array:
+
+    ```bash
+    ping -M do -s 8972 {{ storage_array_ip }}
+    ```
+
 ## Pre-Installation Requirements
 
 Before installing OpenShift, coordinate with your storage vendor to ensure:
 
 - [ ] Storage array is accessible from all cluster nodes over the network
+- [ ] Storage network supports jumbo frames (MTU 9000) end-to-end
 - [ ] Required network ports are open between nodes and the storage array
 - [ ] Storage credentials or certificates are available for CSI driver configuration
 - [ ] A StorageClass will be created after installation to provision PVCs
