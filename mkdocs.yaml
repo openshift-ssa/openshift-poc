@@ -100,8 +100,11 @@ nav:
       - Deploying Virtual Machines: workloads/workload-virtual-machines.md
   - Operations:
       - Overview: operations/index.md
+      - VM Failover Test: operations/vm-failover.md
+      - Container Failover Test: operations/container-failover.md
       - Add Worker Node: operations/add-worker-node.md
       - Rotate SSH Keys: operations/rotate-ssh-keys.md
       - Machine Config: operations/machine-config.md
+      
       
       
