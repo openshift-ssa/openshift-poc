@@ -91,6 +91,7 @@ nav:
       - External Secrets Operator: post-installation/external-secrets-operator.md
       - Workload Availability: post-installation/workload-availability.md
       - Virtualization: post-installation/virtualization.md
+      - OADP: post-installation/oadp.md
       - OpenShift GitOps: post-installation/openshift-gitops.md
       - MultiCluster Observability: post-installation/multicluster-observability.md
       - POC Banner: post-installation/poc-banner.md
@@ -102,6 +103,7 @@ nav:
       - Overview: operations/index.md
       - VM Failover Test: operations/vm-failover.md
       - Container Failover Test: operations/container-failover.md
+      - VM Backup and Restore: operations/vm-backup-restore.md
       - Add Worker Node: operations/add-worker-node.md
       - Rotate SSH Keys: operations/rotate-ssh-keys.md
       - Machine Config: operations/machine-config.md

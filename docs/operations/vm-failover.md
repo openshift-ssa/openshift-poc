@@ -11,13 +11,19 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
 ## Create the Virtual Machine
 
-1. Go to Virtualization -> VirtualMachines -> click "Create VirtualMachine"
-2. Select "From template" and choose "Red Hat Enterprise Linux 9"
-3. Give it a name (e.g., `failover-test-vm`)
-4. Ensure the VM is configured with:
+1. Create a namespace for the test:
+
+  ```bash
+  oc new-project vm-failover-test
+  ```
+
+2. Go to Virtualization -> VirtualMachines -> ensure you are in the `vm-failover-test` project -> click "Create VirtualMachine"
+3. Select "From template" and choose "Red Hat Enterprise Linux 9"
+4. Give it a name (e.g., `failover-test-vm`)
+5. Ensure the VM is configured with:
     - `runStrategy: Always` (this is what tells the cluster to restart the VM if it stops unexpectedly)
     - `evictionStrategy: LiveMigrate`
-5. Click "Customize VirtualMachine" to edit the details before creating
+6. Click "Customize VirtualMachine" to edit the details before creating
 
 ### Add a Data Disk
 
@@ -47,7 +53,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 13. From the CLI, confirm the VM is running and note which node it is on:
 
   ```bash
-  oc get vmi failover-test-vm -o wide
+  oc get vmi failover-test-vm -n vm-failover-test -o wide
   ```
 
   The `NODE` column shows where the VM is currently scheduled.
@@ -55,7 +61,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 14. Check the IP address assigned to the VM via IPAM. This IP is assigned by the CUDN (ClusterUserDefinedNetwork) and persists with the VM across node migrations and failovers:
 
   ```bash
-  oc get vmi failover-test-vm -o jsonpath='{.status.interfaces}' | jq
+  oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.interfaces}' | jq
   ```
 
   Record the IP address — you will verify it stays the same after failover.
@@ -68,7 +74,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 16. Record the node name where the VM is running:
 
   ```bash
-  NODE=$(oc get vmi failover-test-vm -o jsonpath='{.status.nodeName}')
+  NODE=$(oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.nodeName}')
   echo "VM is on node: $NODE"
   ```
 
@@ -86,7 +92,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 18. Immediately watch the VM instance for changes:
 
   ```bash
-  oc get vmi failover-test-vm -w
+  oc get vmi failover-test-vm -n vm-failover-test -w
   ```
 
   You should see the following sequence:
@@ -100,7 +106,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
   ```bash
   date +%T
-  oc get vmi failover-test-vm -o wide
+  oc get vmi failover-test-vm -n vm-failover-test -o wide
   ```
 
   The `NODE` column should show a different node than before.
@@ -110,7 +116,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 20. Confirm the VM is fully running on the new node:
 
   ```bash
-  oc get vmi failover-test-vm -o jsonpath='{.status.phase}'
+  oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.phase}'
   ```
 
   Should output: `Running`
@@ -118,7 +124,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 21. Verify the IP address followed the VM to the new node:
 
   ```bash
-  oc get vmi failover-test-vm -o jsonpath='{.status.interfaces}' | jq
+  oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.interfaces}' | jq
   ```
 
   The IP address should be **identical** to what was recorded before the failover. This is because the CUDN with persistent IPAM allocates the IP to the VM itself (not the node), so when the VM restarts on a different node, it retains the same IP. Clients connecting to this IP will be able to reach the VM on its new node without any DNS or configuration changes.
@@ -126,7 +132,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 22. Check the data disk is still attached:
 
   ```bash
-  oc get vmi failover-test-vm -o jsonpath='{.spec.volumes[*].name}'
+  oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.spec.volumes[*].name}'
   ```
 
 23. Open the VM console from the WebUI to confirm the guest OS has booted:
@@ -158,7 +164,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 25. Delete the test VM:
 
   ```bash
-  oc delete vm failover-test-vm
+  oc delete vm failover-test-vm -n vm-failover-test
   ```
 
 26. Wait for the rebooted node to come back and verify it rejoins the cluster:
@@ -168,6 +174,12 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
   ```
 
   The node should return to `Ready` status after it finishes rebooting.
+
+27. Delete the test namespace:
+
+  ```bash
+  oc delete project vm-failover-test
+  ```
 
 !!! tip
     If the failover took significantly longer than 120 seconds, check:
