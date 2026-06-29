@@ -8,8 +8,8 @@ For fleet management, we recommend starting with a Single Node OpenShift (SNO) i
 2. Set up the [installation host](../prerequisites/installation-host.md)
 3. Install the [SNO hub cluster](sno-hub.md)
 4. Install [storage on the hub](hub-storage.md)
-5. Install [Advanced Cluster Management](acm.md)
-6. Use [ACM](acm.md) to provision and manage spoke clusters
+5. Install [Advanced Cluster Management](acm-install.md)
+6. Use ACM to [provision bare metal spoke clusters](acm-provision-bare-metal-cluster.md)
 
 ## Why Fleet Management?
 

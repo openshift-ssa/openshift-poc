@@ -74,7 +74,8 @@ nav:
       - Overview: fleet-management/index.md
       - Hub Install (SNO): fleet-management/sno-hub.md
       - Hub Storage: fleet-management/hub-storage.md
-      - Advanced Cluster Management: fleet-management/acm.md
+      - Advanced Cluster Management: fleet-management/acm-install.md
+      - Provision Bare Metal Cluster: fleet-management/acm-provision-bare-metal-cluster.md
   - Standalone Cluster:
       - Overview: standalone/index.md
       - Assisted Installer: standalone/assisted-installer.md

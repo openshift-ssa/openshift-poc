@@ -1,6 +1,6 @@
 # Hub Storage
 
-[OpenShift Data Foundation Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/latest)
+[OpenShift Storage - Persistent Storage using LVMS](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms)
 
 After installing the SNO hub cluster, configure storage before installing ACM. These examples are for environments without existing external storage on the hub node.
 
@@ -48,9 +48,11 @@ oc label node {{ node_name }} cluster.ocs.openshift.io/openshift-storage=
 
 4. Click Create
 
-## Install OpenShift Data Foundation
+## OPTIONAL - Install OpenShift Data Foundation - Object Storage
 
-ODF is used here specifically for object storage required by MultiClusterObservability.
+[OpenShift Data Foundation Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/latest)
+
+This is only needed if you are planning to use ODF as part of your OPP subscription. ODF is used here specifically for object storage required by MultiClusterObservability. 
 
 1. Go to Ecosystem -> Software Catalog -> filter for "OpenShift Data Foundation" -> click the tile
 2. Click Install

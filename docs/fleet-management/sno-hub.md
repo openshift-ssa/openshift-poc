@@ -1,12 +1,11 @@
 # Hub Install (SNO)
 
-[Assisted Installer for OpenShift Container Platform Official Documentation](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/latest/html/installing_openshift_container_platform_with_the_assisted_installer/index)
-
-A Single Node OpenShift (SNO) cluster runs the control plane and workloads on a single host. It serves as the management hub for the fleet. We use the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) to provision this cluster.
+A Single Node OpenShift (SNO) cluster runs the control plane and workloads on a single host. It serves as the management hub for the fleet. We use the [Assisted Installer](../standalone/assisted-installer.md) to provision this cluster.
 
 ## Prerequisites
 
-Complete the [prerequisites](../prerequisites/index.md) and set up the [installation host](../prerequisites/installation-host.md).
+* Complete the [prerequisites](../prerequisites/index.md)
+* Set up the [installation host](../prerequisites/installation-host.md).
 
 ## Install Using the Assisted Installer
 
