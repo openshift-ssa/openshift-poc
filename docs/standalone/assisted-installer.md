@@ -2,7 +2,9 @@
 
 [Assisted Installer for OpenShift Container Platform Official Documentation](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/latest/html/installing_openshift_container_platform_with_the_assisted_installer/index)
 
-This guide covers installing a standalone multi-node cluster using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters). This should all be done from the installation host. You should have completed the [prerequisites](../prerequisites/index.md) and you should have that information handy. You should also have a valid ssh key available. 
+This guide covers installing a standalone multi-node cluster using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters). This should all be done from the installation host. 
+
+You should have completed the [prerequisites](../prerequisites/index.md) and you should have that information handy. You should also have a valid ssh key available. 
 
 ## Create the Cluster in the Assisted Installer
 
@@ -16,8 +18,8 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 - Choose your CPU architecture (x86_64 is typical)
 - Choose No platform integration
 - Number of control plane nodes should be selected based on the install type you are doing: 
-    - 1 (Single Node OpenShift)
-    - 3 (highly available cluster)
+  - 1 (Single Node OpenShift)
+  - 3 (highly available cluster)
 - Choose Hosts' network configuration to be "Static IP, bridges and bonds" (unless you allow DHCP, which is rare)
 - No Encryption
 
@@ -36,7 +38,7 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 ### Host specific configurations
 
 - If using a bond, click the "Use bond" checkbox
-    - Bond type is typically 802.3ad (LACP)
+  - Bond type is typically 802.3ad (LACP)
 - Enter the mac addresses for the NICs in the bond using the Host NICs - MAC Address values
 - Enter the IP address for the host
 - If you are doing a full cluster install, repeat this process for all the hosts by using the "Add another host configuration" button. 
@@ -66,8 +68,8 @@ Don't preinstall any operators.
 ### Waiting for host
 
 - Boot the host(s) with the ISO
-    - for a SNO install, wait for the single host to present itself
-    - for a full cluster install, wait for all hosts to come up in the list
+  - for a SNO install, wait for the single host to present itself
+  - for a full cluster install, wait for all hosts to come up in the list
 - Update the Hostname(s) and Role for all the hosts
 - Wait for all the status on the host to be "Ready"
 
