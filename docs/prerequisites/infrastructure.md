@@ -4,6 +4,7 @@ All nodes are bare metal servers in an on-premise environment. Provision compute
 
 !!! info "OpenShift Terminology"
     A quick note on terminology. In OpenShift, the same server can be described at three layers:  
+    
     - **Host** (`BareMetalHost`, managed by the Bare Metal Operator) is the physical box and its BMC, answering how to power and provision the hardware  
     - **Machine** (`Machine`, managed by the Machine API and grouped into a `MachineSet`) is the infrastructure instance that backs a node and is the unit you scale which can be a physical box or a virtual machine  
     - **Node** (`Node`) is the Kubernetes-level member that runs a kubelet and that the scheduler places pods onto. 

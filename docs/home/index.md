@@ -18,16 +18,16 @@ For either method, it is important for you to fully complete and verify the prer
 
 ### Standalone Cluster
 
-For a [standalone cluster](standalone/index.md) installation, we recommend using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). 
+For a [standalone cluster](../standalone/index.md) installation, we recommend using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). 
 
 ### Fleet Management 
 
-For [fleet management](fleet-management/index.md), we recommend starting with a single node OpenShift installation using the using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). Once completed, you can then install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) and use it as your cluster installation hub. 
+For [fleet management](../fleet-management/index.md), we recommend starting with a single node OpenShift installation using the using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). Once completed, you can then install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) and use it as your cluster installation hub. 
 
 ## Important First Steps
 
-1. Read and understand the [prerequisites](prerequisites/index.md) associated with installing a POC environment for OpenShift. 
+1. Read and understand the [prerequisites](../prerequisites/index.md) associated with installing a POC environment for OpenShift. 
 2. Communicate your intent to all the major stakeholders in your organization. The infrastructure, networking, security, and application development teams will all be interested in learning and understanding the impacts of OpenShift on the organization's processes. Invite them to join the conversation early. 
 3. Follow the recommendations in this guide. The documentation here does a very good job pointing out time-wasting mistakes that happen during the install or initial configuration of the environment. 
 
-[Let's Get Started](prerequisites/index.md)
+[Let's Get Started](../prerequisites/index.md)

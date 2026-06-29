@@ -62,7 +62,9 @@ markdown_extensions:
   - mdx_truly_sane_lists
 
 nav:
-  - Home: index.md
+  - Home: 
+      - Overview: home/index.md
+      - Architecture: home/architecture.md
   - Prerequisites:
       - Overview: prerequisites/index.md
       - Infrastructure: prerequisites/infrastructure.md
