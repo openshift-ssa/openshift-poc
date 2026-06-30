@@ -397,6 +397,39 @@ Each bare metal server must have out-of-band management access for remote operat
 
 Virtual media (mounting the discovery ISO remotely) is the recommended method for booting nodes during installation.
 
+#### Testing BMC Access
+
+Verify Redfish API connectivity from the installation host to each BMC before starting the install. This confirms credentials, network access, and helps you identify the correct system ID for each server.
+
+List available systems:
+
+```bash
+curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/ -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
+```
+
+The BMC address format varies by vendor:
+
+| Vendor     | Address Format                                                              |
+| ---------- | --------------------------------------------------------------------------- |
+| HPE iLO    | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1`                  |
+| Dell iDRAC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1`  |
+| Cisco CIMC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/{{ system_id }}`    |
+
+Verify power state:
+
+```bash
+curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/1 -u {{ bmc_username }}:{{ bmc_password }} | jq '.PowerState'
+```
+
+Verify virtual media is available:
+
+```bash
+curl -sk https://{{ bmc_ip }}/redfish/v1/Managers/1/VirtualMedia -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
+```
+
+!!! tip
+    If any of these commands fail, check that the BMC IP is reachable from the installation host, the credentials are correct, and HTTPS (port 443) is open between the installation host and the BMC network.
+
 ### BIOS/Firmware Settings
 
 Ensure the following on all nodes:

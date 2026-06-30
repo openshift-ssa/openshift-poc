@@ -11,8 +11,8 @@ For the installation, the documentation assumes a bare metal environment in an o
 
 ## Checklist
 
-- [ ] [Infrastructure](infrastructure.md) - Compute resources provisioned
-- [ ] [Networking](networking.md) - Network topology and firewall rules configured
-- [ ] [DNS](dns.md) - Required DNS records created
-- [ ] [Storage](storage.md) - Persistent storage backend available
-- [ ] [Installation Host](installation-host.md) - Tools downloaded and environment validated
+- [Infrastructure](infrastructure.md) - Compute resources provisioned
+- [Networking](networking.md) - Network topology and firewall rules configured
+- [DNS](dns.md) - Required DNS records created
+- [Storage](storage.md) - Persistent storage backend available
+- [Installation Host](installation-host.md) - Tools downloaded and environment validated
