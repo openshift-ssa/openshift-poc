@@ -1,5 +1,7 @@
 # Post-Installation Overview
 
+[Post Install Configuration](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/postinstallation_configuration/index)
+
 After the OpenShift cluster is installed, complete the following operations to prepare it for workloads.
 
 ## Required
@@ -22,11 +24,5 @@ These are modular and can be installed in any order based on your needs but we u
 - [Service Mesh](service-mesh.md) — Istio ambient mode (sidecar-less mTLS and traffic management)
 - [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows
 - [MultiCluster Observability](multicluster-observability.md) — Centralized monitoring across managed clusters
+- [Identity Providers](configuring-identity-providers.md) — Configure LDAP, OIDC, or other authentication
 - [POC Banner](poc-banner.md) — Mark the UI as a PoC environment
-
-## Documentation
-
-- [Post Install Configuration](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/postinstallation_configuration/index)
-- [Installing on Bare Metal](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_on_bare_metal/index)
-- [Configuring Firewall](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/installation_configuration/configuring-firewall)
-- [Assisted Installer](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_with_the_assisted_installer/index)
