@@ -4,13 +4,16 @@
 
 By default, only the `kubeadmin` user exists on the cluster. To allow users from your organization to log in, configure one or more identity providers in the OAuth custom resource.
 
+!!! warning
+    Regardless of your other configurations, do not delete the `kubeadmin` user.
+
 ## Supported Identity Providers
 
 | Provider     | Type       | Use Case                                           |
 | ------------ | ---------- | -------------------------------------------------- |
 | LDAP         | `LDAP`     | Active Directory, OpenLDAP, FreeIPA                |
-| HTPasswd     | `HTPasswd` | Simple file-based auth (good for POC admin users)  |
 | OpenID Connect | `OpenID` | Keycloak, Azure AD, Okta, Google                   |
+| HTPasswd     | `HTPasswd` | Simple file-based auth (good for POC admin users)  |
 | GitHub       | `GitHub`   | GitHub or GitHub Enterprise                        |
 | GitLab       | `GitLab`   | GitLab                                             |
 
@@ -106,13 +109,13 @@ The `mappingMethod` controls how identities from the provider are mapped to Open
     --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443
   ```
 
-## LDAP Group Sync
+### LDAP Group Sync
 
 OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access control based on your existing directory structure.
 
-### Create the Group Sync Configuration
+#### Create the Group Sync Configuration
 
-1. Create a sync configuration file. This example uses the RFC 2307 schema (common with Active Directory):
+6. Create a sync configuration file. This example uses the RFC 2307 schema (common with Active Directory):
 
   ```yaml
   kind: LDAPSyncConfig
@@ -145,47 +148,47 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
     tolerateMemberOutOfScopeErrors: true
   ```
 
-### Run the Sync
+#### Run the Sync
 
-2. Preview what will be synced (dry run):
+7. Preview what will be synced (dry run):
 
   ```bash
   oc adm groups sync --sync-config=sync.yaml
   ```
 
-3. Run the sync:
+8. Run the sync:
 
   ```bash
   oc adm groups sync --sync-config=sync.yaml --confirm
   ```
 
-4. Verify the groups were created:
+9. Verify the groups were created:
 
   ```bash
   oc get groups
   ```
 
-### Assign Roles to Groups
+#### Assign Roles to Groups
 
-5. Grant cluster-admin to an admin group:
+10. Grant cluster-admin to an admin group:
 
   ```bash
   oc adm policy add-cluster-role-to-group cluster-admin {{ admin_group_name }}
   ```
 
-6. Grant view access to a read-only group across the cluster:
+11. Grant view access to a read-only group across the cluster:
 
   ```bash
   oc adm policy add-cluster-role-to-group view {{ readonly_group_name }}
   ```
 
-7. Grant edit access to a developer group in a specific namespace:
+12. Grant edit access to a developer group in a specific namespace:
 
   ```bash
   oc adm policy add-role-to-group edit {{ dev_group_name }} -n {{ namespace }}
   ```
 
-### Automate Group Sync with a CronJob
+#### Automate Group Sync with a CronJob
 
 To keep groups in sync automatically, create a CronJob:
 
@@ -231,4 +234,279 @@ oc create serviceaccount ldap-group-syncer -n openshift-authentication
 
 oc adm policy add-cluster-role-to-user cluster-admin \
   system:serviceaccount:openshift-authentication:ldap-group-syncer
+```
+
+## Configure OpenID Connect Identity Provider
+
+OpenID Connect (OIDC) integrates with providers like Keycloak, Microsoft Entra ID (Azure AD), Okta, and Google. The provider must support OpenID Connect Discovery.
+
+### Create the Client Secret
+
+1. Register an OAuth client in your OIDC provider with the following callback URL:
+
+  ```
+  https://oauth-openshift.apps.{{ cluster_name }}.{{ base_domain }}/oauth2callback/{{ provider_name }}
+  ```
+
+  Where `{{ provider_name }}` matches the `name` field in the identity provider configuration below.
+
+2. Create a secret containing the client secret:
+
+  ```bash
+  oc create secret generic oidc-client-secret \
+    --from-literal=clientSecret={{ client_secret }} \
+    -n openshift-config
+  ```
+
+### Create the CA Certificate ConfigMap (if needed)
+
+3. If your OIDC provider uses a private CA or self-signed certificate:
+
+  ```bash
+  oc create configmap oidc-ca-config-map \
+    --from-file=ca.crt={{ path_to_ca_cert }} \
+    -n openshift-config
+  ```
+
+### Apply the OAuth Configuration
+
+4. Create or update the OAuth CR:
+
+  ```yaml
+  apiVersion: config.openshift.io/v1
+  kind: OAuth
+  metadata:
+    name: cluster
+  spec:
+    identityProviders:
+      - name: {{ provider_name }}
+        mappingMethod: claim
+        type: OpenID
+        openID:
+          clientID: {{ client_id }}
+          clientSecret:
+            name: oidc-client-secret
+          ca:
+            name: oidc-ca-config-map
+          issuer: https://{{ oidc_issuer_url }}
+          claims:
+            preferredUsername:
+              - preferred_username
+              - email
+            name:
+              - name
+            email:
+              - email
+            groups:
+              - groups
+  ```
+
+  !!! info "Claims Mapping"
+      | Field                | Purpose                                          | Common Values                    |
+      | -------------------- | ------------------------------------------------ | -------------------------------- |
+      | `preferredUsername`  | Username in OpenShift                            | `preferred_username`, `email`, `upn` |
+      | `name`              | Display name                                     | `name`, `given_name`             |
+      | `email`             | Email address                                    | `email`                          |
+      | `groups`            | Group memberships (maps to OpenShift Groups)     | `groups`, `roles`                |
+
+      The `groups` claim allows the OIDC provider to pass group memberships directly in the token. OpenShift will automatically create Groups and assign users to them based on this claim.
+
+  ```bash
+  oc apply -f oauth.yaml
+  ```
+
+5. Wait for the OAuth pods to redeploy:
+
+  ```bash
+  oc get pods -n openshift-authentication -w
+  ```
+
+### Verify
+
+6. Open the OpenShift console — you should see the new login option on the login page
+7. Test login with an OIDC user:
+
+  ```bash
+  oc login --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443
+  ```
+
+  Select the OIDC provider when prompted.
+
+### Example: Microsoft Entra ID (Azure AD)
+
+```yaml
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+    - name: entra-id
+      mappingMethod: claim
+      type: OpenID
+      openID:
+        clientID: {{ azure_app_client_id }}
+        clientSecret:
+          name: oidc-client-secret
+        issuer: https://login.microsoftonline.com/{{ tenant_id }}/v2.0
+        claims:
+          preferredUsername:
+            - upn
+            - email
+          name:
+            - name
+          email:
+            - email
+          groups:
+            - groups
+```
+
+!!! tip "Azure AD Group Claims"
+    In Microsoft Entra ID, you must configure the app registration to include group claims in the token. Go to App Registration -> Token configuration -> Add groups claim -> Select "Security groups". For large organizations, consider filtering to specific groups to avoid token size limits.
+
+### Example: Keycloak
+
+```yaml
+apiVersion: config.openshift.io/v1
+kind: OAuth
+metadata:
+  name: cluster
+spec:
+  identityProviders:
+    - name: keycloak
+      mappingMethod: claim
+      type: OpenID
+      openID:
+        clientID: openshift
+        clientSecret:
+          name: oidc-client-secret
+        ca:
+          name: oidc-ca-config-map
+        issuer: https://keycloak.example.com/realms/{{ realm_name }}
+        claims:
+          preferredUsername:
+            - preferred_username
+          name:
+            - name
+          email:
+            - email
+          groups:
+            - groups
+```
+
+!!! tip "Keycloak Group Mapper"
+    In Keycloak, add a "Group Membership" mapper to your client scope with the token claim name set to `groups` and "Full group path" disabled. This passes group names directly in the ID token.
+
+## Configure HTPasswd Identity Provider
+
+HTPasswd is a simple file-based identity provider useful for POC environments, break-glass admin accounts, or situations where external identity systems are not yet available.
+
+### Create the HTPasswd File
+
+1. Install the `htpasswd` utility (if not already available):
+
+  ```bash
+  sudo dnf install -y httpd-tools
+  ```
+
+2. Create a new htpasswd file with the first user:
+
+  ```bash
+  htpasswd -c -B -b /tmp/htpasswd admin {{ admin_password }}
+  ```
+
+3. Add additional users:
+
+  ```bash
+  htpasswd -B -b /tmp/htpasswd developer {{ developer_password }}
+  htpasswd -B -b /tmp/htpasswd viewer {{ viewer_password }}
+  ```
+
+  !!! info
+      The `-B` flag uses bcrypt hashing which is the recommended algorithm. The `-b` flag takes the password from the command line (omit it for interactive prompts).
+
+### Create the Secret
+
+4. Create a secret from the htpasswd file:
+
+  ```bash
+  oc create secret generic htpass-secret \
+    --from-file=htpasswd=/tmp/htpasswd \
+    -n openshift-config
+  ```
+
+### Apply the OAuth Configuration
+
+5. Create or update the OAuth CR:
+
+  ```yaml
+  apiVersion: config.openshift.io/v1
+  kind: OAuth
+  metadata:
+    name: cluster
+  spec:
+    identityProviders:
+      - name: htpasswd
+        mappingMethod: claim
+        type: HTPasswd
+        htpasswd:
+          fileData:
+            name: htpass-secret
+  ```
+
+  ```bash
+  oc apply -f oauth.yaml
+  ```
+
+6. Wait for the OAuth pods to redeploy:
+
+  ```bash
+  oc get pods -n openshift-authentication -w
+  ```
+
+### Verify
+
+7. Test login:
+
+  ```bash
+  oc login -u admin -p {{ admin_password }} \
+    --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443
+  ```
+
+### Update Users
+
+To add, remove, or change passwords for htpasswd users:
+
+1. Extract the current htpasswd file:
+
+  ```bash
+  oc get secret htpass-secret -n openshift-config -o jsonpath='{.data.htpasswd}' | base64 -d > /tmp/htpasswd
+  ```
+
+2. Make changes:
+
+  ```bash
+  htpasswd -B -b /tmp/htpasswd newuser {{ new_password }}
+  htpasswd -D /tmp/htpasswd olduser
+  ```
+
+3. Replace the secret:
+
+  ```bash
+  oc create secret generic htpass-secret \
+    --from-file=htpasswd=/tmp/htpasswd \
+    --dry-run=client -o yaml -n openshift-config | oc replace -f -
+  ```
+
+4. The OAuth pods will automatically redeploy. If a user was removed, also clean up the identity and user objects:
+
+  ```bash
+  oc delete user olduser
+  oc delete identity htpasswd:olduser
+  ```
+
+### Assign Roles
+
+```bash
+oc adm policy add-cluster-role-to-user cluster-admin admin
 ```
