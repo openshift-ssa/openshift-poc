@@ -20,6 +20,7 @@ These are modular and can be installed in any order based on your needs but we u
 - [External Secrets Operator](external-secrets-operator.md) — Integrate external secret management
 - [Workload Availability](workload-availability.md) — Node health checks and automatic remediation
 - [Virtualization](virtualization.md) — OpenShift Virtualization (requires workload availability first)
+- [Migration Toolkit for Virtualization](mtv.md) — Migrate VMs from vSphere, RHV, or OpenStack
 - [OADP](oadp.md) — Backup and restore for applications and virtual machines
 - [Service Mesh](service-mesh.md) — Istio ambient mode (sidecar-less mTLS and traffic management)
 - [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows

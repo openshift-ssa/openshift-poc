@@ -94,6 +94,7 @@ nav:
       - External Secrets Operator: post-installation/external-secrets-operator.md
       - Workload Availability: post-installation/workload-availability.md
       - Virtualization: post-installation/virtualization.md
+      - Migration Toolkit for Virtualization: post-installation/mtv.md
       - OADP: post-installation/oadp.md
       - Service Mesh: post-installation/service-mesh.md
       - OpenShift GitOps: post-installation/openshift-gitops.md
