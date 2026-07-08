@@ -82,6 +82,7 @@ nav:
       - Overview: standalone/index.md
       - Assisted Installer: standalone/assisted-installer.md
       - Agent-Based Installer: standalone/agent-based.md
+      - VMware vSphere IPI: standalone/vmware-install.md
       - Troubleshooting: standalone/troubleshooting.md
   - Post-Installation:
       - Overview: post-installation/index.md
