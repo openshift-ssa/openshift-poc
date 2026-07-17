@@ -19,7 +19,6 @@ These are modular and can be installed in any order based on your needs but we u
 - [Networking](networking.md) — NNCPs, OVS bridges, CUDNs, and underlay networking
 - [External Secrets Operator](external-secrets-operator.md) — Integrate external secret management
 - [Workload Availability](workload-availability.md) — Node health checks and automatic remediation
-- [Node Maintenance Operator](node-maintenance-operator.md) — Place nodes in maintenance mode by cordoning and draining
 - [Virtualization](virtualization.md) — OpenShift Virtualization (requires workload availability first)
 - [Migration Toolkit for Virtualization](mtv.md) — Migrate VMs from vSphere, RHV, or OpenStack
 - [OADP](oadp.md) — Backup and restore for applications and virtual machines
