@@ -94,6 +94,7 @@ nav:
       - Networking: post-installation/networking.md
       - External Secrets Operator: post-installation/external-secrets-operator.md
       - Workload Availability: post-installation/workload-availability.md
+      - Node Maintenance Operator: post-installation/node-maintenance-operator.md
       - Virtualization: post-installation/virtualization.md
       - Migration Toolkit for Virtualization: post-installation/mtv.md
       - OADP: post-installation/oadp.md
