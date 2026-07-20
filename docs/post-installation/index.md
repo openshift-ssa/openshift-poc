@@ -24,6 +24,7 @@ These are modular and can be installed in any order based on your needs but we u
 - [OADP](oadp.md) — Backup and restore for applications and virtual machines
 - [Service Mesh](service-mesh.md) — Istio ambient mode (sidecar-less mTLS and traffic management)
 - [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows
+- [Logging](logging.md) — Centralized log collection and storage with Loki
 - [MultiCluster Observability](multicluster-observability.md) — Centralized monitoring across managed clusters
 - [Identity Providers](configuring-identity-providers.md) — Configure LDAP, OIDC, or other authentication
 - [POC Banner](poc-banner.md) — Mark the UI as a PoC environment

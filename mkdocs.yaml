@@ -99,6 +99,7 @@ nav:
       - OADP: post-installation/oadp.md
       - Service Mesh: post-installation/service-mesh.md
       - OpenShift GitOps: post-installation/openshift-gitops.md
+      - Logging: post-installation/logging.md
       - MultiCluster Observability: post-installation/multicluster-observability.md
       - Identity Providers: post-installation/configuring-identity-providers.md
       - POC Banner: post-installation/poc-banner.md
