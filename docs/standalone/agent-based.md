@@ -80,6 +80,25 @@ additionalTrustBundle: |
   -----END CERTIFICATE-----
 ```
 
+### Pull-Through Proxy (Artifactory, Nexus, etc.)
+
+If your environment uses a pull-through cache or registry proxy (such as JFrog Artifactory or Sonatype Nexus) to mirror container images, add `imageContentSources` to redirect image pulls to your local mirror:
+
+```yaml
+imageContentSources:
+  - mirrors:
+      - artifactory.yourdomain.com/quay-remote
+    source: quay.io
+  - mirrors:
+      - artifactory.yourdomain.com/redhat-remote
+    source: registry.redhat.io
+```
+
+This tells the cluster to pull images from your mirror instead of going directly to the upstream registries. The pull-through proxy transparently fetches and caches images from the upstream source on first request.
+
+!!! note
+    If your pull-through proxy uses a self-signed or internal TLS certificate, you must also include it in the `additionalTrustBundle` section above.
+
 ### Compact 3-Node Cluster (No Workers)
 
 For a compact cluster where control plane nodes are schedulable and also run workloads, set `compute[0].replicas` to `0`. The three control plane nodes will handle both control plane and worker duties.
