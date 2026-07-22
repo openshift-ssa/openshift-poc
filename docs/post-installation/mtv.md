@@ -148,6 +148,116 @@ A source provider is the hypervisor environment you are migrating VMs from. A de
 
   The `READY` column should show `True`.
 
+## Set Up the VMware Virtual Disk Development Kit (VDDK)
+
+It is strongly recommended that MTV be used with the VMware Virtual Disk Development Kit (VDDK) SDK when transferring virtual disks from VMware vSphere. Using MTV without VDDK is not recommended and could result in significantly lower migration speeds. You must use a VDDK image if the source VMs are backed by VMware vSAN.
+
+You will download the VDDK, build a container image, and push it to your image registry.
+
+!!! warning "VMware License"
+    Storing the VDDK image in a public registry might violate the VMware license terms.
+
+### Prerequisites
+
+- OpenShift image registry (internal or external accessible from OpenShift Virtualization)
+- `podman` installed
+- You are working on a file system that preserves symbolic links (symlinks) — the VDDK package contains symlinks
+
+### Create a Working Directory
+
+```bash
+mkdir /tmp/vddk && cd /tmp/vddk
+```
+
+### Download VDDK from VMware
+
+1. Open the [VMware VDDK 8 download page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/8.0)
+2. Download version **8.0.1** (Red Hat's current documented version)
+
+    !!! note "OpenShift Virtualization 4.12"
+        If you are running OpenShift Virtualization 4.12, download VDDK version **7.0.3.2** from the [VMware VDDK version 7 download page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/7.0) instead.
+
+3. Save `VMware-vix-disklib-<version>.x86_64.tar.gz` into `/tmp/vddk`
+
+### Extract the VDDK Archive
+
+```bash
+tar -xzf VMware-vix-disklib-*.x86_64.tar.gz
+```
+
+Verify the extracted directory:
+
+```bash
+ls   # should show vmware-vix-disklib-distrib/
+```
+
+### Create the VDDK Container Image
+
+Create a `Dockerfile`:
+
+```bash
+cat > Dockerfile <<'EOF'
+FROM registry.access.redhat.com/ubi8/ubi-minimal
+USER 1001
+COPY vmware-vix-disklib-distrib /vmware-vix-disklib-distrib
+RUN mkdir -p /opt
+ENTRYPOINT ["cp", "-r", "/vmware-vix-disklib-distrib", "/opt"]
+EOF
+```
+
+### Push to the OpenShift Internal Registry
+
+Enable the default registry route if it is not already exposed:
+
+```bash
+oc patch configs.imageregistry.operator.openshift.io/cluster --type merge \
+  -p '{"spec":{"defaultRoute":true}}'
+```
+
+Get the registry hostname:
+
+```bash
+REGISTRY=$(oc get route default-route -n openshift-image-registry \
+  -o jsonpath='{.spec.host}')
+```
+
+Create the target namespace (if it does not already exist):
+
+```bash
+oc new-project openshift-mtv 2>/dev/null || true
+```
+
+Authenticate podman to the internal registry:
+
+```bash
+podman login -u $(oc whoami) -p $(oc whoami -t) $REGISTRY --tls-verify=false
+```
+
+Build and push the VDDK image:
+
+```bash
+podman build . -t $REGISTRY/openshift-mtv/vddk:latest
+podman push $REGISTRY/openshift-mtv/vddk:latest --tls-verify=false
+```
+
+Ensure the image is accessible to your OpenShift Virtualization environment. If you are using an external registry, verify that OpenShift can pull from it.
+
+### Configure MTV to Use the VDDK Image
+
+Update the `ForkliftController` to reference the VDDK init image:
+
+```bash
+oc patch forkliftcontroller forklift-controller -n openshift-mtv --type merge \
+  -p "{\"spec\":{\"controller_vddk_init_image\":\"$REGISTRY/openshift-mtv/vddk:latest\"}}"
+```
+
+Verify the patch:
+
+```bash
+oc get forkliftcontroller forklift-controller -n openshift-mtv \
+  -o jsonpath='{.spec.controller_vddk_init_image}'
+```
+
 ## Create a Migration Plan
 
 Once providers are configured, create a migration plan using the WebUI wizard:
