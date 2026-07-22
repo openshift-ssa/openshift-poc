@@ -164,7 +164,7 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
    ```
 
    !!! note
-   The `forcepathstyle="true"` parameter is required for S3 Compatible storage (not needed for AWS S3).
+       The `forcepathstyle="true"` parameter is required for S3 Compatible storage (not needed for AWS S3).
 
 ### TLS CA Bundle (If Required)
 
@@ -203,9 +203,14 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
    ```
 
    !!! note "If using self-signed storage certificates"
-   Add the TLS section to the LokiStack CR:
+       Add the TLS section to the LokiStack CR:
 
-   ``yaml spec: storage: tls: caName: loki-s3-ca-bundle ``
+       ```yaml
+       spec:
+         storage:
+           tls:
+             caName: loki-s3-ca-bundle
+       ```
 
    ```bash
    oc apply -f lokistack.yaml
@@ -351,7 +356,7 @@ The log collector requires a service account with specific cluster roles to read
     ```
 
     !!! warning "TLS CA Block is Required"
-    The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
+        The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
 
     To also collect audit logs, add `audit` to `inputRefs`:
 
