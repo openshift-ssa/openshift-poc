@@ -258,6 +258,29 @@ spec:
 oc apply -f descheduler-operator.yaml
 ```
 
+### Enable PSI
+
+The `KubeVirtRelieveAndMigrate` profile requires Pressure Stall Information (PSI) metrics on all worker nodes. PSI is disabled by default in OpenShift; enable it with a `MachineConfig` that sets the `psi=1` kernel argument:
+
+```yaml
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-openshift-machineconfig-worker-psi-karg
+spec:
+  kernelArguments:
+    - psi=1
+```
+
+```bash
+oc apply -f psi-machineconfig.yaml
+```
+
+!!! warning
+    Applying this `MachineConfig` triggers a rolling reboot of worker nodes. The object name must use a prefix higher than `98-` (for example `99-...`) because a default config starting with `98-` disables PSI, and machine configs are processed in lexicographical order.
+
 ### Configure
 
 Only one `KubeDescheduler` is allowed per cluster and it must be named `cluster`:
@@ -271,19 +294,27 @@ metadata:
 spec:
   deschedulingIntervalSeconds: 3600
   profiles:
-    - AffinityAndTaints
-    - LifecycleAndUtilization
+    - KubeVirtRelieveAndMigrate
   mode: Predictive
 ```
 
 ### Descheduler Profiles
 
-| Profile                   | Description                                                         |
-| ------------------------- | ------------------------------------------------------------------- |
-| `AffinityAndTaints`       | Evicts pods violating anti-affinity, node affinity, and taint rules |
-| `TopologyAndDuplicates`   | Balances topology domain constraints and spreads duplicates         |
-| `LifecycleAndUtilization` | Evicts from overutilized nodes and long-running pods to rebalance   |
-| `DevPreviewLongLifecycle` | Targets long-running pods; use for OpenShift Virtualization         |
+| Profile                     | Description                                                                                          |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `KubeVirtRelieveAndMigrate` | Load-aware rebalancing for both virtual machines and container workloads using CPU/memory and PSI    |
+| `TopologyAndDuplicates`     | Balances topology domain constraints and spreads duplicates                                          |
+| `LongLifecycle`             | Evicts long-running and overutilized pods; do not combine with `KubeVirtRelieveAndMigrate`           |
+
+`KubeVirtRelieveAndMigrate` is the recommended profile for mixed clusters. It manages both workload types:
+
+- **Virtual machines** — Evicts migratable `virt-launcher` pods so OpenShift Virtualization live-migrates the VM to a less loaded node (requires a `LiveMigrate` eviction strategy on the VM).
+- **Containers** — Evicts ordinary pods from high-cost nodes so the default scheduler can place them on underutilized nodes.
+
+The profile uses the `LowNodeUtilization` strategy with background evictions and, by default, the `PrometheusCPUMemoryCombinedProfile` metric (CPU and memory utilization plus PSI pressure). It also allows eviction of pods with PVCs or local storage, which is required for VM live migration.
+
+!!! note
+    Do not combine `KubeVirtRelieveAndMigrate` with `LongLifecycle`. This profile also sets a node selector for `kubevirt.io/schedulable=true`, so it only acts on nodes schedulable for OpenShift Virtualization.
 
 ### Modes
 
