@@ -308,7 +308,13 @@ wget http://{{ installation_host }}:8080/agent.x86_64.iso
 
 ## Boot and Install
 
-Mount the ISO on each node via BMC virtual media (Redfish, iLO, iDRAC) and boot. When all hosts are booted, monitor the install:
+Mount the ISO on each node via BMC virtual media (Redfish, iLO, iDRAC) and boot. 
+
+!!! warning
+    If you decide to use the BMC web UI to attach a virtual drive using the iso, make a seperate copy of the ISO file (ocp-1, ocp-2, ocp-3, etc) for each of the hosts. If more than one host starts booting against the same file, the BMCs will sometimes have issues. 
+
+
+When all hosts are booted, monitor the install:
 
 ```bash
 openshift-install agent wait-for bootstrap-complete --dir=install

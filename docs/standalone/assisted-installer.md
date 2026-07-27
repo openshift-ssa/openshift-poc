@@ -2,13 +2,13 @@
 
 [Assisted Installer for OpenShift Container Platform Official Documentation](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/latest/html/installing_openshift_container_platform_with_the_assisted_installer/index)
 
-This guide covers installing a standalone multi-node cluster using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters). This should all be done from the installation host. 
+This guide covers installing a standalone multi-node cluster using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters). This should all be done from the installation host.
 
-You should have completed the [prerequisites](../prerequisites/index.md) and you should have that information handy. You should also have a valid ssh key available. 
+You should have completed the [prerequisites](../prerequisites/index.md) and you should have that information handy. You should also have a valid ssh key available.
 
 ## Create the Cluster in the Assisted Installer
 
-To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud Console](https://console.redhat.com/openshift/assisted-installer/clusters). Click on "Create Cluster". If an item in the details below isn't specifically referenced, that means to leave the default. 
+To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud Console](https://console.redhat.com/openshift/assisted-installer/clusters). Click on "Create Cluster". If an item in the details below isn't specifically referenced, that means to leave the default.
 
 ### Cluster details
 
@@ -17,7 +17,7 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 - Choose the OpenShift Version (ensure compatibility, especially with storage CSI driver)
 - Choose your CPU architecture (x86_64 is typical)
 - Choose No platform integration
-- Number of control plane nodes should be selected based on the install type you are doing: 
+- Number of control plane nodes should be selected based on the install type you are doing:
   - 1 (Single Node OpenShift)
   - 3 (highly available cluster)
 - Choose Hosts' network configuration to be "Static IP, bridges and bonds" (unless you allow DHCP, which is rare)
@@ -28,7 +28,7 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 ### Static network configurations
 
 - Select IPv4
-- If you are using a vlan, click "Use VLAN" checkbox, and enter the Machine Subnet VLAN value. 
+- If you are using a vlan, click "Use VLAN" checkbox, and enter the Machine Subnet VLAN value.
 - Enter DNS values
 - Enter the Machine Subnet values
 - Enter the Default gateway
@@ -41,13 +41,13 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
   - Bond type is typically 802.3ad (LACP)
 - Enter the mac addresses for the NICs in the bond using the Host NICs - MAC Address values
 - Enter the IP address for the host
-- If you are doing a full cluster install, repeat this process for all the hosts by using the "Add another host configuration" button. 
+- If you are doing a full cluster install, repeat this process for all the hosts by using the "Add another host configuration" button.
 
 --> Click Next
 
 ### Operators
 
-Don't preinstall any operators. 
+Don't preinstall any operators.
 
 --> Click Next
 
@@ -55,15 +55,18 @@ Don't preinstall any operators.
 
 - Click on the "Add hosts" button at the top of the page
 - For "Provisioning type", select "Full image file - Download a self-contained ISO"
-- Add the SSH public key 
-- If you have a specific [proxy](../prerequisites/networking.md#proxy-configuration) configuration, use the "Show proxy settings" checkbox to enable the view and enter the information. 
-- If you have a [MITM proxy](../prerequisites/networking.md#how-to-determine-if-you-have-a-mitm-proxy) which reencrypts traffic, click the "Configure cluster-wide trusted certificates" and add the MITM root/intermediate cert. 
-- Click "Generate Discovery ISO" and save the ISO file. 
+- Add the SSH public key
+- If you have a specific [proxy](../prerequisites/networking.md#proxy-configuration) configuration, use the "Show proxy settings" checkbox to enable the view and enter the information.
+- If you have a [MITM proxy](../prerequisites/networking.md#how-to-determine-if-you-have-a-mitm-proxy) which reencrypts traffic, click the "Configure cluster-wide trusted certificates" and add the MITM root/intermediate cert.
+- Click "Generate Discovery ISO" and save the ISO file.
 
 #### BMC Install
 
-- If you are using a BMC web interface to create the cluster, save the ISO file locally and attach it. 
-- The web interfaces for BMC installs of this nature can be finicky. If you have a web server somewhere, host it there. Or use the Discovery ISO URL. 
+- If you are using a BMC web interface to create the cluster, save the ISO file locally and attach it.
+- The web interfaces for BMC installs of this nature can be finicky. If you have a web server somewhere, host it there. Or use the Discovery ISO URL.
+
+!!! warning
+    If you decide to use the BMC web UI to attach a virtual drive using the iso, make a seperate copy of the ISO file (ocp-1, ocp-2, ocp-3, etc) for each of the hosts. If more than one host starts booting against the same file, the BMCs will sometimes have issues.
 
 ### Waiting for host
 
@@ -77,7 +80,7 @@ Don't preinstall any operators.
 
 ### Storage
 
-- For each host in the list, ensure the correct disk is selected for the installation disk. 
+- For each host in the list, ensure the correct disk is selected for the installation disk.
 - Deselect format for any network based storage
 
 --> Click Next
@@ -89,9 +92,9 @@ Don't preinstall any operators.
 - Select the correct machine network
 - Fill in the API VIP IP
 - Fill in the Ingress VIP IP
-- Use advanced networking is only used to change the pod and service network. Leave it. 
+- Use advanced networking is only used to change the pod and service network. Leave it.
 - Leave "Use the same host discovery SSH key" checkbox selected
-- In the Host Inventory, you should be able to see all kinds of host information. Check it out. 
+- In the Host Inventory, you should be able to see all kinds of host information. Check it out.
 
 --> Next
 
@@ -118,7 +121,7 @@ Wait for it...
 - User name is kubeadmin
 - Copy the Password
 - Login to the Web Console
-- Wait for the Operators to finish updating and everything to be green. 
+- Wait for the Operators to finish updating and everything to be green.
 
 ## Validate the Install
 
