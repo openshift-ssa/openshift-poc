@@ -93,12 +93,13 @@ The following external endpoints must be reachable from all cluster nodes:
 | Destination                    | Port | Purpose                                |
 | ------------------------------ | ---- | -------------------------------------- |
 | registry.redhat.io             | 443  | Core container images                  |
+| registry.access.redhat.com     | 443  | Core container images                  |
 | access.redhat.com              | 443  | Signature store for image verification |
 | quay.io                        | 443  | Core container images                  |
 | cdn.quay.io                    | 443  | Core container images (CDN)            |
 
 !!! tip
-    You can use `*.quay.io` instead of individually listing `cdn.quay.io` and `cdn0[1-6].quay.io`.
+    You can use `*.quay.io` instead of individually listing `cdn.quay.io` and `cdn0[1-6].quay.io`. You can also use `*.access.redhat.com` to cover the registry. 
 
 **Cluster Access, Authentication, and Updates**
 
