@@ -90,6 +90,7 @@ nav:
       - NMState Operator: post-installation/nmstate.md
       - Storage:
           - Overview: post-installation/storage/index.md
+          - OpenShift Data Foundation: post-installation/storage/odf.md
           - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
       - Registry: post-installation/registry.md
       # optional
