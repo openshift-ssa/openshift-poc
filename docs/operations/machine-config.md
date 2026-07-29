@@ -6,13 +6,13 @@
 
 1. Base64 encode the content for inclusion in a MachineConfig:
 
-  ```bash
+```bash
   echo -n "mysecretvalue" | base64
-  ```
+```
 
 2. Place the encoded value after `base64,` in the MachineConfig:
 
-  ```yaml
+```yaml
   apiVersion: machineconfiguration.openshift.io/v1
   kind: MachineConfig
   metadata:
@@ -30,13 +30,51 @@
           overwrite: true
           contents:
             source: data:text/plain;charset=utf-8;base64,bXlzZWNyZXR2YWx1ZQ==
-  ```
+```
 
 3. Apply:
 
-  ```bash
-  oc apply -f 99-worker-example.yaml
-  ```
+```bash
+oc apply -f 99-worker-example.yaml
+```
+
+## Use a File
+
+```bash
+base64 -w0 myfile.txt
+```
+
+```bash
+# Encode the file content
+CONTENT=$(base64 -w0 /path/to/myfile.conf)
+
+# Reference it in the MachineConfig
+cat <<EOF
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: worker
+  name: 99-worker-myfile
+spec:
+  config:
+    ignition:
+      version: 3.4.0
+    storage:
+      files:
+      - path: /etc/myfile.conf
+        mode: 0644
+        overwrite: true
+        contents:
+          source: data:text/plain;base64,${CONTENT}
+EOF
+```
+
+To decode/verify:
+
+```bash
+echo "$CONTENT" | base64 -d
+```
 
 ## Creating a Machine Configuration File with Butane
 
@@ -44,15 +82,15 @@ Butane transpiles human-readable configs into MachineConfig resources, avoiding 
 
 1. Install Butane:
 
-  ```bash
+```bash
   curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/butane/latest/butane
   chmod +x butane
   sudo mv butane /usr/local/bin/
-  ```
+```
 
 2. Write a Butane config — create `99-worker-example.bu`:
 
-  ```yaml
+```yaml
   variant: openshift
   version: latest.0
   metadata:
@@ -67,19 +105,19 @@ Butane transpiles human-readable configs into MachineConfig resources, avoiding 
         contents:
           inline: |
             mysecretvalue
-  ```
+```
 
 3. Transpile to MachineConfig:
 
-  ```bash
+```bash
   butane 99-worker-example.bu -o 99-worker-example.yaml
-  ```
+```
 
 4. Apply:
 
-  ```bash
+```bash
   oc apply -f 99-worker-example.yaml
-  ```
+```
 
 ### Using a Local File
 
