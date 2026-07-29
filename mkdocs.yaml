@@ -88,7 +88,9 @@ nav:
       - Overview: post-installation/index.md
       # required
       - NMState Operator: post-installation/nmstate.md
-      - Storage: post-installation/storage.md
+      - Storage:
+          - Overview: post-installation/storage/index.md
+          - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
       - Registry: post-installation/registry.md
       # optional
       - Networking: post-installation/networking.md

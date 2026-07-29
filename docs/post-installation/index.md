@@ -9,13 +9,13 @@ After the OpenShift cluster is installed, complete the following operations to p
 These must be completed in order before deploying any workloads:
 
 1. **[NMState Operator](nmstate.md)** — Required for advanced networking (bonds, VLANs, OVS bridges)
-2. **[Storage](storage.md)** — Install your CSI driver and create StorageClasses
+2. **[Storage](storage/index.md)** — Install your CSI driver and create StorageClasses
+    - [VMware vSphere CSI](storage/vsphere-csi.md) — Configure the built-in vSphere CSI driver (vSphere clusters only)
 3. **[Registry](registry.md)** — Configure persistent storage for the internal image registry
 
 ## Optional
 
-These are modular and can be installed in any order based on your needs but we usually recommend this order. 
-
+These are modular and can be installed in any order based on your needs but we usually recommend this order.
 - [Networking](networking.md) — NNCPs, OVS bridges, CUDNs, and underlay networking
 - [External Secrets Operator](external-secrets-operator.md) — Integrate external secret management
 - [Workload Availability](workload-availability.md) — Node health checks and automatic remediation

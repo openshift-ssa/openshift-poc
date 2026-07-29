@@ -16,7 +16,9 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 - Put in the Base domain
 - Choose the OpenShift Version (ensure compatibility, especially with storage CSI driver)
 - Choose your CPU architecture (x86_64 is typical)
-- Choose No platform integration
+- Platform integration:
+  - **VMware vSphere**: Choose **vSphere** to enable the built-in vSphere CSI driver, Machine API auto-scaling, and cloud provider integration. This requires post-install configuration — see [VMware vSphere CSI](../post-installation/storage/vsphere-csi.md).
+  - **Bare metal or other**: Choose **No platform integration**
 - Number of control plane nodes should be selected based on the install type you are doing:
   - 1 (Single Node OpenShift)
   - 3 (highly available cluster)

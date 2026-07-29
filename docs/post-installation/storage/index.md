@@ -48,7 +48,7 @@ Verify your storage vendor and driver version are listed in the [Red Hat Ecosyst
 If you are looking at OpenShift Platform Plus (OPP) and are targeting ODF to be your storage provider, here's how to install it.
 
 !!! warning "Jumbo Frames Required"
-    The storage network must support jumbo frames (MTU 9000) end-to-end for ODF to perform properly. Ensure switches, node NICs, and storage interfaces are all configured for MTU 9000 before deploying ODF. See [Storage Network](../prerequisites/storage.md#storage-network) prerequisites and the [Storage Network NNCP example](networking.md#storage-network-bond-with-jumbo-frames-mtu-9000) for configuration details.
+    The storage network must support jumbo frames (MTU 9000) end-to-end for ODF to perform properly. Ensure switches, node NICs, and storage interfaces are all configured for MTU 9000 before deploying ODF. See [Storage Network](../../prerequisites/storage.md#storage-network) prerequisites and the [Storage Network NNCP example](../networking.md#storage-network-bond-with-jumbo-frames-mtu-9000) for configuration details.
 
 ### Install Local Storage Operator
 
