@@ -91,6 +91,7 @@ nav:
       - Storage:
           - Overview: post-installation/storage/index.md
           - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
+          - Dell Unity Bare Metal: post-installation/storage/dell-unity-bare-metal.md
       - Registry: post-installation/registry.md
       # optional
       - Networking: post-installation/networking.md
