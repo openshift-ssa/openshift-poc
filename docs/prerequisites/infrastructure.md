@@ -16,7 +16,7 @@ Consider these minimum values — the more the better.
 !!! tip "Do I need an installation host?"
     No, as long as the computer we are working from has full access to all the necessary tools or is able to get them without opening tickets (oc, openshift-install, kubectl, helm, kustomize, nmstatectl, git, podman, istioctl, etc). However, if the work is proceeding and the laptop or environment that is currently being used is not available (PTO, sick, etc), then everything comes to a halt. We highly recommend working from a centralized installation host to ensure not only access but also compatibility with the examples in this guide. 
 
-### Standalone Cluster
+### Installation
 
 | Host Type     | Count | CPU | Memory | Install Disk | Secondary Disk |
 | ------------- | ----- | --- | ------ | ------------ | -------------- |

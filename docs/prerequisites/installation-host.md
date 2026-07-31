@@ -104,54 +104,7 @@ If the connection succeeds, no firewall is blocking that port between the two ho
 
 ### Outbound Access
 
-You will need outbound access to the following for pulling OpenShift container images and tools.
-
-**Container Registries**
-
-```
-registry.redhat.io
-access.redhat.com
-quay.io
-cdn.quay.io
-cdn01.quay.io
-cdn02.quay.io
-cdn03.quay.io
-cdn04.quay.io
-cdn05.quay.io
-cdn06.quay.io
-sso.redhat.com
-```
-
-**Cluster Access, Authentication, and Updates**
-
-```
-api.openshift.com
-console.redhat.com
-sso.redhat.com
-```
-
-**Installation and Release Artifacts**
-
-```
-mirror.openshift.com
-quayio-production-s3.s3.amazonaws.com
-rhcos.mirror.openshift.com
-storage.googleapis.com/openshift-release
-```
-
-**Telemetry (if not disabled)**
-
-```
-cert-api.access.redhat.com
-api.access.redhat.com
-infogw.api.openshift.com
-```
-
-**Optional**
-
-```
-registry.connect.redhat.com
-```
+The cluster nodes and installation host need outbound HTTPS (port 443) access to Red Hat registries, update services, and telemetry endpoints. See the [Networking — Outbound Access](networking.md#outbound-access) page for the full list of required endpoints.
 
 ### Connectivity Checks
 

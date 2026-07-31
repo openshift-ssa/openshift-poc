@@ -2,7 +2,7 @@
 
 [Installing on VMware vSphere Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/installing_on_vmware_vsphere/installer-provisioned-infrastructure)
 
-This guide covers installing a standalone OpenShift cluster on VMware vSphere using Installer-Provisioned Infrastructure (IPI). With IPI, the installer provisions VMs, disks, and networking directly in vSphere — no manual VM creation is required.
+This guide covers installing an OpenShift cluster on VMware vSphere using Installer-Provisioned Infrastructure (IPI). With IPI, the installer provisions VMs, disks, and networking directly in vSphere — no manual VM creation is required.
 
 You should have completed the [prerequisites](../prerequisites/index.md) and have that information handy.
 

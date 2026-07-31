@@ -8,7 +8,7 @@ When OpenShift is installed on vSphere with `platform: vsphere`, the **vSphere C
     The vSphere CSI Driver Operator is **only supported on clusters deployed with `platform: vsphere`**. The cluster nodes must be VMs running inside vSphere — the driver provisions VMDKs that attach directly to VMs. **Bare metal clusters cannot use this driver.** For bare metal clusters, use your storage vendor's CSI driver instead (see [Storage](index.md)).
 
 !!! info "Assisted Installer"
-    When using the [Assisted Installer](../../standalone/assisted-installer.md), you must select **vSphere** as the platform integration during cluster creation (not "No platform integration"). After installation completes, you must then manually configure the vSphere connection as described in the [Configure vSphere Connection](#configure-vsphere-connection) section below. The CSI driver will not become operational until this post-install configuration is finished.
+    When using the [Assisted Installer](../../installation/assisted-installer.md), you must select **vSphere** as the platform integration during cluster creation (not "No platform integration"). After installation completes, you must then manually configure the vSphere connection as described in the [Configure vSphere Connection](#configure-vsphere-connection) section below. The CSI driver will not become operational until this post-install configuration is finished.
 
 ## Requirements
 

@@ -2,7 +2,7 @@
 
 The agent-based installer is an alternative to the Assisted Installer that generates a bootable ISO locally using `openshift-install`. It is ideal for environments with limited or no connectivity to console.redhat.com, or when you need full control over the installation artifacts.
 
-This guide covers installing a standalone multi-node cluster. All steps should be performed from the installation host.
+This guide covers installing a multi-node cluster. All steps should be performed from the installation host.
 
 ## Create the Working Directory
 

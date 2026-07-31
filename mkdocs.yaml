@@ -78,12 +78,13 @@ nav:
       - Hub Storage: fleet-management/hub-storage.md
       - Advanced Cluster Management: fleet-management/acm-install.md
       - Provision Bare Metal Cluster: fleet-management/acm-provision-bare-metal-cluster.md
-  - Standalone Cluster:
-      - Overview: standalone/index.md
-      - Assisted Installer: standalone/assisted-installer.md
-      - Agent-Based Installer: standalone/agent-based.md
-      - VMware vSphere IPI: standalone/vmware-install.md
-      - Troubleshooting: standalone/troubleshooting.md
+  - Installation:
+      - Overview: installation/index.md
+      - Assisted Installer: installation/assisted-installer.md
+      - Agent-Based Installer: installation/agent-based.md
+      - VMware vSphere IPI: installation/vmware-install.md
+      - OpenShift on OpenShift: installation/openshift-on-openshift.md
+      - Troubleshooting: installation/troubleshooting.md
   - Post-Installation:
       - Overview: post-installation/index.md
       # required
