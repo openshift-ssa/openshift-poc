@@ -6,7 +6,7 @@ OpenShift Service Mesh 3.x provides Istio ambient mode — a sidecar-less archit
 
 ## Prerequisites
 
-- OpenShift Container Platform 4.19 or later
+- OpenShift Container Platform
 - Cluster administrator privileges
 - OVN-Kubernetes CNI configured for local gateway mode (see below)
 

@@ -10,7 +10,7 @@ Hosted Control Planes (formerly HyperShift) allows you to run OpenShift control 
 
 ## Prerequisites
 
-- An existing OpenShift 4.14+ management cluster
+- An existing OpenShift management cluster
 - Cluster-admin access on the management cluster
 - The `hcp` CLI (Hosted Control Planes CLI)
 - A pull secret from [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret)
@@ -60,7 +60,7 @@ This approach uses the Agent platform, where workers are provisioned via the Dis
     --ssh-key=/path/to/ssh-key.pub \
     --agent-namespace=hardware-inventory \
     --api-server-address=api.hosted-cluster-01.ocp.basedomain.com \
-    --release-image=quay.io/openshift-release-dev/ocp-release:4.16.0-x86_64 \
+    --release-image=quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64 \
     --node-pool-replicas=3
   ```
 
@@ -90,7 +90,7 @@ hcp create cluster kubevirt \
   --memory=8Gi \
   --cores=4 \
   --root-volume-size=50 \
-  --release-image=quay.io/openshift-release-dev/ocp-release:4.16.0-x86_64
+  --release-image=quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
 ```
 
 This creates KubeVirt VirtualMachines as worker nodes for the hosted cluster.
@@ -148,7 +148,7 @@ spec:
   clusterName: hosted-cluster-01
   replicas: 2
   release:
-    image: quay.io/openshift-release-dev/ocp-release:4.16.0-x86_64
+    image: quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
   platform:
     type: Agent
 ```

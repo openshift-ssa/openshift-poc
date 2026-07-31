@@ -19,7 +19,7 @@ When OpenShift is installed on vSphere with `platform: vsphere`, the **vSphere C
 - No third-party vSphere CSI driver present in the cluster
 
 !!! warning "Third-party CSI drivers"
-    If a third-party vSphere CSI driver is already installed, OpenShift will not overwrite it, and upgrades to 4.13+ will be blocked. See the [official documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/storage/using-container-storage-interface-csi#persistent-storage-csi-vsphere-remove-third-party) for removal instructions.
+    If a third-party vSphere CSI driver is already installed, OpenShift will not overwrite it and upgrades will be blocked. See the [official documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/storage/using-container-storage-interface-csi#persistent-storage-csi-vsphere-remove-third-party) for removal instructions.
 
 ## Configure vSphere Connection
 
@@ -98,7 +98,7 @@ When using the Assisted Installer with vSphere platform integration, the cluster
     oc get cm cloud-provider-config -o yaml -n openshift-config > cloud-provider-config-backup.yaml
     ```
 
-    Edit `cloud-provider-config.yaml` (for OCP 4.18+, use YAML syntax):
+    Edit `cloud-provider-config.yaml`:
 
     ```yaml
     apiVersion: v1
@@ -409,4 +409,4 @@ oc delete pvc test-vsphere-pvc
 | ReadWriteMany (RWX) | Yes | Requires vSAN file service |
 | Disk encryption | Yes | RWX encrypted PVs not supported |
 | Topology-aware provisioning | Yes | |
-| CSI migration (in-tree) | Yes | Automatic from OCP 4.13+ |
+| CSI migration (in-tree) | Yes | Automatic |

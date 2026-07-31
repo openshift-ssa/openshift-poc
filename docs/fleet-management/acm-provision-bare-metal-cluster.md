@@ -115,7 +115,7 @@ Once all hosts are registered as agents, create the cluster resources to trigger
     oc get clusterimageset
     ```
 
-    Pick the version that matches your target OpenShift release (e.g., `img4.17.12-x86-64`).
+    Pick the version that matches your target OpenShift release (e.g., `img{{ ocp_release }}-x86-64`).
 
 1. Create the ClusterDeployment and AgentClusterInstall:
 

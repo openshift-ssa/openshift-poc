@@ -174,9 +174,6 @@ mkdir /tmp/vddk && cd /tmp/vddk
 1. Open the [VMware VDDK 8 download page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/8.0)
 2. Download version **8.0.1** (Red Hat's current documented version)
 
-    !!! note "OpenShift Virtualization 4.12"
-        If you are running OpenShift Virtualization 4.12, download VDDK version **7.0.3.2** from the [VMware VDDK version 7 download page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/7.0) instead.
-
 3. Save `VMware-vix-disklib-<version>.x86_64.tar.gz` into `/tmp/vddk`
 
 ### Extract the VDDK Archive

@@ -147,7 +147,7 @@ mirror:
 
 | File                              | Purpose                                         |
 | --------------------------------- | ----------------------------------------------- |
-| `imageContentSourcePolicy.yaml` | Tells the cluster where to find mirrored images |
+| `imageDigestMirrorSet.yaml`     | Tells the cluster where to find mirrored images |
 | `catalogSource.yaml`            | Points OLM to the mirrored operator catalog     |
 | `updateService.yaml`            | Points the update service to the mirror         |
 
@@ -156,7 +156,7 @@ mirror:
 Start with the standard `install-config.yaml` from the [Agent-Based Installer](agent-based.md) guide and add the disconnected-specific fields:
 
 ```yaml
-imageContentSources:
+imageDigestSources:
   - mirrors:
       - {{ mirror_host }}:8443/openshift/release-images
     source: quay.io/openshift-release-dev/ocp-release
@@ -172,7 +172,7 @@ additionalTrustBundle: |
 ```
 
 !!! warning
-    The `imageContentSources` values must match the repository paths used by `oc-mirror`. Check the generated `imageContentSourcePolicy.yaml` for the exact values.
+    The `imageDigestSources` values must match the repository paths used by `oc-mirror`. Check the generated `imageDigestMirrorSet.yaml` for the exact values.
 
 ### Generate and Boot the ISO
 
@@ -254,10 +254,10 @@ For Artifactory, add the credentials to each remote repository under **Advanced 
 
 ### Configure install-config.yaml
 
-Add `imageContentSources` to redirect image pulls to your cache and the trust bundle if the cache uses internal TLS certificates. Start with the standard `install-config.yaml` from the [Agent-Based Installer](agent-based.md) guide and add:
+Add `imageDigestSources` to redirect image pulls to your cache and the trust bundle if the cache uses internal TLS certificates. Start with the standard `install-config.yaml` from the [Agent-Based Installer](agent-based.md) guide and add:
 
 ```yaml
-imageContentSources:
+imageDigestSources:
   - mirrors:
       - {{ artifactory_host }}/quay-remote
     source: quay.io
@@ -308,32 +308,143 @@ oc adm release mirror \
   -a ~/merged-pull-secret.json
 ```
 
+### Validate the Pull-Through Cache
+
+Before generating the ISO, validate that the cache is correctly proxying images. Catching misconfigurations here avoids a failed install.
+
+#### 1. Verify TLS Connectivity
+
+Confirm the installation host trusts the artifact repository's TLS certificate:
+
+```bash
+openssl s_client -connect {{ artifactory_host }}:443 -servername {{ artifactory_host }} </dev/null 2>/dev/null | openssl x509 -noout -subject -issuer
+```
+
+If using a self-signed or internal CA, add it to the trust store:
+
+```bash
+sudo cp /path/to/ca-cert.pem /etc/pki/ca-trust/source/anchors/
+sudo update-ca-trust
+```
+
+#### 2. Verify Registry Authentication
+
+Confirm credentials are valid for both the cache and upstream:
+
+```bash
+podman login {{ artifactory_host }}
+skopeo login {{ artifactory_host }}
+```
+
+#### 3. Test Image Pulls Through the Cache
+
+Use `skopeo inspect` to verify the cache can fetch image metadata from each upstream registry without downloading the full image:
+
+```bash
+# Test quay.io proxy
+skopeo inspect \
+  --authfile ~/merged-pull-secret.json \
+  docker://{{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
+
+# Test registry.redhat.io proxy
+skopeo inspect \
+  --authfile ~/merged-pull-secret.json \
+  docker://{{ artifactory_host }}/redhat-registry-remote/ubi9/ubi:latest
+
+# Test registry.access.redhat.com proxy
+skopeo inspect \
+  --authfile ~/merged-pull-secret.json \
+  docker://{{ artifactory_host }}/redhat-access-remote/ubi9/ubi:latest
+```
+
+If any of these fail, check the remote repository configuration and upstream credentials in Artifactory/Nexus.
+
+#### 4. Verify the Release Payload
+
+Confirm the full release payload is resolvable through the cache:
+
+```bash
+oc adm release info \
+  --registry-config ~/merged-pull-secret.json \
+  {{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
+```
+
+This should print the release metadata (component images, versions, and digests). If it fails, the installer will also fail — resolve the issue before proceeding.
+
+#### 5. Verify the Operator Catalog
+
+If the cluster will install operators through the cache, verify the catalog index is accessible:
+
+```bash
+skopeo inspect \
+  --authfile ~/merged-pull-secret.json \
+  docker://{{ artifactory_host }}/redhat-registry-remote/redhat/redhat-operator-index:v{{ ocp_version }}
+```
+
+#### 6. Check the Cache Repository (Artifactory/Nexus UI)
+
+After running the `skopeo inspect` or pre-warm commands, verify in the artifact repository UI that content has been cached:
+
+- **Artifactory**: Navigate to **Application > Artifactory > Artifacts**, expand the remote repository (e.g., `quay-remote-cache`), and confirm cached layers and manifests are present.
+- **Nexus**: Navigate to **Browse > <repository name>** and verify that image layers appear under the proxied paths.
+
+If the repositories are empty after running the above commands, the proxy configuration or upstream authentication is incorrect.
+
 ### Generate and Boot the ISO
 
 Follow the same ISO generation, hosting, and boot process from the [Agent-Based Installer](agent-based.md#generate-the-iso) guide.
 
 ---
 
-## Verification
+## Post-Install Verification
 
-After installation, verify the cluster is pulling images from the local source:
+After installation, verify the cluster is pulling images from the local source.
+
+### Check Image Mirroring Configuration
 
 ```bash
-oc get imagecontentsourcepolicy -o yaml
+oc get imagedigestmirrorset -o yaml
 ```
 
-Test pulling an image through the mirror:
+### Verify Node-Level Image Pulls
+
+Test pulling an image from a cluster node through the mirror or cache:
 
 ```bash
 oc debug node/{{ worker_node_name }} -- chroot /host \
   podman pull {{ mirror_or_cache_host }}/ubi9/ubi:latest
 ```
 
-Check the `MachineConfigPool` is not degraded (a common symptom of mirror misconfiguration):
+### Check MachineConfigPool Health
+
+A degraded MCP is a common symptom of mirror misconfiguration (bad certificates, incorrect `imageDigestSources`):
 
 ```bash
 oc get mcp
 ```
+
+All pools should show `UPDATED=True`, `UPDATING=False`, `DEGRADED=False`.
+
+### Verify Pods Are Using Cached Images
+
+Spot-check that running pods resolved their images through the cache, not directly from upstream:
+
+```bash
+oc get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{end}' | sort -u | head -20
+```
+
+The image references should reflect the mirror/cache paths, not the upstream registries.
+
+### Verify Operator Catalog Access
+
+If using OLM operators through the cache, confirm the catalog source is healthy:
+
+```bash
+oc get catalogsource -n openshift-marketplace
+oc get packagemanifest | head -10
+```
+
+Both commands should return results without errors.
 
 ## Ongoing Maintenance
 
@@ -355,7 +466,7 @@ oc-mirror --config imageset-config.yaml \
   --v2
 ```
 
-Apply the updated `ImageContentSourcePolicy` and `CatalogSource` if they changed, then initiate the upgrade through the web console or CLI.
+Apply the updated `ImageDigestMirrorSet` and `CatalogSource` if they changed, then initiate the upgrade through the web console or CLI.
 
 For pull-through caches, the upgrade process pulls new images on demand through the cache. No pre-staging is required, but pre-warming is still recommended to avoid timeouts during the upgrade.
 
