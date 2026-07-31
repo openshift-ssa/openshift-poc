@@ -120,6 +120,9 @@ nav:
       - Busybox Hello World: workloads/busybox-hello-world.md
       - Spring PetClinic: workloads/spring-petclinic.md
       - Kafka (Strimzi): workloads/kafka-strimzi.md
+      - Source-to-Image (S2I) Build: workloads/s2i-build.md
+      - PostgreSQL with Persistent Storage: workloads/postgresql.md
+      - Bookinfo (Service Mesh): workloads/bookinfo.md
       - Deploying Virtual Machines: workloads/workload-virtual-machines.md
   - Operations:
       - Overview: operations/index.md
