@@ -442,6 +442,86 @@ Ensure the following on all nodes:
 - Boot order set to local disk (the ISO is mounted via virtual media)
 - Hardware clock set to UTC
 
+### Disable POST Memory Test
+
+Servers with large amounts of RAM (512 GB+) can spend 5–10 minutes running full memory diagnostics during every boot. For a POC where clusters are built and torn down frequently, disabling the POST memory test cuts each reboot cycle significantly with no reliability trade-off.
+
+#### Dell iDRAC
+
+```bash
+racadm set BIOS.MemSettings.MemTest Disabled
+racadm jobqueue create BIOS.Setup.1-1
+racadm serveraction powercycle
+```
+
+Redfish equivalent:
+
+```bash
+curl -sk -X PATCH \
+  https://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1/Bios/Settings \
+  -u {{ bmc_username }}:{{ bmc_password }} \
+  -H "Content-Type: application/json" \
+  -d '{"Attributes":{"MemTest":"Disabled"}}'
+```
+
+#### HPE iLO
+
+Enable Memory Fast Training (skips full initialization after first good boot):
+
+```bash
+ilorest set MemFastTraining=Enabled --selector=Bios.
+ilorest commit
+```
+
+Redfish equivalent:
+
+```bash
+curl -sk -X PATCH \
+  https://{{ bmc_ip }}/redfish/v1/Systems/1/Bios/Settings \
+  -u {{ bmc_username }}:{{ bmc_password }} \
+  -H "Content-Type: application/json" \
+  -d '{"Attributes":{"MemFastTraining":"Enabled"}}'
+```
+
+#### Cisco CIMC
+
+Redfish:
+
+```bash
+curl -sk -X PATCH \
+  https://{{ bmc_ip }}/redfish/v1/Systems/{{ system_id }}/Bios/Settings \
+  -u {{ bmc_username }}:{{ bmc_password }} \
+  -H "Content-Type: application/json" \
+  -d '{"Attributes":{"<memory-test-attribute>":"Disabled"}}'
+```
+
+!!! note
+    The exact attribute name varies between C-series generations and firmware versions (often `POSTErrorPause` or a toggle under the memory RAS group). Query `/redfish/v1/Systems/{{ system_id }}/Bios` to find the correct attribute name for your hardware.
+
+#### Declarative via HostFirmwareSettings (Metal³ / Ironic)
+
+If the bare metal nodes are managed by Metal³/Ironic (BareMetalHost operator), skip per-BMC scripting and drive it declaratively through `HostFirmwareSettings`:
+
+```yaml
+apiVersion: metal3.io/v1alpha1
+kind: HostFirmwareSettings
+metadata:
+  name: {{ baremetalhost_name }}
+  namespace: openshift-machine-api
+spec:
+  settings:
+    MemTest: "Disabled"          # Dell
+    # MemFastTraining: "Enabled" # HPE
+```
+
+Look up the correct attribute names from the node's firmware schema:
+
+```bash
+oc get hostfirmwaresettings {{ baremetalhost_name }} -n openshift-machine-api -o yaml
+```
+
+The `status.settings` field shows current values and `status.schema` shows allowed values per attribute. This keeps the change in your GitOps repo and reapplies on reprovision.
+
 ### Schedulable Control Plane
 
 There is an ability to run the control plane nodes as schedulable, making them effectively worker nodes as well. This is discouraged unless required by the environment constraints, such as testing to run edge systems.
