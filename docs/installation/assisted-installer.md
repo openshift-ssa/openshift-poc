@@ -56,7 +56,7 @@ Don't preinstall any operators.
 ### Host discovery
 
 - Click on the "Add hosts" button at the top of the page
-- For "Provisioning type", select "Full image file - Download a self-contained ISO"
+- For "Provisioning type", select "Minimal"
 - Add the SSH public key
 - If you have a specific [proxy](../prerequisites/networking.md#proxy-configuration) configuration, use the "Show proxy settings" checkbox to enable the view and enter the information.
 - If you have a [MITM proxy](../prerequisites/networking.md#how-to-determine-if-you-have-a-mitm-proxy) which reencrypts traffic, click the "Configure cluster-wide trusted certificates" and add the MITM root/intermediate cert.
