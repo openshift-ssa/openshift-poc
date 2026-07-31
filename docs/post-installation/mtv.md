@@ -193,10 +193,10 @@ ls   # should show vmware-vix-disklib-distrib/
 
 ### Create the VDDK Container Image
 
-Create a `Dockerfile`:
+Create a `Containerfile`:
 
 ```bash
-cat > Dockerfile <<'EOF'
+cat > Containerfile <<'EOF'
 FROM registry.access.redhat.com/ubi9/ubi-minimal
 USER 1001
 COPY vmware-vix-disklib-distrib /vmware-vix-disklib-distrib

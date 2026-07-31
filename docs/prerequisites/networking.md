@@ -11,21 +11,21 @@ OpenShift requires specific network configurations and firewall rules between no
 | Service Network | Kubernetes service IPs         | 172.30.0.0/16 |
 
 !!! info
-    Do you have to use these values for the Pod network and Service network? No. But for the POC, just keep the defaults. 
+    Do you have to use these values for the Pod network and Service network? No. But for the POC, just keep the defaults.
 
 ## Static IP Assignments
 
 Since there is no DHCP, every node requires a pre-assigned static IP. Gather the following for each node before installation:
 
-| Field          | Example           |
-| -------------- | ----------------- |
-| IP Address     | 10.0.0.10         |
-| Subnet Mask    | 255.255.255.240   |
-| Gateway        | 10.0.0.1          |
-| Primary DNS    | 10.0.0.2          |
-| Secondary DNS  | 1.1.1.1           |
-| NIC Interface  | eno1              |
-| MAC Address    | aa:bb:cc:dd:ee:00 |
+| Field         | Example           |
+| ------------- | ----------------- |
+| IP Address    | 10.0.0.10         |
+| Subnet Mask   | 255.255.255.240   |
+| Gateway       | 10.0.0.1          |
+| Primary DNS   | 10.0.0.2          |
+| Secondary DNS | 1.1.1.1           |
+| NIC Interface | eno1              |
+| MAC Address   | aa:bb:cc:dd:ee:00 |
 
 !!! tip
     Document all static IP assignments in a spreadsheet or table before starting installation. The Assisted Installer will require this information for each host.
@@ -39,26 +39,26 @@ Since there is no DHCP, every node requires a pre-assigned static IP. Gather the
 
 A single bond or NIC carrying all cluster traffic — management, storage, and VM data.
 
-| Bond  | Purpose        | Mode     | MTU  |
-| ----- | -------------- | -------- | ---- |
-| bond0 | All traffic    | 802.3ad  | 1500 |
+| Bond  | Purpose     | Mode    | MTU  |
+| ----- | ----------- | ------- | ---- |
+| bond0 | All traffic | 802.3ad | 1500 |
 
 ### Production Multi-Bond Architecture
 
 In production environments with OpenShift Virtualization, the recommended architecture separates traffic across two bonds:
 
-| Bond  | Purpose                  | Mode    | MTU  | Switch Config       |
-| ----- | ------------------------ | ------- | ---- | ------------------- |
-| bond0 | Management / Cluster     | 802.3ad | 1500 | Access port or VLAN |
-| bond1 | Data plane (trunk)       | 802.3ad | 9000 | Trunk port          |
+| Bond  | Purpose              | Mode    | MTU  | Switch Config       |
+| ----- | -------------------- | ------- | ---- | ------------------- |
+| bond0 | Management / Cluster | 802.3ad | 1500 | Access port or VLAN |
+| bond1 | Data plane (trunk)   | 802.3ad | 9000 | Trunk port          |
 
 `bond1` carries a trunked connection with multiple VLANs for different traffic types:
 
-| VLAN on bond1 | Purpose              | MTU  | Notes                                      |
-| ------------- | -------------------- | ---- | ------------------------------------------ |
-| VLAN 100      | VM workload traffic  | 9000 | Underlay network for VM-to-external access |
-| VLAN 200      | Storage network      | 9000 | Dedicated path to storage array            |
-| VLAN 300      | Live migration       | 9000 | Dedicated path for VM live migrations      |
+| VLAN on bond1 | Purpose             | MTU  | Notes                                      |
+| ------------- | ------------------- | ---- | ------------------------------------------ |
+| VLAN 100      | VM workload traffic | 9000 | Underlay network for VM-to-external access |
+| VLAN 200      | Storage network     | 9000 | Dedicated path to storage array            |
+| VLAN 300      | Live migration      | 9000 | Dedicated path for VM live migrations      |
 
 This separation provides:
 
@@ -86,51 +86,46 @@ The post-installation [Networking](../post-installation/networking.md) page has 
 
 ## Outbound Access
 
-The following external endpoints must be reachable from all cluster nodes:
+The following external endpoints must be reachable from all cluster nodes (unless you are doing a [disconnected install](../installation/disconnected.md)):
 
 **Container Registries**
 
-| Destination                    | Port | Purpose                                |
-| ------------------------------ | ---- | -------------------------------------- |
-| registry.redhat.io             | 443  | Core container images                  |
-| registry.access.redhat.com     | 443  | Core container images                  |
-| access.redhat.com              | 443  | Signature store for image verification |
-| quay.io                        | 443  | Core container images                  |
-| cdn.quay.io                    | 443  | Core container images (CDN)            |
+| Destination                 | Port | Purpose                                |
+| --------------------------- | ---- | -------------------------------------- |
+| registry.redhat.io          | 443  | Core container images                  |
+| registry.access.redhat.com  | 443  | Core container images                  |
+| access.redhat.com           | 443  | Signature store for image verification |
+| quay.io                     | 443  | Core container images                  |
+| cdn.quay.io                 | 443  | Core container images (CDN)            |
+| registry.connect.redhat.com | 443  | Third-party certified operator images  |
 
 !!! tip
-    You can use `*.quay.io` instead of individually listing `cdn.quay.io` and `cdn0[1-6].quay.io`. You can also use `*.access.redhat.com` to cover the registry. 
+    You can use `*.quay.io` instead of individually listing `cdn.quay.io` and `cdn0[1-6].quay.io`. You can also use `*.access.redhat.com` to cover the registry.
 
 **Cluster Access, Authentication, and Updates**
 
-| Destination                    | Port | Purpose                               |
-| ------------------------------ | ---- | ------------------------------------- |
-| api.openshift.com              | 443  | Cluster tokens and update checks      |
-| console.redhat.com             | 443  | Assisted Installer, telemetry         |
-| sso.redhat.com                 | 443  | Authentication for console.redhat.com |
+| Destination        | Port | Purpose                               |
+| ------------------ | ---- | ------------------------------------- |
+| api.openshift.com  | 443  | Cluster tokens and update checks      |
+| console.redhat.com | 443  | Assisted Installer, telemetry         |
+| sso.redhat.com     | 443  | Authentication for console.redhat.com |
 
 **Installation and Release Artifacts**
 
-| Destination                                | Port | Purpose                              |
-| ------------------------------------------ | ---- | ------------------------------------ |
-| mirror.openshift.com                       | 443  | Mirrored install content and images  |
-| quayio-production-s3.s3.amazonaws.com      | 443  | Quay image content in AWS            |
-| rhcos.mirror.openshift.com                 | 443  | RHCOS images                         |
-| storage.googleapis.com/openshift-release   | 443  | Release image signatures             |
+| Destination                              | Port | Purpose                             |
+| ---------------------------------------- | ---- | ----------------------------------- |
+| mirror.openshift.com                     | 443  | Mirrored install content and images |
+| quayio-production-s3.s3.amazonaws.com    | 443  | Quay image content in AWS           |
+| rhcos.mirror.openshift.com               | 443  | RHCOS images                        |
+| storage.googleapis.com/openshift-release | 443  | Release image signatures            |
 
 **Telemetry (if not disabled)**
 
-| Destination                    | Port | Purpose                              |
-| ------------------------------ | ---- | ------------------------------------ |
-| cert-api.access.redhat.com     | 443  | Telemetry                            |
-| api.access.redhat.com          | 443  | Telemetry                            |
-| infogw.api.openshift.com       | 443  | Telemetry                            |
-
-**Optional**
-
-| Destination                    | Port | Purpose                               |
-| ------------------------------ | ---- | ------------------------------------- |
-| registry.connect.redhat.com    | 443  | Third-party certified operator images |
+| Destination                | Port | Purpose   |
+| -------------------------- | ---- | --------- |
+| cert-api.access.redhat.com | 443  | Telemetry |
+| api.access.redhat.com      | 443  | Telemetry |
+| infogw.api.openshift.com   | 443  | Telemetry |
 
 ```bash
 # Verify connectivity from a node to required endpoints
@@ -152,7 +147,7 @@ All cluster nodes must reside on the same Layer 2 network or have Layer 3 routin
 
 ### NTP
 
-All cluster nodes must have synchronized time. Provide an NTP server that is reachable from the cluster hosts. 
+All cluster nodes must have synchronized time. Provide an NTP server that is reachable from the cluster hosts.
 
 ### Proxy Configuration
 
@@ -168,16 +163,16 @@ Example `noProxy` value:
 .basedomain.com,10.0.0.0/28,10.128.0.0/14,172.30.0.0/16,localhost,127.0.0.1,.cluster.local,.svc
 ```
 
-| Entry              | Reason                                    |
-| ------------------ | ----------------------------------------- |
-| `.basedomain.com`  | Internal domain — do not proxy            |
-| `10.0.0.0/28`      | Machine network (node-to-node traffic)    |
-| `10.128.0.0/14`    | Cluster network (pod-to-pod traffic)      |
-| `172.30.0.0/16`    | Service network (ClusterIP services)      |
-| `localhost`        | Loopback                                  |
-| `127.0.0.1`        | Loopback                                  |
-| `.cluster.local`   | In-cluster DNS                            |
-| `.svc`             | In-cluster service DNS                    |
+| Entry               | Reason                                 |
+| ------------------- | -------------------------------------- |
+| `.basedomain.com` | Internal domain — do not proxy        |
+| `10.0.0.0/28`     | Machine network (node-to-node traffic) |
+| `10.128.0.0/14`   | Cluster network (pod-to-pod traffic)   |
+| `172.30.0.0/16`   | Service network (ClusterIP services)   |
+| `localhost`       | Loopback                               |
+| `127.0.0.1`       | Loopback                               |
+| `.cluster.local`  | In-cluster DNS                         |
+| `.svc`            | In-cluster service DNS                 |
 
 !!! warning
     Do not include the API or Ingress VIPs in the `noProxy` list with a wildcard. Use explicit CIDRs or domains. The installer will automatically add the API and Ingress VIPs to the no-proxy configuration.
@@ -206,12 +201,12 @@ curl -vI https://registry.redhat.io 2>&1 | grep -i "issuer"
 
 Contact your network security or infrastructure team and request the root CA certificate (and any intermediate certificates) used by the TLS-intercepting proxy. Common sources:
 
-| Source                    | How to Obtain                                                |
-| ------------------------- | ------------------------------------------------------------ |
-| Security / Network team   | Request the CA cert directly                                 |
-| Corporate PKI portal      | Download from your organization's certificate portal         |
-| Browser export            | Visit an HTTPS site, inspect the cert chain, export the root |
-| From the proxy itself     | Some proxies publish their CA at a known internal URL        |
+| Source                  | How to Obtain                                                |
+| ----------------------- | ------------------------------------------------------------ |
+| Security / Network team | Request the CA cert directly                                 |
+| Corporate PKI portal    | Download from your organization's certificate portal         |
+| Browser export          | Visit an HTTPS site, inspect the cert chain, export the root |
+| From the proxy itself   | Some proxies publish their CA at a known internal URL        |
 
 You can also extract it directly from the connection:
 

@@ -36,6 +36,12 @@ plugins:
   - privacy:
       links_attr_map:
         target: _blank
+  - macros:
+      on_undefined: keep
+
+extra:
+  ocp_version: "4.21"
+  ocp_release: "4.21.0"
 
 markdown_extensions:
   - admonition
@@ -83,6 +89,7 @@ nav:
       - Assisted Installer: installation/assisted-installer.md
       - Agent-Based Installer: installation/agent-based.md
       - VMware vSphere IPI: installation/vmware-install.md
+      - Disconnected Install: installation/disconnected.md
       - OpenShift on OpenShift: installation/openshift-on-openshift.md
       - Troubleshooting: installation/troubleshooting.md
   - Post-Installation:

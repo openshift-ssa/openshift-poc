@@ -41,6 +41,25 @@ docs/
 └── post-installation/         # Day 2 operations
 ```
 
+## Sitewide Variables
+
+OpenShift version references are managed as sitewide variables in `mkdocs.yaml` under the `extra` key:
+
+```yaml
+extra:
+  ocp_version: "4.21"
+  ocp_release: "4.21.0"
+```
+
+| Variable | Example Value | Usage |
+| --- | --- | --- |
+| `ocp_version` | `4.21` | Channel names, operator index tags, CLI download URLs |
+| `ocp_release` | `4.21.0` | Full release image tags |
+
+Use these in any markdown page with `{{ ocp_version }}` or `{{ ocp_release }}`. The [mkdocs-macros-plugin](https://mkdocs-macros-plugin.readthedocs.io/) substitutes them at build time. To update the version across all pages, change the values in `mkdocs.yaml`.
+
+Undefined `{{ placeholder }}` variables (e.g., `{{ mirror_host }}`, `{{ bmc_ip }}`) are intentionally left as-is for users to fill in. This is controlled by the `on_undefined: keep` setting in the macros plugin config.
+
 ## Contributing
 
 1. Create a feature branch
