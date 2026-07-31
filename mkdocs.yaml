@@ -117,7 +117,7 @@ nav:
   - Workloads: 
       - Overview: workloads/index.md
       - Deploying Containers: workloads/workload-containers.md
-      - Busybox Hello World: workloads/busybox-hello-world.md
+      - Hello World Web Server: workloads/busybox-hello-world.md
       - Spring PetClinic: workloads/spring-petclinic.md
       - Kafka (Strimzi): workloads/kafka-strimzi.md
       - Source-to-Image (S2I) Build: workloads/s2i-build.md

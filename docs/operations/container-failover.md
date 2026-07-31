@@ -45,7 +45,7 @@ This guide walks through testing container workload failover by deploying a samp
                   topologyKey: kubernetes.io/hostname
         containers:
           - name: app
-            image: registry.redhat.io/ubi9/httpd-24:latest
+            image: registry.access.redhat.com/hi/nginx:latest
             ports:
               - containerPort: 8080
             resources:
@@ -203,7 +203,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: registry.redhat.io/ubi9/httpd-24:latest
+          image: registry.access.redhat.com/hi/nginx:latest
           ports:
             - containerPort: 8080
           volumeMounts:

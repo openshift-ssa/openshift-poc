@@ -1,6 +1,8 @@
 # PostgreSQL with Persistent Storage
 
-This example deploys PostgreSQL with a PersistentVolumeClaim (PVC) to validate that the CSI driver and StorageClass are working end-to-end. It demonstrates stateful workloads, persistent storage, and how data survives pod restarts.
+[Red Hat Hardened Images](https://docs.redhat.com/en/documentation/red_hat_hardened_images/1-latest/html/build_and_deploy_secure_minimal_containers_with_red_hat_hardened_images/index) | [Hardened PostgreSQL Image](https://images.redhat.com/?name=postgresql)
+
+This example deploys PostgreSQL using a [Red Hat Hardened Image](https://www.redhat.com/en/products/hardened-images) with a PersistentVolumeClaim (PVC) to validate that the CSI driver and StorageClass are working end-to-end. It demonstrates stateful workloads, persistent storage, and how data survives pod restarts. The hardened image is distroless, minimal, and free of known CVEs.
 
 ## Prerequisites
 
@@ -58,16 +60,18 @@ This example deploys PostgreSQL with a PersistentVolumeClaim (PVC) to validate t
       spec:
         containers:
           - name: postgresql
-            image: registry.redhat.io/rhel9/postgresql-16:latest
+            image: registry.access.redhat.com/hi/postgresql:16
             ports:
               - containerPort: 5432
             env:
-              - name: POSTGRESQL_USER
+              - name: POSTGRES_USER
                 value: demo
-              - name: POSTGRESQL_PASSWORD
+              - name: POSTGRES_PASSWORD
                 value: demo123
-              - name: POSTGRESQL_DATABASE
+              - name: POSTGRES_DB
                 value: sampledb
+              - name: PGDATA
+                value: /var/lib/postgresql/data/pgdata
             resources:
               requests:
                 memory: "256Mi"
@@ -77,19 +81,16 @@ This example deploys PostgreSQL with a PersistentVolumeClaim (PVC) to validate t
                 cpu: "500m"
             volumeMounts:
               - name: postgresql-data
-                mountPath: /var/lib/pgsql/data
+                mountPath: /var/lib/postgresql/data
             readinessProbe:
-              exec:
-                command:
-                  - /usr/libexec/check-container
+              tcpSocket:
+                port: 5432
               initialDelaySeconds: 5
               periodSeconds: 10
             livenessProbe:
-              exec:
-                command:
-                  - /usr/libexec/check-container
-                  - --live
-              initialDelaySeconds: 120
+              tcpSocket:
+                port: 5432
+              initialDelaySeconds: 30
               periodSeconds: 10
         volumes:
           - name: postgresql-data
@@ -125,7 +126,7 @@ This example deploys PostgreSQL with a PersistentVolumeClaim (PVC) to validate t
   Inside the pod:
 
   ```sql
-  psql -U demo sampledb
+  psql -U demo -d sampledb
   CREATE TABLE demo (id serial PRIMARY KEY, message text, created_at timestamp DEFAULT now());
   INSERT INTO demo (message) VALUES ('Hello from OpenShift!');
   INSERT INTO demo (message) VALUES ('Persistent storage works.');
@@ -155,7 +156,7 @@ This example deploys PostgreSQL with a PersistentVolumeClaim (PVC) to validate t
   ```
 
   ```sql
-  psql -U demo sampledb
+  psql -U demo -d sampledb
   SELECT * FROM demo;
   \q
   exit
