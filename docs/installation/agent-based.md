@@ -80,24 +80,9 @@ additionalTrustBundle: |
   -----END CERTIFICATE-----
 ```
 
-### Pull-Through Proxy (Artifactory, Nexus, etc.)
+### Disconnected or Pull-Through Proxy Environments
 
-If your environment uses a pull-through cache or registry proxy (such as JFrog Artifactory or Sonatype Nexus) to mirror container images, add `imageContentSources` to redirect image pulls to your local mirror:
-
-```yaml
-imageContentSources:
-  - mirrors:
-      - artifactory.yourdomain.com/quay-remote
-    source: quay.io
-  - mirrors:
-      - artifactory.yourdomain.com/redhat-remote
-    source: registry.redhat.io
-```
-
-This tells the cluster to pull images from your mirror instead of going directly to the upstream registries. The pull-through proxy transparently fetches and caches images from the upstream source on first request.
-
-!!! note
-    If your pull-through proxy uses a self-signed or internal TLS certificate, you must also include it in the `additionalTrustBundle` section above.
+If your environment uses a mirror registry, pull-through cache, or artifact proxy (such as JFrog Artifactory or Sonatype Nexus), see the [Disconnected Install](disconnected.md) guide for the full `imageContentSources` configuration and setup instructions.
 
 ### Compact 3-Node Cluster (No Workers)
 
@@ -311,7 +296,7 @@ wget http://{{ installation_host }}:8080/agent.x86_64.iso
 Mount the ISO on each node via BMC virtual media (Redfish, iLO, iDRAC) and boot. 
 
 !!! warning
-    If you decide to use the BMC web UI to attach a virtual drive using the iso, make a seperate copy of the ISO file (ocp-1, ocp-2, ocp-3, etc) for each of the hosts. If more than one host starts booting against the same file, the BMCs will sometimes have issues. 
+    If you decide to use the BMC web UI to attach a virtual drive using the iso, make a separate copy of the ISO file (ocp-1, ocp-2, ocp-3, etc) for each of the hosts. If more than one host starts booting against the same file, the BMCs will sometimes have issues. 
 
 
 When all hosts are booted, monitor the install:

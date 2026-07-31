@@ -52,7 +52,7 @@ oc label node {{ node_name }} cluster.ocs.openshift.io/openshift-storage=
 
 [OpenShift Data Foundation Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/latest)
 
-This is only needed if you are planning to use ODF as part of your OPP subscription. ODF is used here specifically for object storage required by MultiClusterObservability. 
+This is only needed if you are planning to use ODF as part of your OPP subscription. ODF is used here specifically for object storage required by [MultiCluster Observability](../post-installation/multicluster-observability.md). 
 
 1. Go to Ecosystem -> Software Catalog -> filter for "OpenShift Data Foundation" -> click the tile
 2. Click Install

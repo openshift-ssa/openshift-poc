@@ -10,8 +10,8 @@
 - Storage configured with a default virtualization storage class
 - Set annotation `storageclass.kubevirt.io/is-default-virt-class` to `true` on the storage class
 - RWX access mode required for live migration
-- NMState Operator installed and underlay networks created
-- Optional but recommended: dedicated network for live migration
+- [NMState Operator](nmstate.md) installed and [underlay networks created](networking.md)
+- Optional but recommended: [dedicated network for live migration](networking.md)
 
 ## Install the Operator via WebUI
 
@@ -108,21 +108,4 @@ userData: |
 
 ## Descheduler for Live Migration
 
-If running OpenShift Virtualization with the Kube Descheduler Operator, use the `DevPreviewLongLifecycle` profile. This handles long-running VM workloads and triggers live migrations instead of pod deletions when rebalancing.
-
-Each `VirtualMachine` must be annotated to opt in to descheduler evictions:
-
-```yaml
-apiVersion: kubevirt.io/v1
-kind: VirtualMachine
-metadata:
-  name: example-vm
-spec:
-  template:
-    metadata:
-      annotations:
-        descheduler.alpha.kubernetes.io/evict: "true"
-```
-
-!!! note
-    The VM must have a `LiveMigrate` eviction strategy set for the descheduler to trigger a live migration rather than deleting the pod.
+If running the Kube Descheduler Operator alongside OpenShift Virtualization, see the [Workload Availability — Kube Descheduler](workload-availability.md#kube-descheduler-operator) section for profile selection and configuration. The recommended profile for mixed clusters with VMs is `KubeVirtRelieveAndMigrate`.

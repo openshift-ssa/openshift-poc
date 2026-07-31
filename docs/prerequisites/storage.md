@@ -3,7 +3,7 @@
 Persistent storage for OpenShift will be provided by a third-party storage vendor with a supported CSI (Container Storage Interface) driver. etcd storage remains local to the control plane nodes.
 
 !!! warning "Storage Vendor Inclusion"
-    It is **highly recommend** to bring your storage vendor in to assist directly in the installation and configuration of their CSI driver. While the Red Hat sales engineers are multidisciplinary and bring tons of expertise, it is impossible for them to keep up with the nuances and best practices of every single storage provider in the market. 
+    It is **highly recommended** to bring your storage vendor in to assist directly in the installation and configuration of their CSI driver. See [Post-Installation — Storage](../post-installation/storage/index.md) for CSI driver installation guidance.
 
 ## Storage Requirements
 

@@ -2,7 +2,7 @@
 
 [OpenShift Networking Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/networking_operators/index)
 
-This page provides examples for configuring advanced networking post-installation using the NMState Operator and OVN-Kubernetes.
+This page provides examples for configuring advanced networking post-installation using the NMState Operator and OVN-Kubernetes. See [Prerequisites — Networking](../prerequisites/networking.md) for the network architecture and planning guidance these examples implement.
 
 ## Overview
 
@@ -55,10 +55,10 @@ spec:
           enabled: false
         ipv6:
           enabled: false
-      - name: <devicename2>
+      - name: {{ device_name_2 }}
         type: ethernet
         state: up
-        mac-address: <macaddress2>
+        mac-address: {{ mac_address_2 }}
         ipv4:
           enabled: false
         ipv6:
@@ -70,7 +70,7 @@ spec:
           mode: 802.3ad
           port:
             - {{ device_name }}
-            - <devicename2>
+            - {{ device_name_2 }}
           options:
             miimon: "100"
             lacp_rate: fast
@@ -114,10 +114,10 @@ spec:
           enabled: false
         ipv6:
           enabled: false
-      - name: <devicename2>
+      - name: {{ device_name_2 }}
         type: ethernet
         state: up
-        mac-address: <macaddress2>
+        mac-address: {{ mac_address_2 }}
         ipv4:
           enabled: false
         ipv6:
@@ -129,7 +129,7 @@ spec:
           mode: active-backup
           port:
             - {{ device_name }}
-            - <devicename2>
+            - {{ device_name_2 }}
           options:
             miimon: "100"
             primary: {{ device_name }}

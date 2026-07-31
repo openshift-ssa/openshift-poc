@@ -2,7 +2,7 @@
 
 The installation host serves multiple purposes. All install work is done here. It is used to validate the environment prior to installation and provides tools for generating the ISO images.
 
-The installation host can be a bare metal or virtualized host and only requires what is needed for a normal Red Hat Enterprise Linux install. We recommend at least 4 CPU, 16 GB memory, and 100 GB disk. It should be on the same network as the targeted hosts for the OpenShift cluster install so it can be used to validate the firewall is open prior to installation.
+The installation host can be a bare metal or virtualized host and only requires what is needed for a normal Red Hat Enterprise Linux install. See [Infrastructure](infrastructure.md) for the recommended hardware specifications. It should be on the same network as the targeted hosts for the OpenShift cluster install so it can be used to validate the firewall is open prior to installation.
 
 ## Install the OS
 
@@ -73,20 +73,7 @@ sudo firewall-cmd --reload
 
 ### Inter-Node Firewall Ports
 
-The following ports must be open between cluster nodes:
-
-| Port        | Protocol | Source        | Destination   | Purpose                 |
-| ----------- | -------- | ------------- | ------------- | ----------------------- |
-| 6443        | TCP      | All           | Control Plane | Kubernetes API          |
-| 22623       | TCP      | Nodes         | Control Plane | Machine Config Server   |
-| 2379-2380   | TCP      | Control Plane | Control Plane | etcd                    |
-| 10250       | TCP      | All nodes     | All nodes     | Kubelet                 |
-| 4789        | UDP      | All nodes     | All nodes     | VXLAN (OVN-Kubernetes)  |
-| 6081        | UDP      | All nodes     | All nodes     | Geneve (OVN-Kubernetes) |
-| 9000-9999   | TCP      | All nodes     | All nodes     | Node services           |
-| 500         | UDP      | All nodes     | All nodes     | IPsec IKE              |
-| 4500        | UDP      | All nodes     | All nodes     | IPsec NAT-T            |
-| 30000-32767 | TCP/UDP  | All nodes     | All nodes     | NodePort services       |
+The required ports between cluster nodes are listed on the [Networking — Required Firewall Ports](networking.md#required-firewall-ports) page.
 
 To verify ports are not blocked between hosts, start a temporary listener on the target host and connect from the source host:
 

@@ -24,10 +24,10 @@ The OpenShift internal image registry is deployed by default with ephemeral stor
   ```
 
   !!! warning "HA Filesystem Storage"
-      Your backing storage class requires ReadWriteMany (RWX) on file storage for the resgistry to run with multiple instances. If you are just using ReadWriteOnce (RWO) filesystem storage, change the `replicas` value in the `Config` to `1` instead.
+      Your backing storage class requires ReadWriteMany (RWX) on file storage for the registry to run with multiple instances. If you are just using ReadWriteOnce (RWO) filesystem storage, change the `replicas` value in the `Config` to `1` instead.
 
 3. From the WebUI, go to Home -> API Explorer
-4. Filter for "Config", make sure to clock on the one in Group of "imageregistry.operator.openshift.io"
+4. Filter for "Config", make sure to click on the one in Group of "imageregistry.operator.openshift.io"
 5. Click on Instances tab at the top and then click on the 3 dots to the right of the cluster instance and click Edit Config
 
   ```yaml
@@ -86,7 +86,7 @@ The OpenShift internal image registry is deployed by default with ephemeral stor
   ```
 
 10. From the WebUI, go to Home -> API Explorer
-11. Filter for "Config", make sure to clock on the one in Group of "imageregistry.operator.openshift.io"
+11. Filter for "Config", make sure to click on the one in Group of "imageregistry.operator.openshift.io"
 12. Click on Instances tab at the top and then click on the 3 dots to the right of the cluster instance and click Edit Config
 13. Update the yaml 
 

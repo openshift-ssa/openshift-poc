@@ -68,7 +68,7 @@ Don't preinstall any operators.
 - The web interfaces for BMC installs of this nature can be finicky. If you have a web server somewhere, host it there. Or use the Discovery ISO URL.
 
 !!! warning
-    If you decide to use the BMC web UI to attach a virtual drive using the iso, make a seperate copy of the ISO file (ocp-1, ocp-2, ocp-3, etc) for each of the hosts. If more than one host starts booting against the same file, the BMCs will sometimes have issues.
+    If you decide to use the BMC web UI to attach a virtual drive using the iso, make a separate copy of the ISO file (ocp-1, ocp-2, ocp-3, etc) for each of the hosts. If more than one host starts booting against the same file, the BMCs will sometimes have issues.
 
 ### Waiting for host
 

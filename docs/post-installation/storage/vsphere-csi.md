@@ -54,8 +54,8 @@ When using the Assisted Installer with vSphere platform integration, the cluster
 1. Generate base64-encoded credentials:
 
     ```bash
-    VCENTER_USER_B64=$(echo -n "<vcenter_username>" | base64 -w0)
-    VCENTER_PASS_B64=$(echo -n "<vcenter_password>" | base64 -w0)
+    VCENTER_USER_B64=$(echo -n "{{ vcenter_username }}" | base64 -w0)
+    VCENTER_PASS_B64=$(echo -n "{{ vcenter_password }}" | base64 -w0)
     ```
 
 2. Back up and update the vSphere credentials secret:
@@ -69,8 +69,8 @@ When using the Assisted Installer with vSphere platform integration, the cluster
     ```yaml
     apiVersion: v1
     data:
-      <vcenter_address>.username: <base64_encoded_username>
-      <vcenter_address>.password: <base64_encoded_password>
+      {{ vcenter_address }}.username: {{ base64_encoded_username }}
+      {{ vcenter_address }}.password: {{ base64_encoded_password }}
     kind: Secret
     metadata:
       annotations:
@@ -109,12 +109,12 @@ When using the Assisted Installer with vSphere platform integration, the cluster
           secretName: vsphere-creds
           secretNamespace: kube-system
         vcenter:
-          <vcenter_address>:
-            server: "<vcenter_address>"
+          {{ vcenter_address }}:
+            server: "{{ vcenter_address }}"
             port: 443
             insecureFlag: true
             datacenters:
-            - <datacenter>
+            - {{ datacenter }}
     kind: ConfigMap
     metadata:
       name: cloud-provider-config

@@ -34,11 +34,15 @@ The static site is output to the `site/` directory.
 
 ```
 docs/
-├── index.md                   # Home page
-├── stylesheets/extra.css      # Red Hat brand colors
-├── prerequisites/             # Infrastructure, networking, DNS, LB, storage
-├── installation/              # IPI, UPI, agent-based install methods
-└── post-installation/         # Day 2 operations
+├── home/                      # Landing page and architecture overview
+├── prerequisites/             # Infrastructure, networking, DNS, storage, installation host
+├── fleet-management/          # ACM hub install, storage, and spoke provisioning
+├── installation/              # Assisted Installer, agent-based, vSphere IPI, disconnected
+├── post-installation/         # Day 2 operators, storage, networking, virtualization
+│   └── storage/               # ODF and vSphere CSI sub-pages
+├── workloads/                 # Container and VM workload examples
+├── operations/                # Failover tests, backup/restore, node management
+└── assets/                    # Images and stylesheets
 ```
 
 ## Sitewide Variables
