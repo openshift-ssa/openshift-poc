@@ -100,6 +100,8 @@ nav:
           - Overview: post-installation/storage/index.md
           - OpenShift Data Foundation: post-installation/storage/odf.md
           - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
+          - Dell:
+              - Dell Unity XT (iSCSI): post-installation/storage/dell/dell-unity.md
       - Registry: post-installation/registry.md
       # optional
       - Networking: post-installation/networking.md
