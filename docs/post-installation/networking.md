@@ -33,7 +33,7 @@ From a Linux configuration perspective:
 | Network Attachment Definition       | OVN-K      | CUDN       |
 | Virtual Ethernet Pair               | Kubernetes | CNI        |
 
-### xmit_hash_policy
+### xmit_hash_policy explanations
 
 The main xmit_hash_policy values for 802.3ad bonds:
 
@@ -48,7 +48,9 @@ For storage over LACP, layer3+4 is the usual choice because it lets multiple ses
 
 ## NodeNetworkConfigurationPolicy Examples
 
-### 2-eth Bond1 (LACP) with IP
+### Bonds and Vlans
+
+#### 2-eth Bond1 (LACP) with IP
 
 ```yaml
 apiVersion: nmstate.io/v1
@@ -84,7 +86,9 @@ spec:
           enabled: false
 ```
 
-### 2-eth Bond1 (LACP) with trunk
+Creates an LACP bond with a static IP assigned directly on the bond interface. Because the bond itself carries the IP (no VLAN tagging), the switch ports must either be in access mode or have a native/untagged VLAN configured. The commented-out `mtu` lines show where to set jumbo frames if needed. `lacp_rate: fast` sends LACPDUs every second instead of the default 30 seconds, enabling faster link-failure detection.
+
+#### 2-eth Bond1 (LACP) with trunk
 
 ```yaml
 apiVersion: nmstate.io/v1
@@ -114,7 +118,9 @@ spec:
           enabled: false
 ```
 
-### 2-eth Bond (LACP) with VLAN
+Creates an LACP bond configured as a trunk — no IP is assigned to the bond itself. Traffic flows through VLAN sub-interfaces defined in separate policies. The switch side must have the corresponding port-channel configured as a trunk passing the needed VLAN IDs. This is the typical building block when you need multiple VLANs over a single bonded uplink.
+
+#### 2-eth Bond (LACP) with VLAN
 
 ```yaml
 apiVersion: nmstate.io/v1
@@ -158,7 +164,9 @@ spec:
           enabled: false
 ```
 
-### 2-eth Bond (Active-Backup) with VLAN
+Creates an LACP bond trunk and a VLAN sub-interface with a static IP in a single policy. The bond carries no IP; the VLAN interface (`bond1.{{ vlan_id }}`) is where the address lives. Defining both in the same NNCP ensures they are applied atomically — if either fails, NMState rolls back both. The switch must trunk the specified VLAN ID on the port-channel.
+
+#### 2-eth Bond (Active-Backup) with VLAN
 
 ```yaml
 apiVersion: nmstate.io/v1
@@ -201,37 +209,9 @@ spec:
           enabled: false
 ```
 
-### OVS Bridge Trunk
+Same pattern as the LACP-with-VLAN example above but using `active-backup` mode instead of `802.3ad`. No switch-side LACP or port-channel configuration is required — only one NIC is active at a time, so the switch sees a single MAC. The `primary` option designates the preferred active interface; the other takes over only on failure. There is no `xmit_hash_policy` because there is no load distribution across members. Simpler to set up but provides redundancy only, not bandwidth aggregation.
 
-This assumes an existing `bond1` on worker nodes:
-
-```yaml
-apiVersion: nmstate.io/v1
-kind: NodeNetworkConfigurationPolicy
-metadata:
-  name: ovs-bridge-trunk-nncp
-spec:
-  nodeSelector:
-    node-role.kubernetes.io/worker: ""
-  desiredState:
-    interfaces:
-      - name: ovs-bridge-trunk
-        type: ovs-bridge
-        state: up
-        bridge:
-          port:
-            - name: bond1
-          allow-extra-patch-ports: true
-          options:
-            stp: false
-    ovn:
-      bridge-mappings:
-        - localnet: localnet-bridge-trunk
-          bridge: ovs-bridge-trunk
-          state: present
-```
-
-### Storage Network Bond with Jumbo Frames (MTU 9000)
+#### Storage Network Bond with Jumbo Frames (MTU 9000)
 
 This configures a dedicated storage bond with MTU 9000 and a VLAN for storage traffic. Set MTU on the bond (ports inherit it) and explicitly on any VLAN interface on top.
 
@@ -278,12 +258,46 @@ spec:
           enabled: false
 ```
 
+Builds a dedicated storage bond with jumbo frames and a tagged VLAN for storage traffic. MTU 9000 is set on the bond (the kernel propagates it to the ethernet port members) and explicitly on the VLAN interface, since VLANs do not automatically inherit MTU changes from their parent. The physical switch ports and any intermediate infrastructure must also support the MTU end-to-end or frames will be silently dropped. Unlike the other LACP examples, `xmit_hash_policy` is omitted here — add `layer3+4` if your storage protocol uses multiple TCP sessions (e.g. NVMe/TCP, iSCSI) and you want them distributed across bond members.
+
 !!! note
     Set MTU on the bond (ports inherit it) and explicitly on any VLAN interface on top. Verify after applying with:
 
     ```bash
     oc debug node/{{ node_name }} -- chroot /host ip link show bond-storage
     ```
+
+### OVS Bridge Trunk
+
+This assumes an existing `bond1` on worker nodes:
+
+```yaml
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: ovs-bridge-trunk-nncp
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
+  desiredState:
+    interfaces:
+      - name: ovs-bridge-trunk
+        type: ovs-bridge
+        state: up
+        bridge:
+          port:
+            - name: bond1
+          allow-extra-patch-ports: true
+          options:
+            stp: false
+    ovn:
+      bridge-mappings:
+        - localnet: localnet-bridge-trunk
+          bridge: ovs-bridge-trunk
+          state: present
+```
+
+Creates an OVS bridge on top of an existing bond and maps it to an OVN localnet. The bond must already be configured (via a separate NNCP) before this policy is applied. `allow-extra-patch-ports: true` is required for OVN-Kubernetes integration, and STP is disabled because the underlying bond already provides link redundancy. The `bridge-mappings` section ties the OVS bridge to a logical localnet name (`localnet-bridge-trunk`) — this is the name that ClusterUserDefinedNetworks reference via `physicalNetworkName` to attach pod traffic to the physical network.
 
 ## ClusterUserDefinedNetwork
 
@@ -319,6 +333,8 @@ spec:
         lifecycle: Persistent
 ```
 
+Creates a cluster-scoped localnet network with OVN-managed IP address assignment. The `namespaceSelector` controls which namespaces can attach pods to this network — only pods in matching namespaces will get a secondary interface. `physicalNetworkName` must exactly match the localnet name from the OVS bridge NNCP above. The `excludeSubnets` entries reserve the gateway and broadcast addresses so OVN does not hand them out to pods. `lifecycle: Persistent` ensures pod IPs survive pod restarts, which is important for stateful workloads or when external systems maintain firewall rules based on pod addresses.
+
 ### CUDN without IPAM
 
 ```yaml
@@ -344,3 +360,5 @@ spec:
       ipam:
         mode: Disabled
 ```
+
+Same localnet topology as above but with IPAM disabled — OVN provides layer-2 connectivity only and does not assign IP addresses to pods. Use this when an external DHCP server on the VLAN handles addressing, or when the application manages its own IPs (e.g. VMs with static network configs via OpenShift Virtualization). No `subnets` or `excludeSubnets` are needed since OVN is not allocating addresses.
