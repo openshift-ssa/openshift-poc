@@ -21,19 +21,98 @@ From a Linux configuration perspective:
 
 ## The Full Stack for Underlay Networking
 
-| Concept                              | Where      | Managed By |
-| ------------------------------------ | ---------- | ---------- |
-| Switch                               | Physical   | Switch     |
-| Ethernet                             | Linux      | NNCP       |
-| Bond                                 | Linux      | NNCP       |
-| OVS Bridge                           | Linux      | NNCP       |
-| OVN Bridge Mapping                   | OVN-K      | NNCP       |
-| Localnet                             | OVN-K      | NNCP       |
-| Cluster User Defined Network (CUDN)  | OVN-K      | —          |
-| Network Attachment Definition        | OVN-K      | CUDN       |
-| Virtual Ethernet Pair                | Kubernetes | CNI        |
+| Concept                             | Where      | Managed By |
+| ----------------------------------- | ---------- | ---------- |
+| Switch                              | Physical   | Switch     |
+| Ethernet                            | Linux      | NNCP       |
+| Bond                                | Linux      | NNCP       |
+| OVS Bridge                          | Linux      | NNCP       |
+| OVN Bridge Mapping                  | OVN-K      | NNCP       |
+| Localnet                            | OVN-K      | NNCP       |
+| Cluster User Defined Network (CUDN) | OVN-K      | —         |
+| Network Attachment Definition       | OVN-K      | CUDN       |
+| Virtual Ethernet Pair               | Kubernetes | CNI        |
+
+### xmit_hash_policy
+
+The main xmit_hash_policy values for 802.3ad bonds:
+
+- layer2 — Hashes on source/destination MAC only. All traffic between two given MACs takes a single slave, so a single node-to-node flow can't spread across members. Standard 802.3ad compliant.
+- layer2+3 — Hashes on MAC plus IP addresses. Better distribution than layer2 across different IP pairs, still 802.3ad compliant. Good default when traffic spans multiple hosts/subnets but you don't want L4 hashing.
+- layer3+4 — Hashes on IP addresses plus L4 (TCP/UDP) ports. Distributes individual connections between the same two hosts across different slaves, which is why it's good for NVMe/TCP and iSCSI with multiple sessions. Not strictly 802.3ad compliant because fragmented packets can reorder, but widely used.
+- encap2+3 — Like layer2+3 but uses inner headers for encapsulated traffic (e.g. VXLAN/tunneled), falling back to outer headers if it can't parse the inner. Useful on overlay/tunnel-heavy paths.
+- encap3+4 — Like layer3+4 but for encapsulated traffic, hashing on inner L3/L4 when available.
+- vlan+srcmac — Hashes on VLAN ID and source MAC. Niche; mainly for setups where you want per-VLAN slave selection.
+
+For storage over LACP, layer3+4 is the usual choice because it lets multiple sessions/connections between the same two endpoints actually use both bond members. Just make sure the switch's port-channel hash policy is set comparably (e.g. src-dst-port / L4 hashing) so distribution is balanced in both directions—the host and switch hash independently for their respective transmit directions.
 
 ## NodeNetworkConfigurationPolicy Examples
+
+### 2-eth Bond1 (LACP) with IP
+
+```yaml
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: bond1-{{ hostname }}
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: {{ hostname }}
+  desiredState:
+    interfaces:
+      - name: bond1
+        type: bond
+        state: up
+        # mtu: 9000
+        # mtu: 1500
+        link-aggregation:
+          mode: 802.3ad
+          port:
+            - {{ interface_name1 }}
+            - {{ interface_name2 }}
+          options:
+            miimon: "100"
+            lacp_rate: fast
+            xmit_hash_policy: layer3+4
+        ipv4:
+          enabled: true
+          address:
+            - ip: {{ ip_address }}
+              prefix-length: 24
+          dhcp: false
+        ipv6:
+          enabled: false
+```
+
+### 2-eth Bond1 (LACP) with trunk
+
+```yaml
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: bond1-{{ hostname }}
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: {{ hostname }}
+  desiredState:
+    interfaces:
+      - name: bond1
+        type: bond
+        state: up
+        link-aggregation:
+          mode: 802.3ad
+          port:
+            - {{ interface_name1 }}
+            - {{ interface_name2 }}
+          options:
+            miimon: "100"
+            lacp_rate: fast
+            xmit_hash_policy: layer3+4
+        ipv4:
+          enabled: false
+        ipv6:
+          enabled: false
+```
 
 ### 2-eth Bond (LACP) with VLAN
 
@@ -41,39 +120,24 @@ From a Linux configuration perspective:
 apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
 metadata:
-  name: 2-eth-bond-lacp-vlan
+  name: 2-eth-bond-lacp-vlan-{{ hostname }}
 spec:
   nodeSelector:
     kubernetes.io/hostname: {{ hostname }}
   desiredState:
     interfaces:
-      - name: {{ device_name }}
-        type: ethernet
-        state: up
-        mac-address: {{ mac_address }}
-        ipv4:
-          enabled: false
-        ipv6:
-          enabled: false
-      - name: {{ device_name_2 }}
-        type: ethernet
-        state: up
-        mac-address: {{ mac_address_2 }}
-        ipv4:
-          enabled: false
-        ipv6:
-          enabled: false
       - name: bond1
         type: bond
         state: up
         link-aggregation:
           mode: 802.3ad
           port:
-            - {{ device_name }}
-            - {{ device_name_2 }}
+            - {{ interface_name1 }}
+            - {{ interface_name2 }}
           options:
             miimon: "100"
             lacp_rate: fast
+            xmit_hash_policy: layer3+4
         ipv4:
           enabled: false
         ipv6:
@@ -100,39 +164,23 @@ spec:
 apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
 metadata:
-  name: 2-eth-bond-active-backup-vlan
+  name: 2-eth-bond-active-backup-vlan-{{ hostname }}
 spec:
   nodeSelector:
     kubernetes.io/hostname: {{ hostname }}
   desiredState:
     interfaces:
-      - name: {{ device_name }}
-        type: ethernet
-        state: up
-        mac-address: {{ mac_address }}
-        ipv4:
-          enabled: false
-        ipv6:
-          enabled: false
-      - name: {{ device_name_2 }}
-        type: ethernet
-        state: up
-        mac-address: {{ mac_address_2 }}
-        ipv4:
-          enabled: false
-        ipv6:
-          enabled: false
       - name: bond1
         type: bond
         state: up
         link-aggregation:
           mode: active-backup
           port:
-            - {{ device_name }}
-            - {{ device_name_2 }}
+            - {{ interface_name1 }}
+            - {{ interface_name2 }}
           options:
             miimon: "100"
-            primary: {{ device_name }}
+            primary: {{ interface_name1 }}
         ipv4:
           enabled: false
         ipv6:
@@ -185,36 +233,18 @@ spec:
 
 ### Storage Network Bond with Jumbo Frames (MTU 9000)
 
-This configures a dedicated storage bond with MTU 9000 and a VLAN for storage traffic. All interfaces in the path (ethernet, bond, VLAN) must have MTU set consistently.
+This configures a dedicated storage bond with MTU 9000 and a VLAN for storage traffic. Set MTU on the bond (ports inherit it) and explicitly on any VLAN interface on top.
 
 ```yaml
 apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
 metadata:
-  name: storage-bond-mtu9000
+  name: storage-bond-mtu9000-{{ hostname }}
 spec:
   nodeSelector:
-    node-role.kubernetes.io/worker: ""
+    kubernetes.io/hostname: {{ hostname }}
   desiredState:
     interfaces:
-      - name: {{ storage_nic_1 }}
-        type: ethernet
-        state: up
-        mtu: 9000
-        mac-address: {{ storage_mac_1 }}
-        ipv4:
-          enabled: false
-        ipv6:
-          enabled: false
-      - name: {{ storage_nic_2 }}
-        type: ethernet
-        state: up
-        mtu: 9000
-        mac-address: {{ storage_mac_2 }}
-        ipv4:
-          enabled: false
-        ipv6:
-          enabled: false
       - name: bond-storage
         type: bond
         state: up
@@ -222,8 +252,8 @@ spec:
         link-aggregation:
           mode: 802.3ad
           port:
-            - {{ storage_nic_1 }}
-            - {{ storage_nic_2 }}
+            - {{ interface_name1 }}
+            - {{ interface_name2 }}
           options:
             miimon: "100"
             lacp_rate: fast
@@ -249,7 +279,7 @@ spec:
 ```
 
 !!! note
-    The MTU must be set on every layer — ethernet interfaces, bond, and VLAN. If any layer is missing the `mtu: 9000` setting, jumbo frames will not work end-to-end. Verify after applying with:
+    Set MTU on the bond (ports inherit it) and explicitly on any VLAN interface on top. Verify after applying with:
 
     ```bash
     oc debug node/{{ node_name }} -- chroot /host ip link show bond-storage
