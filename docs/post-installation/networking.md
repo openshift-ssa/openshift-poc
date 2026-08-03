@@ -237,6 +237,7 @@ spec:
           options:
             miimon: "100"
             lacp_rate: fast
+            xmit_hash_policy: layer3+4
         ipv4:
           enabled: false
         ipv6:
@@ -258,14 +259,12 @@ spec:
           enabled: false
 ```
 
-Builds a dedicated storage bond with jumbo frames and a tagged VLAN for storage traffic. MTU 9000 is set on the bond (the kernel propagates it to the ethernet port members) and explicitly on the VLAN interface, since VLANs do not automatically inherit MTU changes from their parent. The physical switch ports and any intermediate infrastructure must also support the MTU end-to-end or frames will be silently dropped. Unlike the other LACP examples, `xmit_hash_policy` is omitted here — add `layer3+4` if your storage protocol uses multiple TCP sessions (e.g. NVMe/TCP, iSCSI) and you want them distributed across bond members.
+Builds a dedicated storage bond with jumbo frames and a tagged VLAN for storage traffic. MTU 9000 is set on the bond (the kernel propagates it to the ethernet port members) and explicitly on the VLAN interface, since VLANs do not automatically inherit MTU changes from their parent. The physical switch ports and any intermediate infrastructure must also support the MTU end-to-end or frames will be silently dropped. `xmit_hash_policy: layer3+4` is set so that storage protocols using multiple TCP sessions (e.g. NVMe/TCP, iSCSI) distribute connections across bond members — make sure the switch port-channel hash policy matches (e.g. src-dst-port / L4 hashing).
 
 !!! note
     Set MTU on the bond (ports inherit it) and explicitly on any VLAN interface on top. Verify after applying with:
 
-    ```bash
-    oc debug node/{{ node_name }} -- chroot /host ip link show bond-storage
-    ```
+    ``bash     oc debug node/{{ node_name }} -- chroot /host ip link show bond-storage     ``
 
 ### OVS Bridge Trunk
 
