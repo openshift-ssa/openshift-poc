@@ -255,7 +255,10 @@ EOF
 
 ## Step 7 — StorageClass and VolumeSnapshotClass
 
-Replace `arrayId` and `storagepool` with your values from Step 1:
+Replace `arrayId` and `storagepool` with your values from Step 1.
+
+!!! warning "ArrayID Must Be Lowercase"
+    The `arrayId` value in the StorageClass **must be lowercase**. The Unity CSI driver labels worker nodes with a lowercase ArrayID in the topology key (e.g. `csi-unity.dellemc.com/apx00241102102-iscsi=true`). If the StorageClass specifies it in uppercase (e.g. `APX00241102102`), the topology constraint will not match and PVCs will stay stuck in `Pending`. Kubernetes topology labels are case-sensitive.
 
 ```bash
 cat << 'EOF' | oc apply -f -
@@ -269,7 +272,7 @@ allowVolumeExpansion: true
 volumeBindingMode: WaitForFirstConsumer
 parameters:
   protocol: iSCSI
-  arrayId: "APM00XXXXXXXXX"
+  arrayId: "apm00xxxxxxxxx"
   storagepool: "pool_1"
   thinProvisioned: "true"
   isDataReductionEnabled: "false"
@@ -349,5 +352,6 @@ oc delete pvc unity-test -n unity
 |---------|-------|-----|
 | Node pods CrashLoop with initiator errors | MachineConfig not finished before driver deployed | Wait for `oc get mcp worker` to show `UPDATED=True`, then delete the node pods to restart them |
 | PVC stuck in Pending | Wrong `arrayId` or `storagepool` in StorageClass | Check controller pod logs: `oc logs -n unity -l app=unity-controller --tail=50` |
+| PVC stuck in Pending with topology mismatch | `arrayId` in StorageClass is uppercase but the driver labels nodes with lowercase | Change `arrayId` in the StorageClass to lowercase to match the node topology labels (e.g. `apm00xxxxxxxxx` not `APM00XXXXXXXXX`) |
 | `configVersion` rejected | Operator/driver version mismatch | Check `oc get csm unity -n unity -o yaml` for the expected version |
 | iSCSI login failures | Array iSCSI interfaces not on the same VLAN as nodes | Verify SPA/SPB iSCSI IPs are reachable from worker nodes |
