@@ -46,3 +46,7 @@ Verify your storage vendor and driver version are listed in the [Red Hat Ecosyst
 ## OpenShift Data Foundation
 
 If you are targeting ODF as your storage provider, see the dedicated [OpenShift Data Foundation](odf.md) installation guide.
+
+## NetApp Trident
+
+If you are using NetApp ONTAP storage, see the [NetApp Trident](netapp-trident.md) installation guide. Trident supports NFS (FlexVol and FlexGroup), iSCSI, NVMe/TCP, and Fibre Channel protocols.
