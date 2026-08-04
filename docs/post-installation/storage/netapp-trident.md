@@ -163,28 +163,81 @@ For disconnected installation instructions, see the offline install methods in t
 
 ## Install Trident
 
-=== "OpenShift OperatorHub"
+### Install via WebUI
 
-    1. Go to Ecosystem -> Software Catalog -> filter for "Trident" -> click the "NetApp Trident" tile
-    2. Click Install
-    3. Leave all the defaults and click Install
-    4. Wait for the Operator to install
+1. Go to Ecosystem -> Software Catalog -> filter for "Trident" -> click the "NetApp Trident" tile
+2. Click Install
+3. Leave all the defaults and click Install
+4. Wait for the Operator to install
 
-=== "Helm"
+### Install via YAML
 
-    ```bash
-    helm repo add netapp-trident https://netapp.github.io/trident-helm-chart
-    helm install my-trident-operator netapp-trident/trident-operator \
-      --create-namespace -n trident
-    ```
+```yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trident
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: trident-operator
+  namespace: trident
+spec: {}
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: trident-operator
+  namespace: trident
+spec:
+  channel: stable
+  name: trident-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  installPlanApproval: Automatic
+```
 
-Wait for the operator to be ready:
+```bash
+oc apply -f trident-operator.yaml
+```
+
+Wait for the operator:
 
 ```bash
 oc get csv -n trident -w
 ```
 
 The `PHASE` should show `Succeeded`.
+
+### Configure the TridentOrchestrator
+
+After the operator is installed, create (or patch) the TridentOrchestrator CR with `enableForceDetach` and `enableConcurrency` enabled:
+
+```yaml
+apiVersion: trident.netapp.io/v1
+kind: TridentOrchestrator
+metadata:
+  name: trident
+spec:
+  namespace: trident
+  enableForceDetach: true
+  enableConcurrency: true
+```
+
+```bash
+oc apply -f trident-orchestrator.yaml
+```
+
+- **enableForceDetach** — allows Trident to force-detach volumes from non-responsive nodes so they can be reattached elsewhere
+- **enableConcurrency** — enables parallel processing of volume operations for improved throughput
+
+Verify Trident is running:
+
+```bash
+oc get torc trident -n trident
+oc get pods -n trident
+```
 
 ## Create the SVM Credentials Secret
 
