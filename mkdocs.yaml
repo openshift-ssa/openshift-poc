@@ -126,6 +126,7 @@ nav:
       - Kafka (Strimzi): workloads/kafka-strimzi.md
       - Source-to-Image (S2I) Build: workloads/s2i-build.md
       - PostgreSQL with Persistent Storage: workloads/postgresql.md
+      - PVC Read-Back Test: workloads/pvc-readback.md
       - Bookinfo (Service Mesh): workloads/bookinfo.md
       - Deploying Virtual Machines: workloads/workload-virtual-machines.md
   - Operations:
