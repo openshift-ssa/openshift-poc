@@ -27,5 +27,6 @@ These are modular and can be installed in any order based on your needs but we u
 - [OpenShift GitOps](openshift-gitops.md) — ArgoCD for GitOps workflows
 - [Logging](logging.md) — Centralized log collection and storage with Loki
 - [MultiCluster Observability](multicluster-observability.md) — Centralized monitoring across managed clusters
+- [Web Terminal](web-terminal.md) — Embedded CLI terminal in the web console
 - [Identity Providers](configuring-identity-providers.md) — Configure LDAP, OIDC, or other authentication
 - [POC Banner](poc-banner.md) — Mark the UI as a PoC environment
