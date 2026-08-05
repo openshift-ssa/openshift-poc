@@ -1,27 +1,48 @@
 # NetApp Trident
 
-[NetApp Trident Documentation](https://docs.netapp.com/us-en/trident/) | [Requirements](https://docs.netapp.com/us-en/trident/trident-get-started/requirements.html)
+[NetApp Trident 26.06 Documentation](https://docs.netapp.com/us-en/trident/) | [Requirements](https://docs.netapp.com/us-en/trident/trident-get-started/requirements.html)
 
-NetApp Trident is a CSI driver that provides dynamic storage provisioning for Kubernetes clusters using NetApp ONTAP storage systems. It supports NFS (FlexVol and FlexGroup), iSCSI, NVMe/TCP, and Fibre Channel protocols.
+NetApp Trident is a CSI driver that provides dynamic storage provisioning for Kubernetes clusters using NetApp ONTAP storage systems. It supports NFS (FlexVol and FlexGroup), iSCSI, NVMe/TCP, and Fibre Channel protocols. This guide targets **Trident 26.06**.
+
+!!! danger "Critical Information about Trident 26.06"
+    Trident strictly enforces the use of multipathing configuration in SAN environments, with a recommended value of `find_multipaths: no` in `multipath.conf`.
+
+    Use of non-multipathing configuration or use of `find_multipaths: yes` or `find_multipaths: smart` in `multipath.conf` **will result in mount failures**. Trident has recommended the use of `find_multipaths: no` since the 21.07 release.
+
+    The MachineConfigs in this guide already set `find_multipaths no`. See the [Trident 26.06 critical information](https://docs.netapp.com/us-en/trident/trident-install/kubernetes-deploy-operator.html#critical-information-about-trident-26-06) for full details.
 
 ## Prerequisites
 
 ### Worker Node Preparation
 
-Worker nodes must be configured for the storage protocols you plan to use **before** installing Trident. Follow the [NetApp worker node preparation guide](https://docs.netapp.com/us-en/trident/trident-use/worker-node-prep.html) and complete the steps for each protocol you need.
+Worker nodes must be configured for the storage protocols you plan to use **before** installing Trident. Follow the [NetApp worker node preparation guide](https://docs.netapp.com/us-en/trident/trident-use/worker-node-prep.html) for Trident 26.06 and complete the steps for each protocol you need.
 
 !!! tip
     The protocol instruction boxes in the NetApp docs are tabbed — click the tab for the protocol you need (NFS, iSCSI, NVMe/TCP, etc.).
 
+The required tools per driver:
+
+| Driver | Required Tools |
+| --- | --- |
+| `ontap-nas`, `ontap-nas-economy`, `ontap-nas-flexgroup` | NFS |
+| `ontap-san`, `ontap-san-economy` (iSCSI) | iSCSI, multipath |
+| `ontap-san` (NVMe/TCP) | NVMe (requires RHEL 9 or later) |
+| `ontap-san` with `sanType: fcp` | FC, multipath |
+
+!!! info "iSCSI Self-Healing"
+    Trident 26.06 runs iSCSI self-healing every 5 minutes to identify and repair stale or missing iSCSI sessions and rescan for missing LUNs. This is enabled by default and requires no additional configuration.
+
 !!! warning "NFS v4 Requires Additional Configuration"
-    If NFS v4 will be used:
+    If you are using NFS v4:
 
     - The `/etc/idmapd.conf` domain on each worker node **must match** the NFS v4 domain configured on the NetApp array
     - Use `mountOptions: sec=sys` in your StorageClass (shown in the examples below)
 
+    The StorageClass examples below use `vers=4`, which negotiates to NFS 4.0. If your ONTAP system supports it, consider using `vers=4.1` instead for improved locking and session behavior. Confirm with your NetApp team which NFS version is configured on the SVM.
+
 #### iSCSI and Multipath MachineConfigs
 
-For iSCSI, NVMe, or Fibre Channel protocols, enable `iscsid` and configure multipath on both master and worker nodes. Apply the following MachineConfigs, then wait for the nodes to reboot.
+For iSCSI, enable `iscsid` on both master and worker nodes. For block storage protocols (iSCSI and Fibre Channel), configure multipath. NVMe uses native NVMe multipathing (ANA) and does not require `iscsid` or `multipathd`. Apply the following MachineConfigs, then wait for the nodes to reboot.
 
 ##### Enable iscsid
 
@@ -107,9 +128,32 @@ spec:
 oc apply -f multipath-conf.yaml
 ```
 
+??? note "Decoded multipath.conf contents"
+    The base64 value above decodes to the following `multipath.conf`:
+
+    ```
+    defaults {
+        find_multipaths no
+    }
+    blacklist {
+        device {
+            vendor  .*
+            product .*
+        }
+    }
+    blacklist_exceptions {
+        device {
+            product LUN
+            vendor  NETAPP
+        }
+    }
+    ```
+
+    This blacklists all multipath devices by default, then adds an exception for NetApp LUNs only.
+
 ##### Wait for Rollout
 
-Nodes reboot serially. Wait for both MachineConfigPools to finish:
+Nodes reboot serially. Wait for both MachineConfigPools to finish updating:
 
 ```bash
 oc get mcp master worker -w
@@ -126,11 +170,11 @@ Prepare the ONTAP SVM (Storage Virtual Machine) before installing Trident:
 
 | Requirement | Details |
 | --- | --- |
-| **SVM credentials** | An `vsadmin`-equivalent username and password |
-| **API protocols** | Enable `ontapi`, `ssh`, and `http` on the SVM user |
+| **SVM credentials** | A `vsadmin`-equivalent username and password |
+| **API protocols** | Enable `ontapi`, `ssh`, and `http` application methods on the SVM user (Trident communicates over HTTPS on port 443 — the `http` application type covers both REST and ZAPI over TLS) |
 | **Storage protocols** | Enable NFS, iSCSI, and/or NVMe on the SVM as needed |
 | **Aggregate assignment** | Assign at least one aggregate directly to the SVM (this does not remove it from other SVMs) |
-| **SVM root export** | The SVM root export policy must include the worker nodes |
+| **SVM root export** | The SVM root export policy must include the worker nodes. If you use `autoExportPolicy: true` in the backend config, Trident manages volume export policies automatically; however, the SVM root volume's export policy must still permit initial access from the worker nodes |
 | **SVM capacity limit** | Set an [SVM capacity limit](https://docs.netapp.com/us-en/ontap/volumes/manage-svm-capacity.html) to protect the array from being overrun with storage requests from Kubernetes |
 
 !!! info "Trident Handles igroup and NQN Registration"
@@ -159,13 +203,17 @@ If your cluster has no access to public container registries, download the requi
 
 **Trident Protect images** — see the private registry instructions on the [Trident Protect installation page](https://docs.netapp.com/us-en/trident/trident-protect/trident-protect-installation.html) (click "Install Trident Protect from private registry")
 
-For disconnected installation instructions, see the offline install methods in the [Trident deployment guide](https://docs.netapp.com/us-en/trident/trident-get-started/kubernetes-deploy.html) (look for entries labelled "Offline" in the left-hand navigation).
+For disconnected installation instructions, see the offline install methods in the [Trident deployment guide](https://docs.netapp.com/us-en/trident/trident-install/kubernetes-deploy.html) (look for entries labelled "Offline" in the left-hand navigation).
 
 ## Install Trident
 
+[Trident Installation Overview](https://docs.netapp.com/us-en/trident/trident-install/kubernetes-deploy.html)
+
+Trident can be installed using the Trident operator (manually or via Helm) or with `tridentctl`. For OpenShift, the operator via OperatorHub is the recommended approach. For all methods and modes (standard, offline, remote), see the [installation overview](https://docs.netapp.com/us-en/trident/trident-install/kubernetes-deploy.html).
+
 ### Install via WebUI
 
-1. Go to Ecosystem -> Software Catalog -> filter for "Trident" -> click the "NetApp Trident" tile
+1. Go to Operators -> OperatorHub -> filter for "Trident" -> click the "NetApp Trident" tile
 2. Click Install
 3. Leave all the defaults and click Install
 4. Wait for the Operator to install
@@ -193,7 +241,7 @@ metadata:
 spec:
   channel: stable
   name: trident-operator
-  source: redhat-operators
+  source: certified-operators
   sourceNamespace: openshift-marketplace
   installPlanApproval: Automatic
 ```
@@ -231,6 +279,9 @@ oc apply -f trident-orchestrator.yaml
 
 - **enableForceDetach** — allows Trident to force-detach volumes from non-responsive nodes so they can be reattached elsewhere
 - **enableConcurrency** — enables parallel processing of volume operations for improved throughput
+
+!!! warning "enableConcurrency is Tech Preview"
+    `enableConcurrency` is a Tech Preview / feature-gated flag in Trident and is not GA-hardened. It is suitable for POC environments but should be evaluated carefully before use in production.
 
 Verify Trident is running:
 
@@ -504,7 +555,7 @@ oc get tridentbackend -n trident
 oc get sc
 ```
 
-All backends should show `Bound` status.
+TridentBackendConfigs should show a `Success` status and TridentBackends should show `online` state.
 
 ## VolumeSnapshotClass
 
@@ -558,7 +609,7 @@ oc apply -f storageprofile.yaml
 ```
 
 !!! tip
-    Set `filesystemOverhead` to at least 10% to avoid potential space issues. The extra space has no real cost since NetApp is thin-provisioned.
+    Set `filesystemOverhead` to at least 10% to avoid potential space issues during VM operations. The extra space has no real cost since NetApp is thin-provisioned.
 
     ```yaml
     spec:
