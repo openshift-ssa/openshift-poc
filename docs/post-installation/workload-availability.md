@@ -210,6 +210,57 @@ oc get selfnoderemediationtemplate -n openshift-workload-availability
 oc get daemonset -n openshift-workload-availability
 ```
 
+### Troubleshooting: NHC Cannot Find SelfNodeRemediationTemplate
+
+If NHC is not reconciling and reports that it cannot find the `SelfNodeRemediationTemplate` kind, the Self Node Remediation Operator is either not installed or its CRDs are not present.
+
+**Verify the issue:**
+
+```bash
+oc get crd selfnoderemediationtemplates.self-node-remediation.medik8s.io
+oc get csv -A | grep -i self-node-remediation
+oc get selfnoderemediationtemplate -A
+```
+
+**Check for an existing subscription:**
+
+```bash
+oc get subscription -A | grep self-node-remediation
+```
+
+**If missing, install the Self Node Remediation Operator into the same namespace as NHC:**
+
+```yaml
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: self-node-remediation
+  namespace: openshift-workload-availability
+spec:
+  channel: stable
+  name: self-node-remediation
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+```
+
+Once the CSV reaches `Succeeded`, the operator auto-creates the `self-node-remediation-automatic-strategy-template` in its install namespace.
+
+**Confirm the NHC `remediationTemplate` reference points at the correct name and namespace:**
+
+```yaml
+spec:
+  remediationTemplate:
+    apiVersion: self-node-remediation.medik8s.io/v1alpha1
+    kind: SelfNodeRemediationTemplate
+    name: self-node-remediation-automatic-strategy-template
+    namespace: openshift-workload-availability
+```
+
+!!! warning
+    The `namespace` in the `remediationTemplate` reference must match the namespace where the Self Node Remediation Operator is actually running. If NHC was installed into `openshift-operators` instead of `openshift-workload-availability`, adjust the namespace accordingly in both the Subscription and the NHC CR.
+
+Once the CRD registers and the template is present, NHC will reconcile and re-enable.
+
 ## Kube Descheduler Operator
 
 Runs periodically and evicts pods that violate scheduling rules so the default scheduler can reschedule them onto more appropriate nodes.

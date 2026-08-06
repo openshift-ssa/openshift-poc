@@ -13,7 +13,7 @@ Before touching the cluster, configure the Unity XT array:
 3. Confirm the Unisphere management IP is reachable over IPv4 from the cluster nodes (the driver is IPv4-only)
 4. If running jumbo frames, MTU 9000 must match end-to-end (array ports, switches, node NICs)
 
-Collect the **array serial** (`APM00...`) and **pool name** — both are required below.
+Collect the **array serial** (`apm00...`) and **pool name** — both are required below.
 
 ## Step 2 — Node Prep (MachineConfigs)
 
@@ -198,7 +198,7 @@ Replace the array serial, Unisphere endpoint (IPv4), and password:
 ```bash
 cat << 'EOF' > /tmp/unity-creds.yaml
 storageArrayList:
-  - arrayId: "APM00XXXXXXXXX"
+  - arrayId: "apm00XXXXXXXXX"
     username: "admin"
     password: "YourPassword"
     endpoint: "https://10.0.0.10/"
