@@ -171,9 +171,10 @@ mkdir /tmp/vddk && cd /tmp/vddk
 
 ### Download VDDK from VMware
 
-1. Open the [VMware VDDK 8 download page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/8.0)
-2. Download version **8.0.1** (Red Hat's current documented version)
+Match the VDDK version to your source vSphere (vCenter/ESXi) version. VMware aligns VDDK version numbers with vSphere (for example, use VDDK **8.0.x** with vSphere **8.0**). Prefer the VDDK release that corresponds to your environment's major.minor version so disk-transfer features and compatibility stay aligned.
 
+1. Open the [VMware VDDK download page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/) for the major version that matches your vSphere release (for example, [VDDK 8](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/8.0) for vSphere 8)
+2. Select the VDDK version closest to your vSphere version and click Download
 3. Save `VMware-vix-disklib-<version>.x86_64.tar.gz` into `/tmp/vddk`
 
 ### Extract the VDDK Archive
