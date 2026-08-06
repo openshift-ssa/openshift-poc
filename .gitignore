@@ -4,3 +4,4 @@ site/
 __pycache__/
 .cache
 resume.txt
+temp.yaml
