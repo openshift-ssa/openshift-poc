@@ -312,7 +312,7 @@ spec:
     matchExpressions:
       - key: kubernetes.io/metadata.name
         operator: In
-        values: ["{{ namespace }}", "{{ namespace2 }}"]
+        values: ["{{ namespace1 }}", "{{ namespace2 }}"]
   network:
     topology: Localnet
     localnet:
@@ -346,7 +346,7 @@ spec:
     matchExpressions:
       - key: kubernetes.io/metadata.name
         operator: In
-        values: ["{{ namespace }}", "{{ namespace2 }}"]
+        values: ["{{ namespace1 }}", "{{ namespace2 }}"]
   network:
     topology: Localnet
     localnet:
