@@ -107,6 +107,7 @@ A source provider is the hypervisor environment you are migrating VMs from. A de
     - Username: a vCenter user with at least read access to the VMs
     - Password: the vCenter password
     - SHA-1 fingerprint of the vCenter certificate (or skip verification for POC)
+    - VDDK init image: upload the VDDK archive or paste an existing image URL (see [Upload the VDDK Image via WebUI](#upload-the-vddk-image-via-webui))
 5. Click Create
 
 ### Add vSphere Provider via YAML
@@ -152,22 +153,10 @@ A source provider is the hypervisor environment you are migrating VMs from. A de
 
 It is strongly recommended that MTV be used with the VMware Virtual Disk Development Kit (VDDK) SDK when transferring virtual disks from VMware vSphere. Using MTV without VDDK is not recommended and could result in significantly lower migration speeds. You must use a VDDK image if the source VMs are backed by VMware vSAN.
 
-You will download the VDDK, build a container image, and push it to your image registry.
+Download the VDDK archive from VMware, then either upload it through the MTV WebUI (MTV builds the init image for you) or build and push the container image yourself with `podman`.
 
 !!! warning "VMware License"
     Storing the VDDK image in a public registry might violate the VMware license terms.
-
-### Prerequisites
-
-- OpenShift image registry (internal or external accessible from OpenShift Virtualization)
-- `podman` installed
-- You are working on a file system that preserves symbolic links (symlinks) — the VDDK package contains symlinks
-
-### Create a Working Directory
-
-```bash
-mkdir /tmp/vddk && cd /tmp/vddk
-```
 
 ### Download VDDK from VMware
 
@@ -175,9 +164,46 @@ Match the VDDK version to your source vSphere (vCenter/ESXi) version. VMware ali
 
 1. Open the [VMware VDDK download page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest) for the major version that matches your vSphere release (for example, [VDDK 8](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/8.0) for vSphere 8)
 2. Select the VDDK version closest to your vSphere version and click Download
-3. Save `VMware-vix-disklib-<version>.x86_64.tar.gz` into `/tmp/vddk`
+3. Save `VMware-vix-disklib-<version>.x86_64.tar.gz` locally (for example, into `/tmp/vddk`)
 
-### Extract the VDDK Archive
+### Upload the VDDK Image via WebUI
+
+The MTV console can upload the VDDK archive and build the init image when you create or edit a vSphere provider. This is the simplest path for POC environments.
+
+1. Go to Migration -> Providers for virtualization
+2. Click **Create Provider** (or open an existing vSphere provider and edit it)
+3. Select **vSphere** / **VMware**
+4. Fill in the provider details (name, URL, credentials, certificate options)
+5. In the **VDDK init image** section, either:
+    - **Upload the archive (recommended for POC):**
+        1. Click **Browse** next to the VDDK init image archive field
+        2. Select your downloaded `VMware-vix-disklib-<version>.x86_64.tar.gz` and click **Select**
+        3. Click **Upload**
+        4. Wait for the upload to finish — MTV builds the init image and populates the image URL
+    - **Use an existing image:** paste the image path (for example, `image-registry.openshift-image-registry.svc:5000/openshift-mtv/vddk:latest`)
+6. Click **Create provider** (or save the edit)
+7. Wait until the provider status is `Ready` (this can take a few minutes while the image is built)
+
+!!! tip
+    Prefer creating the provider in the `openshift-mtv` project so the built VDDK image lands in that namespace. If you migrate VMs into other namespaces, grant those namespaces pull access as described in [Allow Target Namespaces to Pull the VDDK Image](#allow-target-namespaces-to-pull-the-vddk-image).
+
+### Build and Push the VDDK Image via CLI
+
+Use this path when you need to push the VDDK image to a specific registry yourself, or when you want to set a cluster-wide default on the `ForkliftController`.
+
+#### Prerequisites
+
+- OpenShift image registry (internal or external accessible from OpenShift Virtualization)
+- `podman` installed
+- You are working on a file system that preserves symbolic links (symlinks) — the VDDK package contains symlinks
+
+#### Create a Working Directory
+
+```bash
+mkdir /tmp/vddk && cd /tmp/vddk
+```
+
+#### Extract the VDDK Archive
 
 ```bash
 tar -xzf VMware-vix-disklib-*.x86_64.tar.gz
@@ -189,7 +215,7 @@ Verify the extracted directory:
 ls   # should show vmware-vix-disklib-distrib/
 ```
 
-### Create the VDDK Container Image
+#### Create the VDDK Container Image
 
 Create a `Containerfile`:
 
@@ -203,7 +229,7 @@ ENTRYPOINT ["cp", "-r", "/vmware-vix-disklib-distrib", "/opt"]
 EOF
 ```
 
-### Push to the OpenShift Internal Registry
+#### Push to the OpenShift Internal Registry
 
 Enable the default registry route if it is not already exposed:
 
@@ -240,7 +266,7 @@ podman push $REGISTRY/openshift-mtv/vddk:latest --tls-verify=false
 
 Ensure the image is accessible to your OpenShift Virtualization environment. If you are using an external registry, verify that OpenShift can pull from it.
 
-### Configure MTV to Use the VDDK Image
+#### Configure MTV to Use the VDDK Image
 
 Update the `ForkliftController` to reference the VDDK init image:
 
@@ -255,6 +281,8 @@ Verify the patch:
 oc get forkliftcontroller forklift-controller -n openshift-mtv \
   -o jsonpath='{.spec.controller_vddk_init_image}'
 ```
+
+You can also set the same image URL on a vSphere provider in the WebUI (**VDDK init image** field) instead of patching the controller.
 
 ### Allow Target Namespaces to Pull the VDDK Image
 
