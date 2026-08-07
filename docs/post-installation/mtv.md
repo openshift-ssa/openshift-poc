@@ -256,6 +256,51 @@ oc get forkliftcontroller forklift-controller -n openshift-mtv \
   -o jsonpath='{.spec.controller_vddk_init_image}'
 ```
 
+### Allow Target Namespaces to Pull the VDDK Image
+
+MTV runs VDDK init and disk-transfer pods in the **target namespace** of the migration plan (where the VMs are created), not in `openshift-mtv`. When the VDDK image is stored in the OpenShift internal registry under `openshift-mtv`, those pods cannot pull it until service accounts in the target namespace are granted the `system:image-puller` role in the image's namespace.
+
+#### Single target namespace
+
+Grant pull access to all service accounts in the migration target namespace (recommended — MTV/CDI may use more than the `default` service account):
+
+```bash
+TARGET_NAMESPACE={{ target_namespace }}
+
+oc adm policy add-role-to-group system:image-puller \
+  system:serviceaccounts:${TARGET_NAMESPACE} \
+  -n openshift-mtv
+```
+
+Or grant pull access to only the `default` service account:
+
+```bash
+oc adm policy add-role-to-user system:image-puller \
+  system:serviceaccount:${TARGET_NAMESPACE}:default \
+  -n openshift-mtv
+```
+
+Repeat for each additional target namespace that will receive migrated VMs.
+
+#### All namespaces (POC / lab)
+
+To allow service accounts in every namespace to pull the VDDK image:
+
+```bash
+oc adm policy add-role-to-group system:image-puller \
+  system:serviceaccounts \
+  -n openshift-mtv
+```
+
+!!! warning
+    Granting `system:image-puller` to `system:serviceaccounts` lets any service account on the cluster pull images from `openshift-mtv`. Prefer the per-namespace form outside of POC environments.
+
+Verify the role bindings:
+
+```bash
+oc get rolebinding -n openshift-mtv | grep image-puller
+```
+
 ## Create a Migration Plan
 
 Once providers are configured, create a migration plan using the WebUI wizard:
