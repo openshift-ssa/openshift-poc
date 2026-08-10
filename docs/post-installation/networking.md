@@ -46,6 +46,10 @@ The main xmit_hash_policy values for 802.3ad bonds:
 
 For storage over LACP, layer3+4 is the usual choice because it lets multiple sessions/connections between the same two endpoints actually use both bond members. Just make sure the switch's port-channel hash policy is set comparably (e.g. src-dst-port / L4 hashing) so distribution is balanced in both directions—the host and switch hash independently for their respective transmit directions.
 
+### Why Management and VM Traffic Need Separate VLANs
+
+Do not place VM (or pod) traffic on the same VLAN used for cluster management (API, machine network, ingress). Management traffic carries etcd heartbeats, API server requests, and node health checks — all of which are latency-sensitive and critical to cluster stability. VM workloads can generate unpredictable bursts of broadcast, multicast, or high-bandwidth traffic that saturate the segment, causing etcd leader elections, API timeouts, or nodes flapping to `NotReady`. Keeping them on separate VLANs also gives you independent broadcast domains, lets you apply distinct QoS and firewall policies per network, and makes troubleshooting straightforward since a noisy VM cannot interfere with cluster control-plane communication.
+
 ## NodeNetworkConfigurationPolicy Examples
 
 ### Bonds and Vlans
@@ -321,7 +325,7 @@ spec:
         state: absent
 ```
 
-Sets the VLAN sub-interface `eth0.301` to `absent`, which tells NMState to remove it from all matching nodes. The underlying parent interface (`eth0`) is unaffected. Apply the same pattern for bonds, OVS bridges, or any other interface type — specify the `name`, `type`, and `state: absent`.
+Sets the VLAN sub-interface `eth0.3` to `absent`, which tells NMState to remove it from all matching nodes. The underlying parent interface (`eth0`) is unaffected. Apply the same pattern for bonds, OVS bridges, or any other interface type — specify the `name`, `type`, and `state: absent`.
 
 ## ClusterUserDefinedNetwork
 
