@@ -298,6 +298,31 @@ spec:
 
 Creates an OVS bridge on top of an existing bond and maps it to an OVN localnet. The bond must already be configured (via a separate NNCP) before this policy is applied. `allow-extra-patch-ports: true` is required for OVN-Kubernetes integration, and STP is disabled because the underlying bond already provides link redundancy. The `bridge-mappings` section ties the OVS bridge to a logical localnet name (`localnet-bridge-trunk`) — this is the name that ClusterUserDefinedNetworks reference via `physicalNetworkName` to attach pod traffic to the physical network.
 
+## Removing NMState Configurations
+
+NMState uses a declarative model — to delete an interface, you don't remove the NNCP that created it. Instead, you apply a new (or updated) policy that sets the interface `state: absent`. NMState will then remove the interface from the node's network configuration.
+
+This applies to any interface type: VLANs, bonds, OVS bridges, etc. If you simply delete the NNCP object, NMState does **not** roll back the configuration it applied — the interface stays on the node.
+
+### Remove a VLAN Interface
+
+```yaml
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: remove-eth0-3
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/worker: ""
+  desiredState:
+    interfaces:
+      - name: eth0.3
+        type: vlan
+        state: absent
+```
+
+Sets the VLAN sub-interface `eth0.301` to `absent`, which tells NMState to remove it from all matching nodes. The underlying parent interface (`eth0`) is unaffected. Apply the same pattern for bonds, OVS bridges, or any other interface type — specify the `name`, `type`, and `state: absent`.
+
 ## ClusterUserDefinedNetwork
 
 ### CUDN with IPAM
