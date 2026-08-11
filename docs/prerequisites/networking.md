@@ -10,6 +10,9 @@ OpenShift requires specific network configurations and firewall rules between no
 | Pod Network     | Pod-to-pod communication (SDN) | 10.128.0.0/14 |
 | Service Network | Kubernetes service IPs         | 172.30.0.0/16 |
 
+!!! warning "Machine Network Isolation"
+    In a production environment, it is best to run the machine network in an isolated network in a seperate vlan than your workloads. If you are planning to run OpenShift Virtualization, those VMs should run on a different vlan than the machine network. 
+
 !!! info
     Do you have to use these values for the Pod network and Service network? No. But for the POC, just keep the defaults.
 
