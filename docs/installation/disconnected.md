@@ -20,6 +20,30 @@ There are two approaches to making images available locally:
 
 ---
 
+## Obtaining the openshift-install Binary
+
+The `openshift-install` binary is needed to generate the bootable ISO, but you cannot download it from the internet on a disconnected machine. The binary is embedded inside the OpenShift release container image itself — you extract it from the payload you mirrored to your internal registry.
+
+### Transfer the oc CLI Across the Airgap
+
+You need the `oc` CLI on the disconnected installation host before you can extract anything. On a workstation with internet access, download `oc` from the [Red Hat mirror site](https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/) and transfer it into the disconnected environment via bastion host, secure file transfer, or physical media.
+
+### Extract the Installer from the Mirrored Payload
+
+Once the release images have been mirrored to your internal registry and `oc` is available on the disconnected installation host, extract the installer:
+
+```bash
+oc adm release extract \
+  -a ~/merged-pull-secret.json \
+  --command=openshift-install \
+  {{ mirror_host }}:8443/openshift/release-images:{{ ocp_release }}-x86_64
+```
+
+This pulls the `openshift-install` binary out of the release image in your internal registry and writes it to the current directory. The `--command` flag tells `oc` to extract only the named binary rather than the full image contents.
+
+!!! tip "Why not just download the tarball?"
+    You can download the `openshift-install` tarball from Red Hat at the same time you download `oc` on your connected workstation and transfer both across the airgap. However, using `oc adm release extract` guarantees that the installer version is an exact match for the release payload you mirrored — eliminating any risk of a version mismatch between the installer and the images it references.
+
 ## Option 1: Mirror Registry with oc-mirror
 
 This approach uses `oc-mirror` to download all OpenShift release images, operator catalogs, and any additional images into a local registry. It is the only option for fully air-gapped environments.
@@ -131,17 +155,32 @@ mirror:
 
 === "Direct (bastion has access to both networks)"
 
-    ``bash     oc-mirror --config imageset-config.yaml \       docker://{{ mirror_host }}:8443/openshift \       --authfile ~/merged-pull-secret.json \       --v2     ``
+    ```bash
+    oc-mirror --config imageset-config.yaml \
+      docker://{{ mirror_host }}:8443/openshift \
+      --authfile ~/merged-pull-secret.json \
+      --v2
+    ```
 
 === "Air-Gapped (two-step with portable media)"
 
     On the internet-connected host, mirror to disk:
 
-    ``bash     oc-mirror --config imageset-config.yaml \       file:///mnt/mirror-data \       --authfile ~/merged-pull-secret.json \       --v2     ``
+    ```bash
+    oc-mirror --config imageset-config.yaml \
+      file:///mnt/mirror-data \
+      --authfile ~/merged-pull-secret.json \
+      --v2
+    ```
 
-    Transfer`/mnt/mirror-data` to the disconnected network, then load into the registry:
+    Transfer `/mnt/mirror-data` to the disconnected network, then load into the registry:
 
-    ``bash     oc-mirror --from file:///mnt/mirror-data \       docker://{{ mirror_host }}:8443/openshift \       --authfile ~/merged-pull-secret.json \       --v2     ``
+    ```bash
+    oc-mirror --from file:///mnt/mirror-data \
+      docker://{{ mirror_host }}:8443/openshift \
+      --authfile ~/merged-pull-secret.json \
+      --v2
+    ```
 
 `oc-mirror` generates output files in the `oc-mirror-workspace/results-*` directory. You will need these during install:
 
@@ -153,7 +192,11 @@ mirror:
 
 ### Configure install-config.yaml
 
-Start with the standard `install-config.yaml` from the [Agent-Based Installer](agent-based.md) guide and add the disconnected-specific fields:
+Start with the standard `install-config.yaml` from the [Agent-Based Installer](agent-based.md) guide and add three disconnected-specific fields: the image mirror routing, the combined pull secret, and the registry's TLS trust bundle.
+
+#### Image Mirror Routing
+
+`imageDigestSources` tells the installer which public registries map to your internal mirror. When you ran `oc-mirror`, it generated these exact mappings in `imageDigestMirrorSet.yaml` — copy the values from there.
 
 ```yaml
 imageDigestSources:
@@ -163,7 +206,29 @@ imageDigestSources:
   - mirrors:
       - {{ mirror_host }}:8443/openshift/release
     source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+```
 
+!!! warning
+    The `imageDigestSources` values must match the repository paths used by `oc-mirror`. Check the generated `imageDigestMirrorSet.yaml` for the exact values.
+
+!!! note
+    `imageDigestSources` was introduced in OpenShift 4.14. If you are on 4.13 or older, use the legacy `imageContentSources` key instead.
+
+#### Combined Pull Secret
+
+The default Red Hat pull secret only authenticates against `quay.io` and `registry.redhat.io`. In a disconnected environment, you must combine it with credentials for your internal registry. The `merged-pull-secret.json` created in the [Configure Authentication](#configure-authentication) step already contains both — use its contents as the `pullSecret` value:
+
+```yaml
+pullSecret: '< contents of ~/merged-pull-secret.json >'
+```
+
+The value must be a single JSON string containing the base64-encoded auth tokens for both Red Hat and your mirror registry.
+
+#### Additional Trust Bundle
+
+Internal registries almost always use self-signed or internal CA certificates. Without the CA certificate in the install config, cluster nodes will reject TLS connections to the mirror and image pulls will fail. Paste the PEM-encoded CA certificate (the `rootCA.pem` generated during [mirror registry setup](#set-up-the-mirror-registry)) under `additionalTrustBundle`:
+
+```yaml
 additionalTrustBundlePolicy: Always
 additionalTrustBundle: |
   -----BEGIN CERTIFICATE-----
@@ -171,8 +236,28 @@ additionalTrustBundle: |
   -----END CERTIFICATE-----
 ```
 
+#### Putting It All Together
+
+When appended to your base configuration, the disconnected-specific portion of `install-config.yaml` looks like this:
+
+```yaml
+additionalTrustBundlePolicy: Always
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE-----
+  < contents of /opt/quay/quay-rootCA/rootCA.pem >
+  -----END CERTIFICATE-----
+imageDigestSources:
+  - mirrors:
+      - {{ mirror_host }}:8443/openshift/release-images
+    source: quay.io/openshift-release-dev/ocp-release
+  - mirrors:
+      - {{ mirror_host }}:8443/openshift/release
+    source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+pullSecret: '< contents of ~/merged-pull-secret.json >'
+```
+
 !!! warning
-    The `imageDigestSources` values must match the repository paths used by `oc-mirror`. Check the generated `imageDigestMirrorSet.yaml` for the exact values.
+    Always make a backup copy of your `install-config.yaml` before running the installer. The installation process consumes and deletes this file when generating Ignition configurations.
 
 ### Generate and Boot the ISO
 
