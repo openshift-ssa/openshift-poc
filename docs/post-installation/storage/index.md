@@ -9,6 +9,14 @@ After the cluster is running, install your vendor's CSI driver to provide persis
 
 If you are planning on running virtual machines using OpenShift Virtualization, the live migration feature requires shared storage with ReadWriteMany (RWX) access mode. A VM's disk PVCs must be RWX for it to migrate — during migration the VM runs briefly on both source and destination nodes, so the disk volume has to be mountable on two nodes at once, which RWO can't do.
 
+## Vendor Guides
+
+| Platform / vendor | Guide |
+| ----------------- | ----- |
+| VMware vSphere | [VMware vSphere CSI](vsphere-csi.md) |
+| Dell Unity XT (bare metal, iSCSI) | [Dell Unity Bare Metal](dell-unity-bare-metal.md) |
+| OpenShift Data Foundation | [OpenShift Data Foundation](#openshift-data-foundation) |
+
 ## CSI Driver Installation
 
 Most vendors provide an Operator available through OperatorHub or a Helm chart. The general process is:

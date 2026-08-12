@@ -103,6 +103,7 @@ nav:
           - Dell:
               - Dell Unity XT (iSCSI): post-installation/storage/dell/dell-unity.md
           - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
+          - Dell Unity Bare Metal: post-installation/storage/dell-unity-bare-metal.md
       - Registry: post-installation/registry.md
       # optional
       - Networking: post-installation/networking.md
