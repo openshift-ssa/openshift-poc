@@ -343,6 +343,7 @@ metadata:
   name: cluster
   namespace: openshift-kube-descheduler-operator
 spec:
+  managementState: Managed
   deschedulingIntervalSeconds: 3600
   profiles:
     - KubeVirtRelieveAndMigrate
