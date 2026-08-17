@@ -355,3 +355,26 @@ oc delete pvc unity-test -n unity
 | PVC stuck in Pending with topology mismatch | `arrayId` in StorageClass is uppercase but the driver labels nodes with lowercase | Change `arrayId` in the StorageClass to lowercase to match the node topology labels (e.g. `apm00xxxxxxxxx` not `APM00XXXXXXXXX`) |
 | `configVersion` rejected | Operator/driver version mismatch | Check `oc get csm unity -n unity -o yaml` for the expected version |
 | iSCSI login failures | Array iSCSI interfaces not on the same VLAN as nodes | Verify SPA/SPB iSCSI IPs are reachable from worker nodes |
+| PVC stuck in Pending, attach failures, or missing `csi-unity.dellemc.com` topology labels after a network outage | Stale Unisphere API sessions or iSCSI logins in the driver pods | Restore connectivity, then restart all Unity driver pods (see below) |
+
+### Network interruption — restart driver pods
+
+After a network outage between the cluster and the Unity array (Unisphere management or the iSCSI data path), the CSI controller and node pods can keep stale sessions. Provisioning and attach then fail until the pods restart and re-login.
+
+Confirm the array is reachable again from a worker, then delete every pod in the `unity` namespace. The CSM operator recreates the controller Deployment and node DaemonSet:
+
+```bash
+oc delete pods -n unity --all
+```
+
+Wait until both controller replicas and the node pods are `Running`:
+
+```bash
+oc get pods -n unity -w
+```
+
+Confirm each worker still lists the Unity CSI driver:
+
+```bash
+oc get csinode -o wide
+```
