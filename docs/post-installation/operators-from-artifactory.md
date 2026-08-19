@@ -16,9 +16,11 @@ echo -n 'username:password' | base64
 
 2. Download the current global pull secret:
 
+{% raw %}
 ```bash
 oc get secret/pull-secret -n openshift-config --template='{{index .data ".dockerconfigjson" | base64decode}}' > pull-secret.json
 ```
+{% endraw %}
 
 3. Edit the `pull-secret.json` to include your Artifactory registry:
 

@@ -73,6 +73,7 @@ nav:
       - Architecture: home/architecture.md
   - Prerequisites:
       - Overview: prerequisites/index.md
+      - POC Checklist: prerequisites/poc-checklist.md
       - Infrastructure: prerequisites/infrastructure.md
       - Networking: prerequisites/networking.md
       - DNS: prerequisites/dns.md
