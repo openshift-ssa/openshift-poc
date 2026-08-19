@@ -20,4 +20,7 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Generate downloadable assets
+        run: python scripts/generate_checklist_docx.py
+
       - run: mkdocs gh-deploy --force

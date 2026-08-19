@@ -5,3 +5,4 @@ __pycache__/
 .cache
 resume.txt
 temp.yaml
+docs/assets/downloads/*.docx

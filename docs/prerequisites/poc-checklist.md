@@ -4,6 +4,8 @@ This checklist provides a complete end-to-end baseline for validating OpenShift 
 
 Use this as a tracker for your POC engagement. Not every item will apply to every environment — skip sections that are out of scope for your specific goals.
 
+[Download as Word Document](../assets/downloads/poc-checklist.docx){ .md-button }
+
 ---
 
 ## Phase 1: Discovery and Scoping
@@ -12,36 +14,39 @@ Complete this phase before any technical work begins. Align on goals, boundaries
 
 ### Goals and Drivers
 
-- [ ] Define the core business problem OpenShift will address
-- [ ] Document specific POC objectives with measurable outcomes
-- [ ] Identify which applications or workloads will be evaluated
-- [ ] Capture high-availability and recovery expectations
-- [ ] Note any security, regulatory, or compliance constraints
-- [ ] Understand target production timeline and anticipated scale
+| #  | Item                                                        | Status | Notes |
+| -- | ----------------------------------------------------------- | ------ | ----- |
+| 1  | Define the core business problem OpenShift will address     |        |       |
+| 2  | Document specific POC objectives with measurable outcomes   |        |       |
+| 3  | Identify which applications or workloads will be evaluated  |        |       |
+| 4  | Capture high-availability and recovery expectations         |        |       |
+| 5  | Note any security, regulatory, or compliance constraints    |        |       |
+| 6  | Understand target production timeline and anticipated scale |        |       |
 
 ### Boundaries and Assumptions
 
-- [ ] Agree on what is included in the POC and document it
-- [ ] Explicitly list what is excluded (to prevent scope creep)
-- [ ] Document assumptions and responsibilities (customer vs. Red Hat)
-- [ ] Identify all participating teams (infra, network, security, app dev)
-- [ ] Set a timeline with key milestone dates
+| #  | Item                                                             | Status | Notes |
+| -- | ---------------------------------------------------------------- | ------ | ----- |
+| 7  | Agree on what is included in the POC and document it             |        |       |
+| 8  | Explicitly list what is excluded (to prevent scope creep)        |        |       |
+| 9  | Document assumptions and responsibilities (customer vs. Red Hat) |        |       |
+| 10 | Identify all participating teams (infra, network, security, dev) |        |       |
+| 11 | Set a timeline with key milestone dates                          |        |       |
 
 ### Exit Criteria
 
 Agree on pass/fail criteria before installation begins:
 
-| Area           | How We Measure Success                            | Status |
-| -------------- | ------------------------------------------------- | ------ |
-| Installation   | Cluster deployed, all nodes healthy               |        |
-| Networking     | Application traffic flows end-to-end              |        |
-| Storage        | Persistent volumes provision and bind on demand   |        |
-| Security       | Users authenticate and RBAC enforces permissions  |        |
-| Applications   | Sample and customer workloads run correctly       |        |
-| Performance    | Workloads meet agreed throughput/latency targets  |        |
-| Resilience     | Cluster recovers from simulated failures          |        |
-| Operations     | Monitoring, logging, and backups function         |        |
-| Migration      | VMs move from VMware to OpenShift (if applicable) |        |
+| Area         | How We Measure Success                            | Status |
+| ------------ | ------------------------------------------------- | ------ |
+| Installation | Cluster deployed, all nodes healthy               |        |
+| Networking   | Application traffic flows end-to-end              |        |
+| Storage      | Persistent volumes provision and bind on demand   |        |
+| Security     | Users authenticate and RBAC enforces permissions  |        |
+| Applications | Sample and customer workloads run correctly       |        |
+| Resilience   | Cluster recovers from simulated failures          |        |
+| Operations   | Monitoring, logging, and backups function         |        |
+| Migration    | VMs migrated to OpenShift (if applicable)         |        |
 
 ---
 
@@ -49,42 +54,38 @@ Agree on pass/fail criteria before installation begins:
 
 Complete these before scheduling the installation.
 
-- [ ] Red Hat account created and trial subscriptions allocated
-- [ ] Infrastructure provisioned ([details](infrastructure.md))
-    - [ ] Compute nodes meet minimum specs (control plane + workers)
-    - [ ] BMC/iLO/iDRAC access confirmed for bare metal
-    - [ ] BIOS/firmware settings validated (UEFI, virtualization extensions)
-- [ ] Networking configured ([details](networking.md))
-    - [ ] VLANs/subnets allocated for cluster traffic
-    - [ ] Firewall rules opened (API, ingress, registry access)
-    - [ ] NTP accessible from all nodes
-    - [ ] Load balancer configured (if required)
-- [ ] DNS records created ([details](dns.md))
-    - [ ] `api.<cluster>.<domain>` resolves correctly
-    - [ ] `*.apps.<cluster>.<domain>` wildcard resolves correctly
-    - [ ] Reverse DNS entries (PTR) configured
-- [ ] Storage backend available ([details](storage.md))
-    - [ ] SAN/NAS or local storage provisioned
-    - [ ] iSCSI/NFS/FC connectivity verified from node networks
-- [ ] Installation host prepared ([details](installation-host.md))
-    - [ ] `oc` CLI installed
-    - [ ] Pull secret downloaded from Red Hat console
-    - [ ] SSH key pair generated
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Red Hat account created and subscriptions allocated               |        |       |
+| 2  | Compute nodes provisioned and meet minimum specs                  |        |       |
+| 3  | Management access to nodes confirmed (BMC, vCenter, cloud API)    |        |       |
+| 4  | Firmware/BIOS settings validated (UEFI, virtualization extensions) |        |       |
+| 5  | Network subnets allocated for cluster traffic                     |        |       |
+| 6  | Firewall rules opened (API, ingress, registry access)             |        |       |
+| 7  | NTP accessible from all nodes                                     |        |       |
+| 8  | Load balancer configured (if required)                            |        |       |
+| 9  | `api.<cluster>.<domain>` DNS record resolves correctly            |        |       |
+| 10 | `*.apps.<cluster>.<domain>` wildcard DNS resolves correctly       |        |       |
+| 11 | Reverse DNS entries (PTR) configured                              |        |       |
+| 12 | Persistent storage backend provisioned and accessible             |        |       |
+| 13 | Storage connectivity verified from node networks                  |        |       |
+| 14 | `oc` CLI installed on installation host                           |        |       |
+| 15 | Pull secret downloaded from Red Hat console                       |        |       |
+| 16 | SSH key pair generated                                            |        |       |
 
 ---
 
 ## Phase 3: Installation
 
-- [ ] Installation method chosen:
-    - [ ] [Assisted Installer](../installation/assisted-installer.md) (recommended for connected environments)
-    - [ ] [Agent-Based Installer](../installation/agent-based.md) (disconnected or air-gapped)
-    - [ ] [VMware vSphere IPI](../installation/vmware-install.md) (vSphere environments)
-- [ ] Cluster installation completed successfully
-- [ ] All nodes showing `Ready` status (`oc get nodes`)
-- [ ] All ClusterOperators report Available=True, Degraded=False (`oc get co`)
-- [ ] Cluster version matches target release (`oc get clusterversion`)
-- [ ] Web console accessible at `https://console-openshift-console.apps.<cluster>.<domain>`
-- [ ] `kubeadmin` credentials stored securely
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Installation method selected                                      |        |       |
+| 2  | Cluster installation completed successfully                       |        |       |
+| 3  | All nodes showing `Ready` status                                  |        |       |
+| 4  | All ClusterOperators Available=True, Degraded=False               |        |       |
+| 5  | Cluster version matches target release                            |        |       |
+| 6  | Web console accessible                                            |        |       |
+| 7  | `kubeadmin` credentials stored securely                           |        |       |
 
 ---
 
@@ -92,12 +93,14 @@ Complete these before scheduling the installation.
 
 These must be completed before deploying workloads.
 
-- [ ] [NMState Operator](../post-installation/nmstate.md) installed (if using bonds, VLANs, or OVS bridges)
-- [ ] Storage driver installed and StorageClasses created ([Storage](../post-installation/storage/index.md))
-    - [ ] Default StorageClass set
-    - [ ] RWO PVC created and bound successfully
-    - [ ] RWX PVC created and bound successfully (if applicable)
-- [ ] [Image Registry](../post-installation/registry.md) configured with persistent storage
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Advanced networking operator installed (if using bonds/VLANs)     |        |       |
+| 2  | Storage driver installed and StorageClasses created               |        |       |
+| 3  | Default StorageClass set                                          |        |       |
+| 4  | RWO PVC created and bound successfully                            |        |       |
+| 5  | RWX PVC created and bound successfully (if applicable)            |        |       |
+| 6  | Internal image registry configured with persistent storage        |        |       |
 
 ---
 
@@ -107,76 +110,83 @@ Install based on your POC goals. Each subsection is independent.
 
 ### Networking
 
-- [ ] [Networking](../post-installation/networking.md) — NNCPs, OVS bridges, secondary networks configured
-- [ ] Pod-to-pod communication verified across nodes
-- [ ] Ingress/Route exposes an application externally
-- [ ] DNS resolution works from within pods (internal and external)
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Additional network configuration applied (bridges, secondary NICs)|        |       |
+| 2  | Pod-to-pod communication verified across nodes                    |        |       |
+| 3  | Ingress/Route exposes an application externally                   |        |       |
+| 4  | DNS resolution works from within pods (internal and external)     |        |       |
 
 ### Virtualization
 
-- [ ] [OpenShift Virtualization](../post-installation/virtualization.md) installed
-    - [ ] HyperConverged CR created
-    - [ ] Live migration network configured (if applicable)
-- [ ] [Workload Availability](../post-installation/workload-availability.md) configured
-    - [ ] Node Health Check Operator installed
-    - [ ] Self Node Remediation Operator installed
-    - [ ] NodeHealthCheck CRs created (workers and control plane)
-    - [ ] Kube Descheduler Operator installed and configured
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | OpenShift Virtualization operator installed                       |        |       |
+| 2  | HyperConverged CR created                                         |        |       |
+| 3  | Live migration network configured (if applicable)                 |        |       |
+| 4  | Node health check and remediation operators installed             |        |       |
+| 5  | Health check CRs created (workers and control plane)              |        |       |
+| 6  | Descheduler operator installed and configured                     |        |       |
 
 ### Migration
 
-- [ ] [Migration Toolkit for Virtualization](../post-installation/mtv.md) installed
-    - [ ] VMware vSphere provider added
-    - [ ] Network and storage mappings configured
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Migration toolkit operator installed                              |        |       |
+| 2  | Source virtualization provider added                               |        |       |
+| 3  | Network and storage mappings configured                           |        |       |
 
 ### Backup and Restore
 
-- [ ] [OADP](../post-installation/oadp.md) installed
-    - [ ] Backup storage location configured (S3/MinIO)
-    - [ ] DataProtectionApplication CR created
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Backup operator installed                                         |        |       |
+| 2  | Backup storage location configured                                |        |       |
+| 3  | DataProtectionApplication CR created                              |        |       |
 
 ### Observability
 
-- [ ] [Logging](../post-installation/logging.md) — Loki + ClusterLogForwarder configured
-- [ ] [Network Observability](../post-installation/network-observability.md) — eBPF flow collection enabled
-- [ ] [MultiCluster Observability](../post-installation/multicluster-observability.md) (if using ACM)
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Cluster logging configured                                        |        |       |
+| 2  | Network observability enabled                                     |        |       |
+| 3  | Multi-cluster observability configured (if multi-cluster)         |        |       |
 
 ### Developer Experience
 
-- [ ] [Service Mesh](../post-installation/service-mesh.md) — Istio ambient mode configured
-- [ ] [OpenShift GitOps](../post-installation/openshift-gitops.md) — ArgoCD installed
-- [ ] [Web Terminal](../post-installation/web-terminal.md) — Embedded CLI enabled
-- [ ] [External Secrets Operator](../post-installation/external-secrets-operator.md) — Vault/secret integration
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Web terminal enabled                                              |        |       |
+| 2  | External secrets integration configured (if applicable)           |        |       |
 
 ### Security and Access
 
-- [ ] [Identity Providers](../post-installation/configuring-identity-providers.md) configured (LDAP, OIDC, etc.)
-- [ ] RBAC groups mapped correctly (LDAP/OIDC group members get expected roles)
-- [ ] `kubeadmin` secret removed after OAuth verification (if desired)
-- [ ] [POC Banner](../post-installation/poc-banner.md) applied to mark environment as non-production
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Identity provider configured (LDAP, OIDC, etc.)                   |        |       |
+| 2  | RBAC groups mapped correctly (members get expected roles)         |        |       |
+| 3  | `kubeadmin` secret removed after IdP verification (if desired)    |        |       |
+| 4  | Non-production banner applied to the console                      |        |       |
 
 ---
 
-## Phase 6: VM Migration from VMware
+## Phase 6: VM Migration
 
-Validate that virtual machines can be migrated from VMware vSphere to OpenShift Virtualization. Requires [MTV](../post-installation/mtv.md) and [OpenShift Virtualization](../post-installation/virtualization.md) from Phase 5.
+Validate that virtual machines can be migrated from an existing virtualization platform to OpenShift Virtualization.
 
-- [ ] Source VMware environment accessible from OpenShift
-- [ ] MTV provider connection healthy (green status in console)
-- [ ] Migration plan created
-    - [ ] Target storage class selected
-    - [ ] Target network mapping configured
-    - [ ] VMs selected for migration
-- [ ] Test migration executed (cold migration)
-    - [ ] VM boots successfully on OpenShift
-    - [ ] Networking functional (IP, DNS, connectivity)
-    - [ ] Storage attached and data intact
-    - [ ] Applications inside the VM running correctly
-- [ ] Warm migration tested (if applicable)
-    - [ ] Cutover completed with minimal downtime
-- [ ] Post-migration validation
-    - [ ] VM accessible via console and SSH
-    - [ ] Performance acceptable (CPU, memory, disk I/O)
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Source virtualization environment accessible from OpenShift        |        |       |
+| 2  | Migration provider connection healthy                             |        |       |
+| 3  | Target storage class selected                                     |        |       |
+| 4  | Target network mapping configured                                 |        |       |
+| 5  | VMs selected for migration                                        |        |       |
+| 6  | Cold migration executed — VM boots on OpenShift                   |        |       |
+| 7  | Networking functional (IP, DNS, connectivity)                     |        |       |
+| 8  | Storage attached and data intact                                  |        |       |
+| 9  | Applications inside the VM running correctly                      |        |       |
+| 10 | Warm migration tested — cutover with minimal downtime             |        |       |
+| 11 | VM accessible via console and SSH post-migration                  |        |       |
 
 ---
 
@@ -186,27 +196,22 @@ Deploy workloads to validate platform capabilities.
 
 ### Container Workloads
 
-- [ ] Basic container deployment ([Hello World](../workloads/busybox-hello-world.md))
-    - [ ] Pod running and accessible via Route
-- [ ] Source-to-Image build ([S2I Build](../workloads/s2i-build.md))
-    - [ ] Build completes from source repository
-    - [ ] Application deployed and accessible
-- [ ] Stateful application ([PostgreSQL](../workloads/postgresql.md))
-    - [ ] PVC bound and data persists across pod restarts
-- [ ] Multi-tier application ([Spring PetClinic](../workloads/spring-petclinic.md))
-    - [ ] Frontend and backend components communicating
-- [ ] Event streaming ([Kafka](../workloads/kafka-strimzi.md)) (if applicable)
-- [ ] Service mesh application ([Bookinfo](../workloads/bookinfo.md)) (if Service Mesh installed)
-- [ ] Customer application deployed (if provided)
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Basic container deployed and accessible via Route                 |        |       |
+| 2  | Build from source — image built and app deploys                   |        |       |
+| 3  | Stateful application — data persists across pod restarts          |        |       |
+| 4  | Multi-tier application — frontend and backend communicating       |        |       |
+| 5  | Event streaming workload deployed (if applicable)                 |        |       |
+| 6  | Customer application deployed (if provided)                       |        |       |
 
 ### Virtual Machine Workloads
 
-- [ ] [Deploy a RHEL VM](../workloads/workload-virtual-machines.md) from template
-    - [ ] VM boots and is accessible via console
-    - [ ] SSH access functional
-    - [ ] Storage attached correctly
-- [ ] Live migration tested (move VM between nodes without downtime)
-- [ ] Snapshot and restore tested
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | VM deployed from template — boots, SSH, storage functional        |        |       |
+| 2  | Live migration tested (move VM between nodes without downtime)    |        |       |
+| 3  | Snapshot and restore tested                                       |        |       |
 
 ---
 
@@ -216,52 +221,48 @@ Demonstrate Day 2 operations and resilience.
 
 ### Failover and Resilience
 
-- [ ] [VM Failover Test](../operations/vm-failover.md)
-    - [ ] Node failure simulated
-    - [ ] VM restarted on healthy node within target time (~120s)
-    - [ ] Application recovered without manual intervention
-- [ ] [Container Failover Test](../operations/container-failover.md)
-    - [ ] Pod rescheduled to healthy node after node failure
-    - [ ] Service remained available during failover
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Node failure simulated                                            |        |       |
+| 2  | VM restarted on healthy node within target time                   |        |       |
+| 3  | Application recovered without manual intervention                 |        |       |
+| 4  | Container pod rescheduled to healthy node after failure           |        |       |
+| 5  | Service remained available during failover                        |        |       |
 
 ### Backup and Restore
 
-- [ ] [VM Backup and Restore](../operations/vm-backup-restore.md)
-    - [ ] Backup completed successfully
-    - [ ] Restore to same or different namespace validated
-    - [ ] Data integrity confirmed after restore
-- [ ] etcd backup taken and verified
-    - [ ] Backup script executed successfully
-    - [ ] Backup file stored securely off-cluster
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Application or VM backup completed successfully                   |        |       |
+| 2  | Restore to same or different namespace validated                  |        |       |
+| 3  | Data integrity confirmed after restore                            |        |       |
+| 4  | etcd backup taken and stored securely off-cluster                 |        |       |
 
 ### Scaling
 
-- [ ] [Add Worker Node](../operations/add-worker-node.md) — Scale cluster by adding a node
-- [ ] Horizontal Pod Autoscaler (HPA) validated (if applicable)
-    - [ ] Application scales under load
-    - [ ] Application scales down when load decreases
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Worker node added — new node joins cluster successfully           |        |       |
 
 ### Cluster Lifecycle
 
-- [ ] [Rotate SSH Keys](../operations/rotate-ssh-keys.md) — Validate key rotation procedure
-- [ ] [Machine Config](../operations/machine-config.md) — Apply node-level configuration changes
-- [ ] Node drain and maintenance — Cordon, drain, and uncordon a node
-- [ ] Cluster upgrade tested (minor version or z-stream)
-    - [ ] Pre-upgrade health check passed
-    - [ ] Upgrade completed without degraded operators
-    - [ ] Workloads remained available during upgrade
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | SSH key rotation validated                                        |        |       |
+| 2  | Node-level configuration change applied via MachineConfig         |        |       |
+| 3  | Node drain and maintenance — cordon, drain, uncordon              |        |       |
+| 4  | Cluster upgrade tested (minor version or z-stream)                |        |       |
+| 5  | Workloads remained available during upgrade                       |        |       |
 
 ### Monitoring and Troubleshooting
 
-- [ ] Monitoring dashboards accessible (Observe section in web console)
-- [ ] Alerts fire correctly (trigger a test alert, verify in Alertmanager)
-- [ ] `oc adm must-gather` executed and bundle reviewed
-- [ ] Log collection validated (node logs, pod logs, operator logs)
-- [ ] Common failure modes understood by the customer team:
-    - [ ] Node NotReady
-    - [ ] Pod Pending / CrashLoopBackOff / ImagePullBackOff
-    - [ ] PVC Pending
-    - [ ] Operator Degraded
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Monitoring dashboards accessible                                  |        |       |
+| 2  | Alerts fire correctly (trigger test alert, verify delivery)       |        |       |
+| 3  | Diagnostic bundle collected and reviewed                          |        |       |
+| 4  | Log collection validated (node, pod, operator logs)               |        |       |
+| 5  | Common failure modes understood by the customer team              |        |       |
 
 ---
 
@@ -285,21 +286,25 @@ Demonstrate Day 2 operations and resilience.
 
 ### Sizing and Architecture for Production
 
-- [ ] Compute sizing documented (CPU, memory, disk per node role)
-- [ ] Storage architecture and capacity plan defined
-- [ ] Network topology and segmentation documented
-- [ ] High-availability and DR strategy outlined
-- [ ] Backup retention and RPO/RTO targets set
-- [ ] Security hardening steps identified (CIS, STIG, network policies)
-- [ ] Alerting and on-call strategy documented
-- [ ] Operational ownership model agreed (who runs what)
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Compute sizing documented (CPU, memory, disk per node role)       |        |       |
+| 2  | Storage architecture and capacity plan defined                    |        |       |
+| 3  | Network topology and segmentation documented                      |        |       |
+| 4  | High-availability and DR strategy outlined                        |        |       |
+| 5  | Backup retention and RPO/RTO targets set                          |        |       |
+| 6  | Security hardening steps identified                               |        |       |
+| 7  | Alerting and on-call strategy documented                          |        |       |
+| 8  | Operational ownership model agreed (who runs what)                |        |       |
 
 ### Subscription and Infrastructure Summary
 
-- [ ] Hardware bill of materials finalized (servers, NICs, disks)
-- [ ] Network allocation documented (VLANs, IP ranges, firewall rules)
-- [ ] Red Hat entitlements and subscription counts confirmed
-- [ ] External dependencies cataloged (storage arrays, load balancers, DNS)
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Hardware bill of materials finalized                              |        |       |
+| 2  | Network allocation documented (subnets, IPs, firewall rules)     |        |       |
+| 3  | Red Hat entitlements and subscription counts confirmed            |        |       |
+| 4  | External dependencies cataloged (storage, load balancers, DNS)   |        |       |
 
 ---
 
@@ -307,35 +312,39 @@ Demonstrate Day 2 operations and resilience.
 
 ### Operational Readiness of Customer Team
 
-- [ ] Team has demonstrated the ability to:
-    - [ ] Perform routine cluster administration
-    - [ ] Diagnose and resolve common issues
-    - [ ] Execute cluster upgrades
-    - [ ] Add or remove cluster capacity
-    - [ ] Run backup and restore procedures
-    - [ ] Deploy new applications to the platform
+| #  | Item                                             | Status | Notes |
+| -- | ------------------------------------------------ | ------ | ----- |
+| 1  | Perform routine cluster administration           |        |       |
+| 2  | Diagnose and resolve common issues               |        |       |
+| 3  | Execute cluster upgrades                         |        |       |
+| 4  | Add or remove cluster capacity                   |        |       |
+| 5  | Run backup and restore procedures                |        |       |
+| 6  | Deploy new applications to the platform          |        |       |
 
 ### Artifacts Delivered
 
-- [ ] Architecture diagram
-- [ ] Installation and configuration runbook
-- [ ] Day 2 operations guide
-- [ ] Troubleshooting reference
-- [ ] Upgrade playbook
-- [ ] Backup and recovery procedure
-- [ ] Escalation and support contacts
+| #  | Item                                             | Status | Notes |
+| -- | ------------------------------------------------ | ------ | ----- |
+| 1  | Architecture diagram                             |        |       |
+| 2  | Installation and configuration runbook           |        |       |
+| 3  | Day 2 operations guide                           |        |       |
+| 4  | Troubleshooting reference                        |        |       |
+| 5  | Upgrade playbook                                 |        |       |
+| 6  | Backup and recovery procedure                    |        |       |
+| 7  | Escalation and support contacts                  |        |       |
 
 ### Findings and Decision
 
-- [ ] Successful tests documented
-- [ ] Failures documented with root cause and resolution
-- [ ] Gaps identified and categorized:
-    - [ ] Platform gaps (features not yet available)
-    - [ ] Infrastructure gaps (hardware, network, or storage shortfalls)
-    - [ ] Application gaps (app-specific constraints)
-    - [ ] POC-only limitations (not relevant to production)
-- [ ] Lessons learned recorded for production planning
-- [ ] Final go/no-go recommendation delivered and agreed
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Successful tests documented                                       |        |       |
+| 2  | Failures documented with root cause and resolution                |        |       |
+| 3  | Platform gaps identified (features not yet available)              |        |       |
+| 4  | Infrastructure gaps identified (hardware, network, storage)       |        |       |
+| 5  | Application gaps identified (app-specific constraints)            |        |       |
+| 6  | POC-only limitations noted (not relevant to production)           |        |       |
+| 7  | Lessons learned recorded for production planning                  |        |       |
+| 8  | Final go/no-go recommendation delivered and agreed                |        |       |
 
 ### Formal Approval
 
@@ -349,4 +358,4 @@ Demonstrate Day 2 operations and resilience.
 ---
 
 !!! tip "Tracking Progress"
-    Copy this checklist into your project tracking tool or print it for your kickoff meeting. Review progress weekly with the customer team and update the status as each milestone completes.
+    Use the downloadable Word document for offline tracking or print it for your kickoff meeting. Review progress weekly with the customer team and update the status as each milestone completes.
