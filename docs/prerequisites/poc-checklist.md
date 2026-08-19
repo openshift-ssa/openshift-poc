@@ -109,7 +109,7 @@ Install based on your POC goals. Each subsection is independent.
 
 - [ ] [Networking](../post-installation/networking.md) — NNCPs, OVS bridges, secondary networks configured
 - [ ] Pod-to-pod communication verified across nodes
-- [ ] Ingress/Route exposes application externally
+- [ ] Ingress/Route exposes an application externally
 - [ ] DNS resolution works from within pods (internal and external)
 
 ### Virtualization
@@ -257,7 +257,7 @@ Demonstrate Day 2 operations and resilience.
 - [ ] Alerts fire correctly (trigger a test alert, verify in Alertmanager)
 - [ ] `oc adm must-gather` executed and bundle reviewed
 - [ ] Log collection validated (node logs, pod logs, operator logs)
-- [ ] Common failure modes understood by customer team:
+- [ ] Common failure modes understood by the customer team:
     - [ ] Node NotReady
     - [ ] Pod Pending / CrashLoopBackOff / ImagePullBackOff
     - [ ] PVC Pending
@@ -269,19 +269,19 @@ Demonstrate Day 2 operations and resilience.
 
 ### Final Validation Summary
 
-| Category     | What Was Tested   | Expected Outcome          | Actual Outcome | Result |
-| ------------ | ----------------- | ------------------------- | -------------- | ------ |
-| Installation | Cluster deploy    | All nodes healthy         |                |        |
-| Networking   | Traffic flow      | Routes reachable          |                |        |
-| Storage      | Volume lifecycle  | PVCs provision and bind   |                |        |
-| Security     | Login and RBAC    | Auth and roles enforced   |                |        |
-| Applications | App deployment    | Workloads run end-to-end  |                |        |
-| Resilience   | Node failure      | Workloads recover         |                |        |
-| Scaling      | Add capacity      | New node joins cluster    |                |        |
-| Backup       | Protect and restore | Data intact after restore |              |        |
-| Monitoring   | Alert pipeline    | Alerts delivered          |                |        |
-| Migration    | VM migration      | VMs operational           |                |        |
-| Upgrade      | Version bump      | Upgrade succeeds cleanly  |                |        |
+| Category     | What Was Tested     | Expected Outcome          | Actual Outcome | Result |
+| ------------ | ------------------- | ------------------------- | -------------- | ------ |
+| Installation | Cluster deploy      | All nodes healthy         |                |        |
+| Networking   | Traffic flow        | Routes reachable          |                |        |
+| Storage      | Volume lifecycle    | PVCs provision and bind   |                |        |
+| Security     | Login and RBAC      | Auth and roles enforced   |                |        |
+| Applications | App deployment      | Workloads run end-to-end  |                |        |
+| Resilience   | Node failure        | Workloads recover         |                |        |
+| Scaling      | Add capacity        | New node joins cluster    |                |        |
+| Backup       | Protect and restore | Data intact after restore |                |        |
+| Monitoring   | Alert pipeline      | Alerts delivered          |                |        |
+| Migration    | VM migration        | VMs operational           |                |        |
+| Upgrade      | Version bump        | Upgrade succeeds cleanly  |                |        |
 
 ### Sizing and Architecture for Production
 
@@ -307,7 +307,7 @@ Demonstrate Day 2 operations and resilience.
 
 ### Operational Readiness of Customer Team
 
-- [ ] Team has demonstrated ability to:
+- [ ] Team has demonstrated the ability to:
     - [ ] Perform routine cluster administration
     - [ ] Diagnose and resolve common issues
     - [ ] Execute cluster upgrades
