@@ -152,13 +152,6 @@ Install based on your POC goals. Each subsection is independent.
 | 2  | Network observability enabled                                     |        |       |
 | 3  | Multi-cluster observability configured (if multi-cluster)         |        |       |
 
-### Developer Experience
-
-| #  | Item                                                              | Status | Notes |
-| -- | ----------------------------------------------------------------- | ------ | ----- |
-| 1  | Web terminal enabled                                              |        |       |
-| 2  | External secrets integration configured (if applicable)           |        |       |
-
 ### Security and Access
 
 | #  | Item                                                              | Status | Notes |
@@ -236,13 +229,6 @@ Demonstrate Day 2 operations and resilience.
 | 1  | Application or VM backup completed successfully                   |        |       |
 | 2  | Restore to same or different namespace validated                  |        |       |
 | 3  | Data integrity confirmed after restore                            |        |       |
-| 4  | etcd backup taken and stored securely off-cluster                 |        |       |
-
-### Scaling
-
-| #  | Item                                                              | Status | Notes |
-| -- | ----------------------------------------------------------------- | ------ | ----- |
-| 1  | Worker node added — new node joins cluster successfully           |        |       |
 
 ### Cluster Lifecycle
 
@@ -253,6 +239,7 @@ Demonstrate Day 2 operations and resilience.
 | 3  | Node drain and maintenance — cordon, drain, uncordon              |        |       |
 | 4  | Cluster upgrade tested (minor version or z-stream)                |        |       |
 | 5  | Workloads remained available during upgrade                       |        |       |
+| 6  | Worker node added — new node joins cluster successfully           |        |       |
 
 ### Monitoring and Troubleshooting
 
@@ -266,9 +253,9 @@ Demonstrate Day 2 operations and resilience.
 
 ---
 
-## Phase 9: Results and Recommendations
+## Phase 9: Results Summary
 
-### Final Validation Summary
+Complete this table during the POC to prepare for the closeout meeting readout.
 
 | Category     | What Was Tested     | Expected Outcome          | Actual Outcome | Result |
 | ------------ | ------------------- | ------------------------- | -------------- | ------ |
@@ -284,7 +271,48 @@ Demonstrate Day 2 operations and resilience.
 | Migration    | VM migration        | VMs operational           |                |        |
 | Upgrade      | Version bump        | Upgrade succeeds cleanly  |                |        |
 
-### Sizing and Architecture for Production
+---
+
+## Phase 10: Closeout
+
+### Deliverables
+
+The POC concludes with two formal deliverables:
+
+1. **Completed checklist** — this document, filled in with status and notes for every item tested.
+2. **Closeout meeting** — a readout of all POC findings, outcomes, gaps, and recommendations presented to stakeholders.
+
+### Findings Summary
+
+| #  | Item                                                              | Status | Notes |
+| -- | ----------------------------------------------------------------- | ------ | ----- |
+| 1  | Successful tests documented                                       |        |       |
+| 2  | Failures documented with root cause and resolution                |        |       |
+| 3  | Platform gaps identified (features not yet available)             |        |       |
+| 4  | Infrastructure gaps identified (hardware, network, storage)       |        |       |
+| 5  | Application gaps identified (app-specific constraints)            |        |       |
+| 6  | POC-only limitations noted (not relevant to production)           |        |       |
+| 7  | Lessons learned recorded for production planning                  |        |       |
+| 8  | Final go/no-go recommendation delivered and agreed                |        |       |
+
+### Operational Readiness of Customer Team
+
+The customer team has demonstrated the ability to:
+
+| #  | Item                                             | Status | Notes |
+| -- | ------------------------------------------------ | ------ | ----- |
+| 1  | Perform routine cluster administration           |        |       |
+| 2  | Diagnose and resolve common issues               |        |       |
+| 3  | Execute cluster upgrades                         |        |       |
+| 4  | Add or remove cluster capacity                   |        |       |
+| 5  | Run backup and restore procedures                |        |       |
+| 6  | Deploy new applications to the platform          |        |       |
+
+---
+
+## Follow-Up: Sizing and Proposal
+
+Upon successful completion of the POC, the next step is a sizing and proposal process that translates POC findings into a production-ready architecture and commercial agreement.
 
 | #  | Item                                                              | Status | Notes |
 | -- | ----------------------------------------------------------------- | ------ | ----- |
@@ -296,64 +324,11 @@ Demonstrate Day 2 operations and resilience.
 | 6  | Security hardening steps identified                               |        |       |
 | 7  | Alerting and on-call strategy documented                          |        |       |
 | 8  | Operational ownership model agreed (who runs what)                |        |       |
-
-### Subscription and Infrastructure Summary
-
-| #  | Item                                                              | Status | Notes |
-| -- | ----------------------------------------------------------------- | ------ | ----- |
-| 1  | Hardware bill of materials finalized                              |        |       |
-| 2  | Network allocation documented (subnets, IPs, firewall rules)     |        |       |
-| 3  | Red Hat entitlements and subscription counts confirmed            |        |       |
-| 4  | External dependencies cataloged (storage, load balancers, DNS)   |        |       |
-
----
-
-## Phase 10: Handoff and Closure
-
-### Operational Readiness of Customer Team
-
-| #  | Item                                             | Status | Notes |
-| -- | ------------------------------------------------ | ------ | ----- |
-| 1  | Perform routine cluster administration           |        |       |
-| 2  | Diagnose and resolve common issues               |        |       |
-| 3  | Execute cluster upgrades                         |        |       |
-| 4  | Add or remove cluster capacity                   |        |       |
-| 5  | Run backup and restore procedures                |        |       |
-| 6  | Deploy new applications to the platform          |        |       |
-
-### Artifacts Delivered
-
-| #  | Item                                             | Status | Notes |
-| -- | ------------------------------------------------ | ------ | ----- |
-| 1  | Architecture diagram                             |        |       |
-| 2  | Installation and configuration runbook           |        |       |
-| 3  | Day 2 operations guide                           |        |       |
-| 4  | Troubleshooting reference                        |        |       |
-| 5  | Upgrade playbook                                 |        |       |
-| 6  | Backup and recovery procedure                    |        |       |
-| 7  | Escalation and support contacts                  |        |       |
-
-### Findings and Decision
-
-| #  | Item                                                              | Status | Notes |
-| -- | ----------------------------------------------------------------- | ------ | ----- |
-| 1  | Successful tests documented                                       |        |       |
-| 2  | Failures documented with root cause and resolution                |        |       |
-| 3  | Platform gaps identified (features not yet available)              |        |       |
-| 4  | Infrastructure gaps identified (hardware, network, storage)       |        |       |
-| 5  | Application gaps identified (app-specific constraints)            |        |       |
-| 6  | POC-only limitations noted (not relevant to production)           |        |       |
-| 7  | Lessons learned recorded for production planning                  |        |       |
-| 8  | Final go/no-go recommendation delivered and agreed                |        |       |
-
-### Formal Approval
-
-| Role                         | Name | Date |
-| ---------------------------- | ---- | ---- |
-| Customer Technical Lead      |      |      |
-| Customer Infrastructure Lead |      |      |
-| Red Hat / Partner Engineer   |      |      |
-| Project Sponsor              |      |      |
+| 9  | Hardware bill of materials finalized                              |        |       |
+| 10 | Network allocation documented (subnets, IPs, firewall rules)     |        |       |
+| 11 | Red Hat entitlements and subscription counts confirmed            |        |       |
+| 12 | External dependencies cataloged (storage, load balancers, DNS)   |        |       |
+| 13 | Commercial proposal delivered to customer                         |        |       |
 
 ---
 

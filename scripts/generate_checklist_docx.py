@@ -3,29 +3,156 @@
 
 Run during CI to keep the .docx in sync with the markdown checklist.
 Output: docs/assets/downloads/poc-checklist.docx
+
+Styling follows Red Hat brand standards:
+- Fonts: Red Hat Display (headings), Red Hat Text (body)
+- Colors: Red Hat red #EE0000 for accents, black/white/gray for structure
+- Layout: Generous margins, full-width tables, sentence case
 """
 
 import os
 from docx import Document
-from docx.shared import Pt, Cm
+from docx.shared import Pt, Cm, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.oxml.ns import qn, nsdecls
+from docx.oxml import parse_xml
+
+RH_RED = RGBColor(0xEE, 0x00, 0x00)
+RH_BLACK = RGBColor(0x15, 0x15, 0x15)
+RH_GRAY_70 = RGBColor(0x38, 0x38, 0x38)
+RH_GRAY_20 = RGBColor(0xE0, 0xE0, 0xE0)
+WHITE = RGBColor(0xFF, 0xFF, 0xFF)
+
+FONT_DISPLAY = 'Red Hat Display'
+FONT_TEXT = 'Red Hat Text'
+
+PAGE_WIDTH = Cm(21.0)
+LEFT_MARGIN = Cm(1.5)
+RIGHT_MARGIN = Cm(1.5)
+TABLE_WIDTH = PAGE_WIDTH - LEFT_MARGIN - RIGHT_MARGIN  # 18cm usable
 
 doc = Document()
 
+# Page setup
+for section in doc.sections:
+    section.page_width = PAGE_WIDTH
+    section.page_height = Cm(29.7)
+    section.left_margin = LEFT_MARGIN
+    section.right_margin = RIGHT_MARGIN
+    section.top_margin = Cm(2.0)
+    section.bottom_margin = Cm(2.0)
+
+# Style: Normal (body text)
 style = doc.styles['Normal']
-style.font.name = 'Calibri'
+style.font.name = FONT_TEXT
 style.font.size = Pt(10)
+style.font.color.rgb = RH_BLACK
+style.paragraph_format.space_after = Pt(6)
+style.paragraph_format.line_spacing = 1.3
 
-title = doc.add_heading('OpenShift POC Checklist', level=0)
-title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+# Style: Heading 1 (phase headings)
+h1 = doc.styles['Heading 1']
+h1.font.name = FONT_DISPLAY
+h1.font.size = Pt(18)
+h1.font.bold = True
+h1.font.color.rgb = RH_RED
+h1.paragraph_format.space_before = Pt(24)
+h1.paragraph_format.space_after = Pt(8)
 
-doc.add_paragraph(
-    'This checklist provides a complete end-to-end baseline for validating OpenShift '
-    'in your environment. Not every item will apply to every environment — skip sections '
-    'that are out of scope for your specific goals.'
-)
-doc.add_paragraph()
+# Style: Heading 2 (section headings)
+h2 = doc.styles['Heading 2']
+h2.font.name = FONT_DISPLAY
+h2.font.size = Pt(13)
+h2.font.bold = True
+h2.font.color.rgb = RH_GRAY_70
+h2.paragraph_format.space_before = Pt(16)
+h2.paragraph_format.space_after = Pt(6)
+
+
+def set_cell_shading(cell, color_hex):
+    """Apply background shading to a table cell."""
+    shading = parse_xml(
+        f'<w:shd {nsdecls("w")} w:fill="{color_hex}" w:val="clear"/>'
+    )
+    cell._tc.get_or_add_tcPr().append(shading)
+
+
+def style_header_row(row, font_color=WHITE, bg_hex='EE0000'):
+    """Style a header row with brand colors."""
+    for cell in row.cells:
+        set_cell_shading(cell, bg_hex)
+        for paragraph in cell.paragraphs:
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            for run in paragraph.runs:
+                run.font.bold = True
+                run.font.color.rgb = font_color
+                run.font.name = FONT_DISPLAY
+                run.font.size = Pt(9)
+
+
+def set_col_widths(table, widths):
+    """Set explicit column widths, grid, and force fixed table layout."""
+    from docx.oxml.ns import qn as _qn
+    tbl = table._tbl
+    tbl_pr = tbl.tblPr
+
+    # Convert Cm/Emu widths to twips (1 twip = 635 EMU)
+    widths_twips = [int(w / 635) for w in widths]
+    total_twips = sum(widths_twips)
+
+    # Set table width to exact value
+    tbl_w = tbl_pr.find(_qn('w:tblW'))
+    if tbl_w is None:
+        tbl_w = parse_xml(f'<w:tblW {nsdecls("w")} w:w="{total_twips}" w:type="dxa"/>')
+        tbl_pr.append(tbl_w)
+    else:
+        tbl_w.set(_qn('w:w'), str(total_twips))
+        tbl_w.set(_qn('w:type'), 'dxa')
+
+    # Set fixed layout
+    tbl_layout = tbl_pr.find(_qn('w:tblLayout'))
+    if tbl_layout is None:
+        tbl_layout = parse_xml(f'<w:tblLayout {nsdecls("w")} w:type="fixed"/>')
+        tbl_pr.append(tbl_layout)
+
+    # Update tblGrid to match column widths
+    tbl_grid = tbl.find(_qn('w:tblGrid'))
+    if tbl_grid is not None:
+        tbl.remove(tbl_grid)
+    tbl_grid = parse_xml(f'<w:tblGrid {nsdecls("w")}/>'.encode())
+    for w in widths_twips:
+        grid_col = parse_xml(f'<w:gridCol {nsdecls("w")} w:w="{w}"/>')
+        tbl_grid.append(grid_col)
+    tbl.insert(tbl.index(tbl_pr) + 1, tbl_grid)
+
+    # Set each cell width explicitly
+    for row in table.rows:
+        for i, width in enumerate(widths):
+            cell = row.cells[i]
+            cell.width = width
+            tc_pr = cell._tc.get_or_add_tcPr()
+            tc_w = tc_pr.find(_qn('w:tcW'))
+            w_twips = widths_twips[i]
+            if tc_w is None:
+                tc_w = parse_xml(
+                    f'<w:tcW {nsdecls("w")} w:w="{w_twips}" w:type="dxa"/>'
+                )
+                tc_pr.append(tc_w)
+            else:
+                tc_w.set(_qn('w:w'), str(w_twips))
+                tc_w.set(_qn('w:type'), 'dxa')
+
+
+def style_body_cells(table, start_row=1):
+    """Apply body font styling to non-header rows."""
+    for row in table.rows[start_row:]:
+        for cell in row.cells:
+            for paragraph in cell.paragraphs:
+                for run in paragraph.runs:
+                    run.font.name = FONT_TEXT
+                    run.font.size = Pt(9)
+                    run.font.color.rgb = RH_BLACK
 
 
 def add_phase_heading(text):
@@ -37,48 +164,47 @@ def add_section_heading(text):
 
 
 def add_checklist_table(items):
+    """Standard checklist: #, Item, Status, Notes — full page width."""
     table = doc.add_table(rows=1, cols=4)
     table.style = 'Table Grid'
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
 
     hdr = table.rows[0].cells
     hdr[0].text = '#'
     hdr[1].text = 'Item'
     hdr[2].text = 'Status'
     hdr[3].text = 'Notes'
-
-    for cell in hdr:
-        cell.paragraphs[0].runs[0].bold = True
+    style_header_row(table.rows[0])
 
     for i, item in enumerate(items, 1):
         row = table.add_row().cells
         row[0].text = str(i)
+        row[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         row[1].text = item
         row[2].text = '☐'
+        row[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         row[3].text = ''
 
-    for row in table.rows:
-        row.cells[0].width = Cm(1)
-        row.cells[1].width = Cm(12)
-        row.cells[2].width = Cm(1.5)
-        row.cells[3].width = Cm(4)
-
+    col_widths = [Cm(0.8), Cm(8.2), Cm(1.8), Cm(7.2)]
+    set_col_widths(table, col_widths)
+    style_body_cells(table)
     doc.add_paragraph()
 
 
 def add_validation_table(rows_data):
+    """Exit criteria table: Area, How We Measure Success, Status, Notes."""
     table = doc.add_table(rows=1, cols=4)
     table.style = 'Table Grid'
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
 
     hdr = table.rows[0].cells
     hdr[0].text = 'Area'
-    hdr[1].text = 'How We Measure Success'
+    hdr[1].text = 'How we measure success'
     hdr[2].text = 'Status'
     hdr[3].text = 'Notes'
-
-    for cell in hdr:
-        cell.paragraphs[0].runs[0].bold = True
+    style_header_row(table.rows[0])
 
     for area, criteria in rows_data:
         row = table.add_row().cells
@@ -87,45 +213,51 @@ def add_validation_table(rows_data):
         row[2].text = ''
         row[3].text = ''
 
+    col_widths = [Cm(2.5), Cm(9.0), Cm(1.5), Cm(5.0)]
+    set_col_widths(table, col_widths)
+    style_body_cells(table)
     doc.add_paragraph()
 
 
 def add_results_table(rows_data):
+    """Results summary: Category, What Was Tested, Expected, Actual, Result."""
     table = doc.add_table(rows=1, cols=5)
     table.style = 'Table Grid'
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
 
     hdr = table.rows[0].cells
     hdr[0].text = 'Category'
-    hdr[1].text = 'What Was Tested'
-    hdr[2].text = 'Expected Outcome'
-    hdr[3].text = 'Actual Outcome'
+    hdr[1].text = 'What was tested'
+    hdr[2].text = 'Expected outcome'
+    hdr[3].text = 'Actual outcome'
     hdr[4].text = 'Result'
-
-    for cell in hdr:
-        cell.paragraphs[0].runs[0].bold = True
+    style_header_row(table.rows[0])
 
     for row_data in rows_data:
         row = table.add_row().cells
         for i, val in enumerate(row_data):
             row[i].text = val
 
+    col_widths = [Cm(2.5), Cm(3.5), Cm(4.5), Cm(4.5), Cm(3.0)]
+    set_col_widths(table, col_widths)
+    style_body_cells(table)
     doc.add_paragraph()
 
 
 def add_signoff_table():
+    """Formal sign-off table with role, name, signature, date."""
     table = doc.add_table(rows=1, cols=4)
     table.style = 'Table Grid'
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
+    table.autofit = False
 
     hdr = table.rows[0].cells
     hdr[0].text = 'Role'
     hdr[1].text = 'Name'
     hdr[2].text = 'Signature'
     hdr[3].text = 'Date'
-
-    for cell in hdr:
-        cell.paragraphs[0].runs[0].bold = True
+    style_header_row(table.rows[0])
 
     roles = [
         'Customer Technical Lead',
@@ -137,23 +269,36 @@ def add_signoff_table():
         row = table.add_row().cells
         row[0].text = role
 
-    for row in table.rows:
-        row.cells[0].width = Cm(5)
-        row.cells[1].width = Cm(4)
-        row.cells[2].width = Cm(5)
-        row.cells[3].width = Cm(3)
-
+    col_widths = [Cm(5.0), Cm(4.5), Cm(5.5), Cm(3.0)]
+    set_col_widths(table, col_widths)
+    style_body_cells(table)
     doc.add_paragraph()
 
 
+# --- Document content ---
+
+title = doc.add_heading('OpenShift POC checklist', level=0)
+title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+for run in title.runs:
+    run.font.name = FONT_DISPLAY
+    run.font.size = Pt(24)
+    run.font.color.rgb = RH_RED
+
+doc.add_paragraph(
+    'This checklist provides a complete end-to-end baseline for validating OpenShift '
+    'in your environment. Not every item will apply to every environment \u2014 skip sections '
+    'that are out of scope for your specific goals.'
+)
+doc.add_paragraph()
+
 # Phase 1
-add_phase_heading('Phase 1: Discovery and Scoping')
+add_phase_heading('Phase 1: Discovery and scoping')
 doc.add_paragraph(
     'Complete this phase before any technical work begins. '
     'Align on goals, boundaries, and what a successful outcome looks like.'
 )
 
-add_section_heading('Goals and Drivers')
+add_section_heading('Goals and drivers')
 add_checklist_table([
     'Define the core business problem OpenShift will address',
     'Document specific POC objectives with measurable outcomes',
@@ -163,7 +308,7 @@ add_checklist_table([
     'Understand target production timeline and anticipated scale',
 ])
 
-add_section_heading('Boundaries and Assumptions')
+add_section_heading('Boundaries and assumptions')
 add_checklist_table([
     'Agree on what is included in the POC and document it',
     'Explicitly list what is excluded (to prevent scope creep)',
@@ -172,7 +317,7 @@ add_checklist_table([
     'Set a timeline with key milestone dates',
 ])
 
-add_section_heading('Exit Criteria')
+add_section_heading('Exit criteria')
 doc.add_paragraph('Agree on pass/fail criteria before installation begins:')
 add_validation_table([
     ('Installation', 'Cluster deployed, all nodes healthy'),
@@ -220,7 +365,7 @@ add_checklist_table([
 ])
 
 # Phase 4
-add_phase_heading('Phase 4: Post-Installation (Required)')
+add_phase_heading('Phase 4: Post-installation (required)')
 doc.add_paragraph('These must be completed before deploying workloads.')
 add_checklist_table([
     'Advanced networking operator installed (if using bonds/VLANs)',
@@ -232,7 +377,7 @@ add_checklist_table([
 ])
 
 # Phase 5
-add_phase_heading('Phase 5: Post-Installation (Optional)')
+add_phase_heading('Phase 5: Post-installation (optional)')
 doc.add_paragraph('Install based on your POC goals. Each subsection is independent.')
 
 add_section_heading('Networking')
@@ -260,7 +405,7 @@ add_checklist_table([
     'Network and storage mappings configured',
 ])
 
-add_section_heading('Backup and Restore')
+add_section_heading('Backup and restore')
 add_checklist_table([
     'Backup operator installed',
     'Backup storage location configured',
@@ -274,15 +419,7 @@ add_checklist_table([
     'Multi-cluster observability configured (if multi-cluster)',
 ])
 
-add_section_heading('Developer Experience')
-add_checklist_table([
-    'Service mesh configured (if applicable)',
-    'GitOps operator installed',
-    'Web terminal enabled',
-    'External secrets integration configured (if applicable)',
-])
-
-add_section_heading('Security and Access')
+add_section_heading('Security and access')
 add_checklist_table([
     'Identity provider configured (LDAP, OIDC, etc.)',
     'RBAC groups mapped correctly (members get expected roles)',
@@ -291,7 +428,7 @@ add_checklist_table([
 ])
 
 # Phase 6
-add_phase_heading('Phase 6: VM Migration')
+add_phase_heading('Phase 6: VM migration')
 doc.add_paragraph(
     'Validate that virtual machines can be migrated from an existing '
     'virtualization platform to OpenShift Virtualization.'
@@ -302,11 +439,11 @@ add_checklist_table([
     'Target storage class selected',
     'Target network mapping configured',
     'VMs selected for migration',
-    'Cold migration executed — VM boots on OpenShift',
+    'Cold migration executed \u2014 VM boots on OpenShift',
     'Networking functional (IP, DNS, connectivity)',
     'Storage attached and data intact',
     'Applications inside the VM running correctly',
-    'Warm migration tested — cutover with minimal downtime',
+    'Warm migration tested \u2014 cutover with minimal downtime',
     'VM accessible via console and SSH post-migration',
 ])
 
@@ -314,29 +451,28 @@ add_checklist_table([
 add_phase_heading('Phase 7: Workloads')
 doc.add_paragraph('Deploy workloads to validate platform capabilities.')
 
-add_section_heading('Container Workloads')
+add_section_heading('Container workloads')
 add_checklist_table([
     'Basic container deployed and accessible via Route',
-    'Build from source — image built and app deploys',
-    'Stateful application — data persists across pod restarts',
-    'Multi-tier application — frontend and backend communicating',
+    'Build from source \u2014 image built and app deploys',
+    'Stateful application \u2014 data persists across pod restarts',
+    'Multi-tier application \u2014 frontend and backend communicating',
     'Event streaming workload deployed (if applicable)',
-    'Service mesh application validated (if mesh installed)',
     'Customer application deployed (if provided)',
 ])
 
-add_section_heading('Virtual Machine Workloads')
+add_section_heading('Virtual machine workloads')
 add_checklist_table([
-    'VM deployed from template — boots, SSH, storage functional',
+    'VM deployed from template \u2014 boots, SSH, storage functional',
     'Live migration tested (move VM between nodes without downtime)',
     'Snapshot and restore tested',
 ])
 
 # Phase 8
-add_phase_heading('Phase 8: Operational Validation')
+add_phase_heading('Phase 8: Operational validation')
 doc.add_paragraph('Demonstrate Day 2 operations and resilience.')
 
-add_section_heading('Failover and Resilience')
+add_section_heading('Failover and resilience')
 add_checklist_table([
     'Node failure simulated',
     'VM restarted on healthy node within target time',
@@ -345,30 +481,29 @@ add_checklist_table([
     'Service remained available during failover',
 ])
 
-add_section_heading('Backup and Restore')
+add_section_heading('Backup and restore')
 add_checklist_table([
     'Application or VM backup completed successfully',
     'Restore to same or different namespace validated',
     'Data integrity confirmed after restore',
-    'etcd backup taken and stored securely off-cluster',
 ])
 
 add_section_heading('Scaling')
 add_checklist_table([
-    'Worker node added — new node joins cluster successfully',
+    'Worker node added \u2014 new node joins cluster successfully',
     'Horizontal Pod Autoscaler validated (if applicable)',
 ])
 
-add_section_heading('Cluster Lifecycle')
+add_section_heading('Cluster lifecycle')
 add_checklist_table([
     'SSH key rotation validated',
     'Node-level configuration change applied via MachineConfig',
-    'Node drain and maintenance — cordon, drain, uncordon',
+    'Node drain and maintenance \u2014 cordon, drain, uncordon',
     'Cluster upgrade tested (minor version or z-stream)',
     'Workloads remained available during upgrade',
 ])
 
-add_section_heading('Monitoring and Troubleshooting')
+add_section_heading('Monitoring and troubleshooting')
 add_checklist_table([
     'Monitoring dashboards accessible',
     'Alerts fire correctly (trigger test alert, verify delivery)',
@@ -378,9 +513,10 @@ add_checklist_table([
 ])
 
 # Phase 9
-add_phase_heading('Phase 9: Results and Recommendations')
-
-add_section_heading('Final Validation Summary')
+add_phase_heading('Phase 9: Results summary')
+doc.add_paragraph(
+    'Complete this table during the POC to prepare for the closeout meeting readout.'
+)
 add_results_table([
     ('Installation', 'Cluster deploy', 'All nodes healthy', '', ''),
     ('Networking', 'Traffic flow', 'Routes reachable', '', ''),
@@ -395,52 +531,32 @@ add_results_table([
     ('Upgrade', 'Version bump', 'Upgrade succeeds cleanly', '', ''),
 ])
 
-add_section_heading('Sizing and Architecture for Production')
-add_checklist_table([
-    'Compute sizing documented (CPU, memory, disk per node role)',
-    'Storage architecture and capacity plan defined',
-    'Network topology and segmentation documented',
-    'High-availability and DR strategy outlined',
-    'Backup retention and RPO/RTO targets set',
-    'Security hardening steps identified',
-    'Alerting and on-call strategy documented',
-    'Operational ownership model agreed (who runs what)',
-])
-
-add_section_heading('Subscription and Infrastructure Summary')
-add_checklist_table([
-    'Hardware bill of materials finalized',
-    'Network allocation documented (subnets, IPs, firewall rules)',
-    'Red Hat entitlements and subscription counts confirmed',
-    'External dependencies cataloged (storage, load balancers, DNS)',
-])
-
 # Phase 10
-add_phase_heading('Phase 10: Handoff and Closure')
+add_phase_heading('Phase 10: Closeout')
 
-add_section_heading('Operational Readiness of Customer Team')
-doc.add_paragraph('The customer team has demonstrated the ability to:')
-add_checklist_table([
-    'Perform routine cluster administration',
-    'Diagnose and resolve common issues',
-    'Execute cluster upgrades',
-    'Add or remove cluster capacity',
-    'Run backup and restore procedures',
-    'Deploy new applications to the platform',
-])
+add_section_heading('Deliverables')
+doc.add_paragraph(
+    'The POC concludes with two formal deliverables:'
+)
+p1 = doc.add_paragraph()
+run = p1.add_run('1. Completed checklist')
+run.bold = True
+run.font.name = FONT_TEXT
+p1.add_run(
+    ' \u2014 this document, filled in with status and notes for every item tested.'
+).font.name = FONT_TEXT
 
-add_section_heading('Artifacts Delivered')
-add_checklist_table([
-    'Architecture diagram',
-    'Installation and configuration runbook',
-    'Day 2 operations guide',
-    'Troubleshooting reference',
-    'Upgrade playbook',
-    'Backup and recovery procedure',
-    'Escalation and support contacts',
-])
+p2 = doc.add_paragraph()
+run = p2.add_run('2. Closeout meeting')
+run.bold = True
+run.font.name = FONT_TEXT
+p2.add_run(
+    ' \u2014 a readout of all POC findings, outcomes, gaps, and '
+    'recommendations presented to stakeholders.'
+).font.name = FONT_TEXT
+doc.add_paragraph()
 
-add_section_heading('Findings and Decision')
+add_section_heading('Findings summary')
 add_checklist_table([
     'Successful tests documented',
     'Failures documented with root cause and resolution',
@@ -452,8 +568,42 @@ add_checklist_table([
     'Final go/no-go recommendation delivered and agreed',
 ])
 
-add_section_heading('Formal Approval')
+add_section_heading('Operational readiness of customer team')
+doc.add_paragraph('The customer team has demonstrated the ability to:')
+add_checklist_table([
+    'Perform routine cluster administration',
+    'Diagnose and resolve common issues',
+    'Execute cluster upgrades',
+    'Add or remove cluster capacity',
+    'Run backup and restore procedures',
+    'Deploy new applications to the platform',
+])
+
+add_section_heading('Formal approval')
 add_signoff_table()
+
+# Follow-Up
+add_phase_heading('Follow-up: Sizing and proposal')
+doc.add_paragraph(
+    'Upon successful completion of the POC, the next step is a sizing and proposal '
+    'process that translates POC findings into a production-ready architecture and '
+    'commercial agreement.'
+)
+add_checklist_table([
+    'Compute sizing documented (CPU, memory, disk per node role)',
+    'Storage architecture and capacity plan defined',
+    'Network topology and segmentation documented',
+    'High-availability and DR strategy outlined',
+    'Backup retention and RPO/RTO targets set',
+    'Security hardening steps identified',
+    'Alerting and on-call strategy documented',
+    'Operational ownership model agreed (who runs what)',
+    'Hardware bill of materials finalized',
+    'Network allocation documented (subnets, IPs, firewall rules)',
+    'Red Hat entitlements and subscription counts confirmed',
+    'External dependencies cataloged (storage, load balancers, DNS)',
+    'Commercial proposal delivered to customer',
+])
 
 # Save
 output_dir = os.path.join(os.path.dirname(__file__), '..', 'docs', 'assets', 'downloads')
