@@ -117,6 +117,7 @@ nav:
       - Network Observability: post-installation/network-observability.md
       - MultiCluster Observability: post-installation/multicluster-observability.md
       - Web Terminal: post-installation/web-terminal.md
+      - Operators from Artifactory: post-installation/operators-from-artifactory.md
       - Identity Providers: post-installation/configuring-identity-providers.md
       - POC Banner: post-installation/poc-banner.md
   - Workloads: 
