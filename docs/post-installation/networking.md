@@ -2,7 +2,7 @@
 
 [OpenShift Networking Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/networking_operators/index)
 
-This page provides examples for configuring advanced networking post-installation using the NMState Operator and OVN-Kubernetes. See [Prerequisites — Networking](../prerequisites/networking.md) for the network architecture and planning guidance these examples implement.
+This page provides examples for configuring advanced networking post-installation using the NMState Operator and OVN-Kubernetes. See [Prerequisites — Networking](../prerequisites/networking.md) for the network architecture and planning guidance these examples implement. To capture and visualize cluster network flows after this underlay is in place, see [Network Observability](network-observability.md).
 
 ## Overview
 

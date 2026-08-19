@@ -114,6 +114,7 @@ nav:
       - Service Mesh: post-installation/service-mesh.md
       - OpenShift GitOps: post-installation/openshift-gitops.md
       - Logging: post-installation/logging.md
+      - Network Observability: post-installation/network-observability.md
       - MultiCluster Observability: post-installation/multicluster-observability.md
       - Web Terminal: post-installation/web-terminal.md
       - Identity Providers: post-installation/configuring-identity-providers.md

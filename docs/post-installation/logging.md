@@ -13,6 +13,8 @@ OpenShift Logging provides centralized log collection, storage, and querying for
 !!! info
     The Loki Operator and the Red Hat OpenShift Logging Operator must use the same major and minor version (e.g., both on `stable-6.5`).
 
+    If you also install [Network Observability](network-observability.md), create a **separate** LokiStack with `tenants.mode: openshift-network`. Do not reuse the logging LokiStack. The Loki Operator can be shared.
+
 ## Prerequisites
 
 - Cluster administrator privileges
