@@ -185,6 +185,90 @@ spec:
   installPlanApproval: Automatic
 ```
 
+## Image Signature Verification (OCP 4.19+)
+
+Starting with OCP 4.19, Red Hat publishes image signatures as **sigstore attachments** stored in the registry alongside the image (as `sha256-<digest>.sig` tags). A pull-through cache can serve these signatures — but only if Artifactory caches the `.sig` tags and CRI-O is configured to look for them.
+
+### Confirm Artifactory caches `.sig` tags
+
+This is the make-or-break item. When CRI-O verifies a signature, it requests a tag like `sha256-<digest>.sig`. Your Artifactory remote repository must pass that through and cache it.
+
+Test from a client:
+
+```bash
+skopeo list-tags docker://artifactory.example.com/quay-remote/openshift-release-dev/ocp-release | grep '\.sig$'
+```
+
+If no `.sig` tags come back, verify the Artifactory remote repository is not filtering tags and can reach the upstream. Nothing downstream works until this does.
+
+!!! note
+    If your Artifactory cannot cache `.sig` tags, you must fall back to mirroring the detached web sigstore (`https://access.redhat.com/webassets/docker/content/sigstore`) into a location you serve internally and pointing a `registries.d` lookaside at it. This is the escape hatch, but significantly more complex.
+
+### Enable sigstore attachment lookup at the mirror
+
+With an `ImageDigestMirrorSet` in place (Step 3), the MCO (4.17+) automatically registers the mirrors for sigstore attachment lookup when a `ClusterImagePolicy` is applied. Confirm your IDMS includes the release image repositories:
+
+```yaml
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: release-mirror
+spec:
+  imageDigestMirrors:
+    - source: quay.io/openshift-release-dev/ocp-release
+      mirrors:
+        - artifactory.example.com/quay-remote/openshift-release-dev/ocp-release
+    - source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+      mirrors:
+        - artifactory.example.com/quay-remote/openshift-release-dev/ocp-v4.0-art-dev
+```
+
+### Apply the ClusterImagePolicy
+
+Get the Red Hat release signing public key and base64-encode it:
+
+```bash
+curl -s https://security.access.redhat.com/data/63405576.txt | base64 -w0
+```
+
+Apply a policy scoped to the mirror. The `signedIdentity: remapIdentity` section is essential — it tells the policy the signature was made for the `quay.io` identity even though the image is pulled from Artifactory:
+
+```yaml
+apiVersion: config.openshift.io/v1
+kind: ClusterImagePolicy
+metadata:
+  name: openshift-release-mirror
+spec:
+  scopes:
+    - artifactory.example.com/quay-remote/openshift-release-dev/ocp-release
+  policy:
+    rootOfTrust:
+      policyType: PublicKey
+      publicKey:
+        keyData: <base64-key-from-above>
+    signedIdentity:
+      matchPolicy: RemapIdentity
+      remapIdentity:
+        prefix: artifactory.example.com/quay-remote/openshift-release-dev/ocp-release
+        signedPrefix: quay.io/openshift-release-dev/ocp-release
+```
+
+Repeat the scope/remap for each mirrored repository you want enforced (`ocp-v4.0-art-dev` for component images, `registry.redhat.io/redhat/...` for operators).
+
+!!! warning
+    Do not create or edit a `ClusterImagePolicy` named `openshift` — that name is reserved for the built-in release policy.
+
+### Verify signature configuration
+
+The MCO rolls this out to every node, writing `/etc/containers/policy.json` and `/etc/containers/registries.d/sigstore-registries.yaml`. Wait for the MachineConfigPool to finish, then verify on a node:
+
+```bash
+oc debug node/<node> -- chroot /host cat /etc/containers/policy.json
+oc debug node/<node> -- chroot /host cat /etc/containers/registries.d/sigstore-registries.yaml
+```
+
+Confirm the mirror appears with `use-sigstore-attachments: true`. Test a pull of a signed image — if the `.sig` tag is cached, it verifies against the Red Hat key without ever reaching `access.redhat.com`.
+
 ## Cluster Upgrades
 
 With the `ImageDigestMirrorSet` in place, cluster upgrades pull release images through Artifactory automatically:
