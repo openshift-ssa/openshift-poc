@@ -164,29 +164,26 @@ def add_section_heading(text):
 
 
 def add_checklist_table(items):
-    """Standard checklist: #, Item, Status, Notes — full page width."""
-    table = doc.add_table(rows=1, cols=4)
+    """Standard checklist: Item, Status, Notes — full page width."""
+    table = doc.add_table(rows=1, cols=3)
     table.style = 'Table Grid'
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     table.autofit = False
 
     hdr = table.rows[0].cells
-    hdr[0].text = '#'
-    hdr[1].text = 'Item'
-    hdr[2].text = 'Status'
-    hdr[3].text = 'Notes'
+    hdr[0].text = 'Item'
+    hdr[1].text = 'Status'
+    hdr[2].text = 'Notes'
     style_header_row(table.rows[0])
 
-    for i, item in enumerate(items, 1):
+    for item in items:
         row = table.add_row().cells
-        row[0].text = str(i)
-        row[0].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        row[1].text = item
-        row[2].text = '☐'
-        row[2].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        row[3].text = ''
+        row[0].text = item
+        row[1].text = '☐'
+        row[1].paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+        row[2].text = ''
 
-    col_widths = [Cm(0.8), Cm(8.2), Cm(1.8), Cm(7.2)]
+    col_widths = [Cm(9.0), Cm(1.8), Cm(7.2)]
     set_col_widths(table, col_widths)
     style_body_cells(table)
     doc.add_paragraph()
