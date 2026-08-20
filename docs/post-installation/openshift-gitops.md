@@ -64,7 +64,7 @@ oc get pods -n openshift-gitops
 3. To get the default `admin` password via CLI:
 
 ```bash
-oc extract secret/openshift-gitops-cluster -n openshift-gitops --to=-
+oc extract secret/openshift-gitops-cluster -n openshift-gitops --keys=admin.password --to=-
 ```
 
 ## Grant Argo CD Access to a Namespace

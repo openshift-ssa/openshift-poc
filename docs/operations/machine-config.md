@@ -91,13 +91,13 @@ Butane transpiles human-readable configs into MachineConfig resources, avoiding 
 2. Write a Butane config — create `99-worker-example.bu`:
 
 ```yaml
-  variant: openshift
-  version: latest.0
-  metadata:
-    name: 99-worker-example
-    labels:
-      machineconfiguration.openshift.io/role: worker
-  storage:
+variant: openshift
+version: 4.17.0
+metadata:
+  name: 99-worker-example
+  labels:
+    machineconfiguration.openshift.io/role: worker
+storage:
     files:
       - path: /etc/file.conf
         mode: 0644
@@ -125,7 +125,7 @@ Instead of `inline`, reference a local file:
 
 ```yaml
 variant: openshift
-version: latest.0
+version: 4.17.0
 metadata:
   name: 99-worker-example
   labels:

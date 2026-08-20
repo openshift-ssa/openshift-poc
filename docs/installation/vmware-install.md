@@ -146,7 +146,7 @@ Folder.Delete
 !!! tip
     Create a dedicated vCenter service account for OpenShift rather than using an admin account. This makes auditing and credential rotation easier.
 
-For the complete privilege reference, see the [official documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/installing_on_vmware_vsphere/installer-provisioned-infrastructure#installation-vsphere-installer-infra-requirements_ipi-vsphere-ipi).
+For the complete privilege reference, see the [official documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/installing_on_vmware_vsphere/installer-provisioned-infrastructure#installation-vsphere-installer-infra-requirements_ipi-vsphere-ipi).
 
 ## Add vCenter Root CA Certificates to System Trust
 
@@ -234,8 +234,7 @@ You can generate the `install-config.yaml` interactively or create it manually.
     baseDomain: {{ base_domain }}
     metadata:
       name: {{ cluster_name }}
-    sshKey: |
-      {{ public_key }}
+    sshKey: '{{ public_key }}'
     pullSecret: '{{ pull_secret }}'
     compute:
       - name: worker
@@ -258,6 +257,7 @@ You can generate the `install-config.yaml` interactively or create it manually.
             diskSizeGB: 120
       replicas: 3
     networking:
+      networkType: OVNKubernetes
       clusterNetwork:
         - cidr: 10.128.0.0/14
           hostPrefix: 23
@@ -284,11 +284,11 @@ You can generate the `install-config.yaml` interactively or create it manually.
             server: {{ vcenter_fqdn }}
             topology:
               datacenter: {{ datacenter_name }}
-              computeCluster: "/{{ datacenter_name }}/host/{{ cluster_name }}"
+              computeCluster: "/{{ datacenter_name }}/host/{{ vsphere_cluster_name }}"
               datastore: "/{{ datacenter_name }}/datastore/{{ datastore_name }}"
               networks:
                 - {{ vm_network_name }}
-              resourcePool: "/{{ datacenter_name }}/host/{{ cluster_name }}/Resources"
+              resourcePool: "/{{ datacenter_name }}/host/{{ vsphere_cluster_name }}/Resources"
     ```
 
 !!! warning "Back up install-config.yaml"
@@ -482,6 +482,8 @@ If your environment uses a proxy, add the proxy settings to `install-config.yaml
     ```bash
     oc delete pvc test-vsphere-pvc
     ```
+
+For common installation issues, see [Troubleshooting](troubleshooting.md).
 
 ## Destroy the Cluster
 

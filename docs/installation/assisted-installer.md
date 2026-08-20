@@ -25,7 +25,7 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 - Choose Hosts' network configuration to be "Static IP, bridges and bonds" (unless you allow DHCP, which is rare)
 - No Encryption
 
--> Click Next
+--> Click Next
 
 ### Static network configurations
 
@@ -35,7 +35,7 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 - Enter the Machine Subnet values
 - Enter the Default gateway
 
--> Click Next
+--> Click Next
 
 ### Host specific configurations
 
@@ -83,7 +83,7 @@ Don't preinstall any operators.
 ### Storage
 
 - For each host in the list, ensure the correct disk is selected for the installation disk.
-- Deselect format for any network based storage
+- Deselect format for any network-based storage
 
 --> Click Next
 
@@ -92,19 +92,19 @@ Don't preinstall any operators.
 - Select Cluster-managed networking
 - Select Network type of Open Virtual Networking (OVN)
 - Select the correct machine network
-- Fill in the API VIP IP
-- Fill in the Ingress VIP IP
-- Use advanced networking is only used to change the pod and service network. Leave it.
+- Fill in the API VIP
+- Fill in the Ingress VIP
+- Advanced networking is only needed to change the pod and service network CIDRs. Leave it at the defaults.
 - Leave "Use the same host discovery SSH key" checkbox selected
 - In the Host Inventory, you should be able to see all kinds of host information. Check it out.
 
---> Next
+--> Click Next
 
 ### Custom Manifests
 
 - No custom manifests
 
---> Next
+--> Click Next
 
 ### Review and Create
 
@@ -120,7 +120,7 @@ Don't preinstall any operators.
 Wait for it...
 
 - Copy the Web Console URL
-- User name is kubeadmin
+- Username is `kubeadmin`
 - Copy the Password
 - Login to the Web Console
 - Wait for the Operators to finish updating and everything to be green.
@@ -128,7 +128,7 @@ Wait for it...
 ## Validate the Install
 
 ```bash
-oc login --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443 -u kubeadmin -p {{ password }}
+oc login --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443 -u kubeadmin
 oc get nodes
 oc get clusterversion
 oc get clusteroperators

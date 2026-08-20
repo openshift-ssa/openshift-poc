@@ -17,7 +17,7 @@ Persistent storage for OpenShift will be provided by a third-party storage vendo
 
 ## Storage Network
 
-The storage network must support jumbo frames (MTU 9000) for optimal performance. This applies to every network hop between the cluster nodes and the storage array — switches, NICs, and the storage array ports must all be configured consistently.
+The storage network should support jumbo frames (MTU 9000) for optimal performance. This applies to every network hop between the cluster nodes and the storage array — switches, NICs, and the storage array ports must all be configured consistently.
 
 - [ ] All switch ports on the storage VLAN/network configured for MTU 9000
 - [ ] Storage array network ports configured for MTU 9000
@@ -50,8 +50,12 @@ etcd requires low-latency storage. Use locally-attached NVMe or SSD drives on co
 Verify disk performance:
 
 ```bash
-sudo dnf install -y fio
-fio --rw=write --ioengine=sync --fdatasync=1 --directory=/var/lib/etcd --size=22m --bs=2300 --name=etcd-benchmark
+podman run --privileged --rm -v /var/lib/etcd:/var/lib/etcd:Z \
+  registry.access.redhat.com/ubi9/ubi-minimal:latest \
+  sh -c "microdnf install -y fio && fio --rw=write --ioengine=sync --fdatasync=1 --directory=/var/lib/etcd --size=22m --bs=2300 --name=etcd-benchmark"
 ```
+
+!!! note
+    RHCOS is an immutable OS without `dnf`. The benchmark runs inside a container that bind-mounts `/var/lib/etcd`. If you are running this from a live RHEL ISO before installation, you can install `fio` directly with `dnf` instead.
 
 The 99th percentile fdatasync latency should be below 10ms.

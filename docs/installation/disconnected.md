@@ -88,6 +88,9 @@ tar -xvzf /tmp/mirror-registry.tar.gz -C /tmp
 sudo /tmp/mirror-registry install --quayHostname {{ mirror_host }} --quayRoot /opt/quay
 ```
 
+!!! warning
+    Ensure `/opt/quay` has at least 200 GB of available disk space. Mirroring an OCP release plus operators can easily exceed 100 GB.
+
 The install command outputs the initial credentials (`init` user and generated password) and generates a self-signed root CA certificate at `/opt/quay/quay-rootCA/rootCA.pem`. Save the credentials — you will need them to log in to the registry.
 
 Add the root CA to the installation host's trust store so tools like `podman` and `oc-mirror` trust the registry's TLS certificate:
@@ -129,8 +132,11 @@ podman login {{ mirror_host }}:8443 --authfile ~/merged-pull-secret.json
 The `ImageSetConfiguration` defines what content to mirror. Create `imageset-config.yaml`:
 
 ```yaml
-kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v2alpha1
+kind: ImageSetConfiguration
+storageConfig:
+  local:
+    path: /tmp/oc-mirror-metadata
 mirror:
   platform:
     channels:
@@ -212,7 +218,7 @@ imageDigestSources:
     The `imageDigestSources` values must match the repository paths used by `oc-mirror`. Check the generated `imageDigestMirrorSet.yaml` for the exact values.
 
 !!! note
-    `imageDigestSources` was introduced in OpenShift 4.14. If you are on 4.13 or older, use the legacy `imageContentSources` key instead.
+    The legacy `imageContentSources` key was removed in OCP 4.14. This documentation targets OCP 4.14+ which uses `imageDigestSources` exclusively.
 
 #### Combined Pull Secret
 

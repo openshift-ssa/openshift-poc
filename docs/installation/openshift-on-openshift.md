@@ -48,6 +48,9 @@ Alternatively, download from the [OpenShift mirror](https://mirror.openshift.com
 
 ## Create a Hosted Cluster (Agent-Based Workers)
 
+!!! note
+    Before creating the cluster, configure the DNS records described in the [DNS Requirements](#dns-requirements) section below. The `--api-server-address` value must be resolvable before the API server certificates are generated.
+
 This approach uses the Agent platform, where workers are provisioned via the Discovery/Infrastructure environment (bare metal or VMs booted with a discovery ISO).
 
 1. Create the hosted cluster:
@@ -100,7 +103,7 @@ This creates KubeVirt VirtualMachines as worker nodes for the hosted cluster.
 1. Retrieve the kubeconfig:
 
   ```bash
-  hcp create kubeconfig --name=hosted-cluster-01 > hosted-cluster-01-kubeconfig
+  hcp create kubeconfig --name=hosted-cluster-01 --namespace=clusters > hosted-cluster-01-kubeconfig
   ```
 
 2. Verify access:

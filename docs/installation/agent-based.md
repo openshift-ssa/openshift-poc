@@ -47,8 +47,10 @@ networking:
   - 172.30.0.0/16
 platform:
   baremetal:
-    apiVIP: 10.0.0.2
-    ingressVIP: 10.0.0.3
+    apiVIPs:
+        - 10.0.0.2
+    ingressVIPs:
+        - 10.0.0.3
     additionalNTPServers:
       - 0.us.pool.ntp.org
       - 1.us.pool.ntp.org
@@ -74,7 +76,7 @@ If your environment uses a TLS-intercepting proxy, add the trust bundle:
 ```yaml
 additionalTrustBundlePolicy: Always
 additionalTrustBundle: |
-    -----BEGIN CERTIFICATE-----
+  -----BEGIN CERTIFICATE-----
   MIIDzTCCArWgAwIBAgIUXXXXXXXXXXXXXXXXXXXXXXXXXXXwDQYJKoZIhvcNAQEL
   ...
   -----END CERTIFICATE-----
@@ -93,7 +95,7 @@ For a compact cluster where control plane nodes are schedulable and also run wor
 The `agent-config.yaml` defines host-level configurations. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN.
 
 ```yaml
-apiVersion: v1alpha1
+apiVersion: v1beta1
 kind: AgentConfig
 metadata:
   name: poc
@@ -251,12 +253,15 @@ For hosts with a single network interface:
 If you have additional manifests to apply at install time (e.g., MachineConfigs, NMState configs), place them in a `cluster-manifests` folder at the same level as `install-config.yaml` and `agent-config.yaml`.
 
 ```bash
-mkdir -p ocp/cluster-manifests
+mkdir -p cluster-manifests
 ```
 
 ## Generate the ISO
 
 Create a script `create-iso.sh` in your working directory:
+
+!!! warning
+    `openshift-install` consumes and deletes `install-config.yaml` and `agent-config.yaml` during image creation. The script below copies them into a subdirectory first so your originals are preserved.
 
 ```bash
 #!/bin/bash
@@ -306,7 +311,7 @@ openshift-install agent wait-for bootstrap-complete --dir=install
 openshift-install agent wait-for install-complete --dir=install
 ```
 
-At the end of the process, you will be presented with the URL for the cluster endpoint along with the kubeadmin credentials. They are also available in the `install` folder as `kubeadmin-password` and `auth/kubeconfig`.
+At the end of the process, you will be presented with the URL for the cluster endpoint along with the kubeadmin credentials. They are also available in the `install` folder as `auth/kubeadmin-password` and `auth/kubeconfig`.
 
 ## Validate the Install
 

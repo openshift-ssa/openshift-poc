@@ -5,7 +5,7 @@
 By default, only the `kubeadmin` user exists on the cluster. To allow users from your organization to log in, configure one or more identity providers in the OAuth custom resource.
 
 !!! warning
-    Regardless of your other configurations, do not delete the `kubeadmin` user.
+    For a POC, keep the `kubeadmin` user as a fallback. Only remove it after confirming that at least one identity provider user has `cluster-admin` access and can log in successfully.
 
 ## Supported Identity Providers
 

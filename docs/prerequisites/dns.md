@@ -33,6 +33,19 @@ The `*.apps` wildcard record routes all application traffic through the OpenShif
 
 For SNO, all three DNS records point to the single node's IP address. No VIPs are needed.
 
+### Reverse DNS (PTR Records)
+
+Reverse DNS records are recommended for all node IPs. Without PTR records, nodes may register with incorrect hostnames during provisioning.
+
+```bash
+dig +noall +answer -x {{ node_ip }}
+```
+
+Each node IP should resolve back to its FQDN (e.g., `cp01.{{ cluster_name }}.{{ base_domain }}`).
+
+!!! note
+    Wildcard DNS records may require special handling in Active Directory DNS. Consult your DNS administrator if using AD-integrated DNS.
+
 ### Documentation
 
 - [DNS Requirements](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_on_bare_metal/index#installation-dns-user-infra_installing-bare-metal-network-customizations)

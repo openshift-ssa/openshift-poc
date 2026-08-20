@@ -48,7 +48,7 @@ A simple "Hello World" web server using the [Red Hat Hardened](https://www.redha
                 cpu: "100m"
             volumeMounts:
               - name: html
-                mountPath: /usr/share/nginx/html
+                mountPath: /opt/app-root/src
                 readOnly: true
         volumes:
           - name: html

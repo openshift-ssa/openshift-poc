@@ -38,7 +38,7 @@ Verify the tools are installed:
 ```bash
 openshift-install version
 oc version
-nmstatectl -V
+nmstatectl version
 git -v
 podman --version
 ```

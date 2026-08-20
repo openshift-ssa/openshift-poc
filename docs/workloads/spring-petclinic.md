@@ -72,7 +72,7 @@ Alternatively, deploy a pre-built image:
       spec:
         containers:
           - name: petclinic
-            image: docker.io/springcommunity/spring-framework-petclinic:latest
+            image: docker.io/springcommunity/spring-petclinic:latest
             ports:
               - containerPort: 8080
             resources:
@@ -136,9 +136,9 @@ By default, Pet Clinic uses an in-memory H2 database. For a persistent setup, de
 ```bash
   oc new-app --name=petclinic \
     -e SPRING_PROFILES_ACTIVE=postgres \
-    -e POSTGRES_URL=jdbc:postgresql://petclinic-db:5432/petclinic \
-    -e POSTGRES_USER=petclinic \
-    -e POSTGRES_PASS=petclinic \
+    -e SPRING_DATASOURCE_URL=jdbc:postgresql://petclinic-db:5432/petclinic \
+    -e SPRING_DATASOURCE_USERNAME=petclinic \
+    -e SPRING_DATASOURCE_PASSWORD=petclinic \
     java~https://github.com/spring-projects/spring-petclinic.git
 ```
 

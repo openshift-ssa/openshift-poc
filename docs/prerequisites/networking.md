@@ -11,7 +11,7 @@ OpenShift requires specific network configurations and firewall rules between no
 | Service Network | Kubernetes service IPs         | 172.30.0.0/16 |
 
 !!! warning "Machine Network Isolation"
-    In a production environment, it is best to run the machine network in an isolated network in a seperate vlan than your workloads. If you are planning to run OpenShift Virtualization, those VMs should run on a different vlan than the machine network. 
+    In a production environment, it is best to run the machine network in an isolated network in a separate vlan than your workloads. If you are planning to run OpenShift Virtualization, those VMs should run on a different vlan than the machine network. 
 
 !!! info
     Do you have to use these values for the Pod network and Service network? No. But for the POC, just keep the defaults.
@@ -80,7 +80,7 @@ The post-installation [Networking](../post-installation/networking.md) page has 
 | 22623       | TCP      | Nodes         | Control Plane | Machine Config Server   |
 | 2379-2380   | TCP      | Control Plane | Control Plane | etcd                    |
 | 10250       | TCP      | All nodes     | All nodes     | Kubelet                 |
-| 4789        | UDP      | All nodes     | All nodes     | VXLAN (OVN-Kubernetes)  |
+| 4789        | UDP      | All nodes     | All nodes     | VXLAN (OpenShift SDN — legacy) |
 | 6081        | UDP      | All nodes     | All nodes     | Geneve (OVN-Kubernetes) |
 | 9000-9999   | TCP      | All nodes     | All nodes     | Node services           |
 | 500         | UDP      | All nodes     | All nodes     | IPsec IKE               |
@@ -120,7 +120,7 @@ The following external endpoints must be reachable from all cluster nodes (unles
 | mirror.openshift.com                     | 443  | Mirrored install content and images |
 | quayio-production-s3.s3.amazonaws.com    | 443  | Quay image content in AWS           |
 | rhcos.mirror.openshift.com               | 443  | RHCOS images                        |
-| storage.googleapis.com/openshift-release | 443  | Release image signatures            |
+| storage.googleapis.com                   | 443  | Release image signatures            |
 
 **Telemetry (if not disabled)**
 

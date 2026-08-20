@@ -54,26 +54,19 @@ This example uses ODF NooBaa. The `ObjectBucketClaim` storage class `openshift-s
   SECRET_KEY=$(oc get secret thanos-object-storage-obc -n open-cluster-management-observability -o jsonpath='{.data.AWS_SECRET_ACCESS_KEY}' | base64 -d)
   ```
 
-  ```yaml
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: thanos-object-storage
-    namespace: open-cluster-management-observability
-  type: Opaque
-  stringData:
-    thanos.yaml: |
-      type: s3
-      config:
-        bucket: thanos-object-storage-bucket
-        endpoint: s3.openshift-storage.svc:443
-        insecure: false
-        access_key: $ACCESS_KEY
-        secret_key: $SECRET_KEY
-  ```
-
   ```bash
-  oc apply -f thanos-secret.yaml
+  oc create secret generic thanos-object-storage \
+      -n open-cluster-management-observability \
+      --from-literal=thanos.yaml="$(cat <<EOF
+  type: s3
+  config:
+    bucket: thanos-object-storage-bucket
+    endpoint: s3.openshift-storage.svc:443
+    insecure: false
+    access_key: ${ACCESS_KEY}
+    secret_key: ${SECRET_KEY}
+  EOF
+  )"
   ```
 
 ### Using MinIO

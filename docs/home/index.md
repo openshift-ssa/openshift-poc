@@ -6,7 +6,7 @@ This site provides the prerequisites and step-by-step instructions for installin
 
 ## Architecture and Process
 
-There is a wide variety of choices on how to install OpenShift. We recommed these two approaches for a POC: 
+There is a wide variety of choices on how to install OpenShift. We recommend these two approaches for a POC:
 
 1. **Installation** - if you are only interested in OpenShift as a application platform and/or to run your virtual machines using [OpenShift Virtualization](https://docs.redhat.com/en/documentation/red_hat_openshift_virtualization)
 2. **Fleet Management** - if you are interested in OpenShift but also how [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes) could be utilized to manage your cluster fleet at scale
@@ -22,7 +22,7 @@ For [installation](../installation/index.md), we recommend using the [Assisted I
 
 ### Fleet Management 
 
-For [fleet management](../fleet-management/index.md), we recommend starting with a single node OpenShift installation using the using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). Once completed, you can then install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) and use it as your cluster installation hub. 
+For [fleet management](../fleet-management/index.md), we recommend starting with a single node OpenShift installation using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). Once completed, you can then install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) and use it as your cluster installation hub.
 
 ## Important First Steps
 

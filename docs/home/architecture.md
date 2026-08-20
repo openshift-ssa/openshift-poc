@@ -54,7 +54,7 @@ graph TD
 
 OpenShift uses three distinct networks:
 
-| Network         | Default CIDR  | Purpose                                        |
+| Network         | Example CIDR  | Purpose                                        |
 | --------------- | ------------- | ---------------------------------------------- |
 | Machine Network | 10.0.0.0/28   | Physical node communication                    |
 | Pod Network     | 10.128.0.0/14 | Internal pod-to-pod communication (overlay)    |
