@@ -11,9 +11,9 @@ This page covers configuring OpenShift to route all image pulls through Artifact
 
 - Artifactory accessible from all cluster nodes over HTTPS
 - Remote repositories configured in Artifactory for:
-    - `registry.redhat.io`
-    - `quay.io`
-    - `docker.io` (if pulling community images)
+  - `registry.redhat.io`
+  - `quay.io`
+  - `docker.io` (if pulling community images)
 - A virtual repository in Artifactory that aggregates the remotes under a single hostname
 - Artifactory credentials with pull access to the virtual repository
 - The CA certificate for Artifactory (if using an internal CA)
