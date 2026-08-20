@@ -228,7 +228,11 @@ Create a dedicated bucket and secret named `loki-s3` in `netobserv-loki`. This s
    ```
 
    !!! note "TLS for object storage"
-       The `tls.caName: openshift-service-ca.crt` entry is for in-cluster ODF NooBaa (`https://s3.openshift-storage.svc:443`). Remove it for public AWS S3. For self-signed S3-compatible storage, set `caName` to `loki-s3-ca-bundle` instead.
+       `caName` references a **ConfigMap** (not a Secret) in the LokiStack namespace containing the CA bundle. `caKey` is the key within that ConfigMap holding the CA cert (defaults to `service-ca.crt` if omitted).
+
+       - For in-cluster ODF NooBaa (`https://s3.openshift-storage.svc:443`), use `caName: openshift-service-ca.crt` with `caKey: service-ca.crt`.
+       - For self-signed S3-compatible storage, set `caName` to the ConfigMap you created (e.g. `loki-s3-ca-bundle`) and set `caKey` to match the key in that ConfigMap.
+       - For public AWS S3, remove the `tls` block entirely.
 
    ```bash
    oc apply -f netobserv-lokistack.yaml

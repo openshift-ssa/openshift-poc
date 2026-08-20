@@ -205,13 +205,14 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
    ```
 
    !!! note "If using self-signed storage certificates"
-       Add the TLS section to the LokiStack CR:
+       Add the TLS section to the LokiStack CR. `caName` references a **ConfigMap** in the LokiStack namespace containing the CA bundle. `caKey` specifies the key within that ConfigMap (defaults to `service-ca.crt` if omitted).
 
        ```yaml
        spec:
          storage:
            tls:
-             caName: loki-s3-ca-bundle
+             caName: loki-s3-ca-bundle   # ConfigMap name
+             caKey: service-ca.crt       # key within the ConfigMap holding the CA cert
        ```
 
    ```bash
