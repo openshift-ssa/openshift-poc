@@ -11,6 +11,21 @@ The Migration Toolkit for Virtualization (MTV) enables migration of virtual mach
 - Network connectivity between the OpenShift cluster and the source hypervisor (vCenter, RHV Manager, etc.)
 - Cluster administrator privileges
 - If performing OVA conversion, an NFS share is required
+- VMware Virtual Disk Development Kit (VDDK) image — see [Obtaining the VDDK](#obtaining-the-vddk) below
+
+## Obtaining the VDDK
+
+!!! warning "Action Required Before Migration"
+    Broadcom has restricted access to the VMware Virtual Disk Development Kit (VDDK). If you plan to migrate VMs from VMware vSphere to OpenShift Virtualization, you **must** open a support ticket with Broadcom to request access to the VDDK download. This can take several business days, so initiate the request early in your POC planning.
+
+To obtain the VDDK:
+
+1. Log in to the [Broadcom Support Portal](https://support.broadcom.com)
+2. Open a support ticket requesting access to the **VMware Virtual Disk Development Kit (VDDK)** for your licensed vSphere version
+3. Once access is granted, download the VDDK archive from the [Broadcom Developer Portal](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest)
+4. Match the VDDK version to your source vSphere version (e.g., VDDK 8.0.x for vSphere 8.0)
+
+Without the VDDK, migrations will fall back to a slower transfer method and migrations from VMware vSAN-backed VMs will not work at all.
 
 ## Install the Operator via WebUI
 
@@ -158,11 +173,14 @@ Download the VDDK archive from VMware, then either upload it through the MTV Web
 !!! warning "VMware License"
     Storing the VDDK image in a public registry might violate the VMware license terms.
 
-### Download VDDK from VMware
+### Download VDDK from Broadcom
 
-Match the VDDK version to your source vSphere (vCenter/ESXi) version. VMware aligns VDDK version numbers with vSphere (for example, use VDDK **8.0.x** with vSphere **8.0**). Prefer the VDDK release that corresponds to your environment's major.minor version so disk-transfer features and compatibility stay aligned.
+Match the VDDK version to your source vSphere (vCenter/ESXi) version. Broadcom aligns VDDK version numbers with vSphere (for example, use VDDK **8.0.x** with vSphere **8.0**). Prefer the VDDK release that corresponds to your environment's major.minor version so disk-transfer features and compatibility stay aligned.
 
-1. Open the [VMware VDDK download page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest) for the major version that matches your vSphere release (for example, [VDDK 8](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/8.0) for vSphere 8)
+!!! note
+    You must have an active Broadcom support ticket granting VDDK access before you can download. See [Obtaining the VDDK](#obtaining-the-vddk) above.
+
+1. Open the [Broadcom Developer Portal VDDK page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest) for the major version that matches your vSphere release (for example, [VDDK 8](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/8.0) for vSphere 8)
 2. Select the VDDK version closest to your vSphere version and click Download
 3. Save `VMware-vix-disklib-<version>.x86_64.tar.gz` locally (for example, into `/tmp/vddk`)
 

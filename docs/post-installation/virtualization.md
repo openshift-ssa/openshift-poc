@@ -13,6 +13,9 @@
 - [NMState Operator](nmstate.md) installed and [underlay networks created](networking.md)
 - Optional but recommended: [dedicated network for live migration](networking.md)
 
+!!! note "Planning VM Migrations from VMware?"
+    If you plan to migrate VMs from VMware vSphere using the [Migration Toolkit for Virtualization](mtv.md), you must obtain the VDDK image from Broadcom ahead of time. Broadcom has restricted access and requires a support ticket. See [Obtaining the VDDK](mtv.md#obtaining-the-vddk) for details.
+
 ## Install the Operator via WebUI
 
 1. Go to Ecosystem -> Software Catalog -> filter for "OpenShift Virtualization" -> click the tile

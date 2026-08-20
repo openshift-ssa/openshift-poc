@@ -16,3 +16,9 @@ For the installation, the documentation assumes a bare metal environment in an o
 - [DNS](dns.md) - Required DNS records created
 - [Storage](storage.md) - Persistent storage backend available
 - [Installation Host](installation-host.md) - Tools downloaded and environment validated
+
+## VM Migration from VMware
+
+If the POC includes migrating virtual machines from VMware vSphere to OpenShift Virtualization, you must obtain the VMware Virtual Disk Development Kit (VDDK) from Broadcom **before** beginning migrations. Broadcom has restricted access to the VDDK — a support ticket is required to get the download. This process can take several business days, so initiate it early.
+
+See [Migration Toolkit for Virtualization — Obtaining the VDDK](../post-installation/mtv.md#obtaining-the-vddk) for full instructions.
