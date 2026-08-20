@@ -10,7 +10,7 @@ There are two approaches to making images available locally:
 2. **Pull-Through Cache** — Use an artifact repository like JFrog Artifactory or Sonatype Nexus as a transparent proxy that caches images on first pull. This works when the artifact repository has outbound access but the cluster nodes do not.
 
 !!! info "Which approach should I use?"
-    If the environment has **zero outbound access** from any system on the cluster network, use the mirror registry approach. If there is a centralized artifact repository that already has outbound access (common in enterprise environments), the pull-through cache is simpler to set up and maintain.
+    If the environment has **zero outbound access** from any system on the cluster network, use the mirror registry approach. If there is a centralized artifact repository that already has outbound access (common in enterprise environments), the pull-through cache is simpler to set up and maintain. For detailed post-installation configuration of a pull-through cache (catalog sources, operator installs, signature verification), see [Disconnected Cluster: Artifactory Pull-Through Cache](../post-installation/disconnected-artifactory.md).
 
 ## Prerequisites
 
@@ -485,6 +485,9 @@ If the repositories are empty after running the above commands, the proxy config
 
 Follow the same ISO generation, hosting, and boot process from the [Agent-Based Installer](agent-based.md#generate-the-iso) guide.
 
+!!! tip "Image Signature Verification"
+    For OCP 4.19+, you can embed a `ClusterImagePolicy` as a day-1 extra manifest to enforce sigstore-based signature verification through the pull-through cache from first boot. See [Image Signature Verification](../post-installation/disconnected-artifactory.md#image-signature-verification-ocp-419) for the full setup.
+
 ---
 
 ## Post-Install Verification
@@ -560,6 +563,15 @@ oc-mirror --config imageset-config.yaml \
 Apply the updated `ImageDigestMirrorSet` and `CatalogSource` if they changed, then initiate the upgrade through the web console or CLI.
 
 For pull-through caches, the upgrade process pulls new images on demand through the cache. No pre-staging is required, but pre-warming is still recommended to avoid timeouts during the upgrade.
+
+### Post-Installation Operations
+
+Once the cluster is running, see [Disconnected Cluster: Artifactory Pull-Through Cache](../post-installation/disconnected-artifactory.md) for day-2 configuration including:
+
+- Disabling default catalog sources and creating custom ones through the cache
+- Installing operators via the pull-through path
+- Image signature verification with `ClusterImagePolicy` (OCP 4.19+)
+- Cluster upgrade procedures through the cache
 
 ## Documentation
 
