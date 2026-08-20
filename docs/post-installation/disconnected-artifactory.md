@@ -269,6 +269,75 @@ oc debug node/<node> -- chroot /host cat /etc/containers/registries.d/sigstore-r
 
 Confirm the mirror appears with `use-sigstore-attachments: true`. Test a pull of a signed image — if the `.sig` tag is cached, it verifies against the Red Hat key without ever reaching `access.redhat.com`.
 
+### Day-1 integration with agent-based installer
+
+If you are using the [agent-based installer](../installation/agent-based.md) in a disconnected environment, you can embed the `ClusterImagePolicy` as a day-1 extra manifest so that signature enforcement exists from the moment the cluster comes up.
+
+The mirror configuration goes in `install-config.yaml` under `imageDigestSources` + `additionalTrustBundle`. The installer converts this into an `ImageDigestMirrorSet` automatically — you do not create the IDMS manually. You only need to provide the `ClusterImagePolicy` as an extra manifest.
+
+**Install directory layout** (before generating the ISO):
+
+```
+install/
+├── install-config.yaml
+├── agent-config.yaml
+└── openshift/
+    └── 99-cluster-image-policy.yaml
+```
+
+**Mirror config in install-config.yaml:**
+
+```yaml
+imageDigestSources:
+  - source: quay.io/openshift-release-dev/ocp-release
+    mirrors:
+      - artifactory.example.com/quay-remote/openshift-release-dev/ocp-release
+  - source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+    mirrors:
+      - artifactory.example.com/quay-remote/openshift-release-dev/ocp-v4.0-art-dev
+additionalTrustBundle: |
+  -----BEGIN CERTIFICATE-----
+  <artifactory CA certificate>
+  -----END CERTIFICATE-----
+```
+
+This produces the IDMS on the running cluster, and (4.17+) the MCO automatically adds these mirrors to the sigstore attachment registry config.
+
+**ClusterImagePolicy as an extra manifest** (`install/openshift/99-cluster-image-policy.yaml`):
+
+```yaml
+apiVersion: config.openshift.io/v1
+kind: ClusterImagePolicy
+metadata:
+  name: openshift-release-mirror
+spec:
+  scopes:
+    - artifactory.example.com/quay-remote/openshift-release-dev/ocp-release
+  policy:
+    rootOfTrust:
+      policyType: PublicKey
+      publicKey:
+        keyData: <base64 of https://security.access.redhat.com/data/63405576.txt>
+    signedIdentity:
+      matchPolicy: RemapIdentity
+      remapIdentity:
+        prefix: artifactory.example.com/quay-remote/openshift-release-dev/ocp-release
+        signedPrefix: quay.io/openshift-release-dev/ocp-release
+```
+
+You can include multiple YAML documents (or multiple files) in `openshift/` for additional scopes (`ocp-v4.0-art-dev`, `registry.redhat.io` operator repos, etc.).
+
+**Generate and boot:**
+
+```bash
+openshift-install agent create image --dir=install --log-level=debug
+```
+
+The installer embeds the extra manifests into the ISO's Ignition config. During bootstrap, the Assisted Service applies them alongside the generated IDMS.
+
+!!! note "Bootstrap timing"
+    The `ClusterImagePolicy` is applied by the MCO once the cluster API is up. The initial release payload pull during bootstrap is governed by the bootstrap node's own `policy.json` (seeded from the pull secret and mirror config), not by your CIP. The extra-manifest CIP governs the running cluster — day-2 pulls, operator images, and upgrades — which is where you need enforcement. Bootstrap release verification relies on the mirror + release signature ConfigMap path instead.
+
 ## Cluster Upgrades
 
 With the `ImageDigestMirrorSet` in place, cluster upgrades pull release images through Artifactory automatically:
