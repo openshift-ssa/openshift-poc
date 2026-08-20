@@ -82,17 +82,19 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
     ttl: 720h0m0s
   ```
 
-  !!! note
-      The label `app: backup-test-vm` is automatically applied by OpenShift Virtualization when creating from a template.
+!!! note
+    The label `app: backup-test-vm` is automatically applied by OpenShift Virtualization when creating from a template.
 
-  !!! info "Crash-Consistent Backups"
-      OADP with the `kubevirt` and `csi` plugins can back up running VMs using CSI volume snapshots. The resulting backup is crash-consistent — equivalent to an unexpected power loss. This is sufficient for most workloads. If you need application-consistent backups (e.g., databases), either stop the VM first or use the QEMU guest agent for filesystem freeze/thaw.
+!!! info "Crash-Consistent Backups"
+    OADP with the `kubevirt` and `csi` plugins can back up running VMs using CSI volume snapshots. The resulting backup is crash-consistent — equivalent to an unexpected power loss. This is sufficient for most workloads. If you need application-consistent backups (e.g., databases), either stop the VM first or use the QEMU guest agent for filesystem freeze/thaw.
+
+17. Apply the backup:
 
   ```bash
   oc apply -f backup.yaml
   ```
 
-17. Watch the backup progress:
+18. Watch the backup progress:
 
   ```bash
   oc get backup backup-test-vm-backup-1 -n openshift-adp -w
@@ -100,7 +102,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
   Wait for the `PHASE` to show `Completed`.
 
-18. Verify the backup contents:
+19. Verify the backup contents:
 
   ```bash
   oc get backup backup-test-vm-backup-1 -n openshift-adp -o jsonpath='{.status.phase}'
@@ -108,7 +110,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Make a Destructive Change
 
-19. Open the VM console and modify the data:
+20. Open the VM console and modify the data:
 
   ```bash
   sudo mount /dev/vdb /mnt/data
@@ -119,7 +121,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
   You should see: `THIS DATA HAS BEEN MODIFIED`
 
-20. Stop the VM:
+21. Stop the VM:
 
   ```bash
   virtctl stop backup-test-vm -n vm-backup-test
@@ -127,14 +129,14 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Delete the VM
 
-21. Delete the VM and its PVCs to simulate a disaster:
+22. Delete the VM and its PVCs to simulate a disaster:
 
   ```bash
   oc delete vm backup-test-vm -n vm-backup-test
   oc delete pvc -l app=backup-test-vm -n vm-backup-test
   ```
 
-22. Confirm the VM is gone:
+23. Confirm the VM is gone:
 
   ```bash
   oc get vm backup-test-vm -n vm-backup-test
@@ -144,7 +146,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Restore from Backup
 
-23. Create a Restore CR pointing to the backup:
+24. Create a Restore CR pointing to the backup:
 
   ```yaml
   apiVersion: velero.io/v1
@@ -163,7 +165,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
   oc apply -f restore.yaml
   ```
 
-24. Watch the restore progress:
+25. Watch the restore progress:
 
   ```bash
   oc get restore backup-test-vm-restore-1 -n openshift-adp -w
@@ -173,13 +175,13 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Verify the Restore
 
-25. Confirm the VM exists again:
+26. Confirm the VM exists again:
 
   ```bash
   oc get vm backup-test-vm -n vm-backup-test
   ```
 
-26. Start the restored VM:
+27. Start the restored VM:
 
   ```bash
   virtctl start backup-test-vm -n vm-backup-test
@@ -191,7 +193,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
   oc get vmi backup-test-vm -n vm-backup-test -w
   ```
 
-27. Open the VM console and verify the original data is restored:
+28. Open the VM console and verify the original data is restored:
 
   ```bash
   sudo mount /dev/vdb /mnt/data
@@ -218,7 +220,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Cleanup
 
-28. Delete the test resources:
+29. Delete the test resources:
 
   ```bash
   oc delete vm backup-test-vm -n vm-backup-test

@@ -185,8 +185,8 @@ Create a dedicated bucket and secret named `loki-s3` in `netobserv-loki`. This s
      --from-literal=forcepathstyle="true"
    ```
 
-   !!! note
-       The `forcepathstyle="true"` parameter is required for S3-compatible storage (not needed for AWS S3).
+!!! note
+    The `forcepathstyle="true"` parameter is required for S3-compatible storage (not needed for AWS S3).
 
 ### TLS CA Bundle (If Required)
 
@@ -227,24 +227,26 @@ Create a dedicated bucket and secret named `loki-s3` in `netobserv-loki`. This s
        mode: openshift-network
    ```
 
-   !!! note "TLS for object storage"
-       `caName` references a **ConfigMap** (not a Secret) in the LokiStack namespace containing the CA bundle. `caKey` is the key within that ConfigMap holding the CA cert (defaults to `service-ca.crt` if omitted).
+!!! note "TLS for object storage"
+    `caName` references a **ConfigMap** (not a Secret) in the LokiStack namespace containing the CA bundle. `caKey` is the key within that ConfigMap holding the CA cert (defaults to `service-ca.crt` if omitted).
 
-       - For in-cluster ODF NooBaa (`https://s3.openshift-storage.svc:443`), use `caName: openshift-service-ca.crt` with `caKey: service-ca.crt`.
-       - For self-signed S3-compatible storage, set `caName` to the ConfigMap you created (e.g. `loki-s3-ca-bundle`) and set `caKey` to match the key in that ConfigMap.
-       - For public AWS S3, remove the `tls` block entirely.
+    - For in-cluster ODF NooBaa (`https://s3.openshift-storage.svc:443`), use `caName: openshift-service-ca.crt` with `caKey: service-ca.crt`.
+    - For self-signed S3-compatible storage, set `caName` to the ConfigMap you created (e.g. `loki-s3-ca-bundle`) and set `caKey` to match the key in that ConfigMap.
+    - For public AWS S3, remove the `tls` block entirely.
+
+5. Apply the LokiStack CR:
 
    ```bash
    oc apply -f netobserv-lokistack.yaml
    ```
 
-5. Wait for the LokiStack to be ready:
+6. Wait for the LokiStack to be ready:
 
    ```bash
    oc get lokistack loki -n netobserv-loki -w
    ```
 
-6. Verify PVCs are bound:
+7. Verify PVCs are bound:
 
    ```bash
    oc get pvc -n netobserv-loki

@@ -165,8 +165,8 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
      --from-literal=forcepathstyle="true"
    ```
 
-   !!! note
-       The `forcepathstyle="true"` parameter is required for S3 Compatible storage (not needed for AWS S3).
+!!! note
+    The `forcepathstyle="true"` parameter is required for S3 Compatible storage (not needed for AWS S3).
 
 ### TLS CA Bundle (If Required)
 
@@ -204,26 +204,29 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
        mode: openshift-logging
    ```
 
-   !!! note "If using self-signed storage certificates"
-       Add the TLS section to the LokiStack CR. `caName` references a **ConfigMap** in the LokiStack namespace containing the CA bundle. `caKey` specifies the key within that ConfigMap (defaults to `service-ca.crt` if omitted).
+!!! note "If using self-signed storage certificates"
+    Add the TLS section to the LokiStack CR. `caName` references a **ConfigMap** in the LokiStack namespace containing the CA bundle. `caKey` specifies the key within that ConfigMap (defaults to `service-ca.crt` if omitted).
 
-       ```yaml
-       spec:
-         storage:
-           tls:
-             caName: loki-s3-ca-bundle   # ConfigMap name
-             caKey: service-ca.crt       # key within the ConfigMap holding the CA cert
-       ```
+    ```yaml
+    spec:
+      storage:
+        tls:
+          caName: loki-s3-ca-bundle   # ConfigMap name
+          caKey: service-ca.crt       # key within the ConfigMap holding the CA cert
+    ```
+
+8. Apply the LokiStack CR:
 
    ```bash
    oc apply -f lokistack.yaml
    ```
-8. Wait for the LokiStack to be ready:
+
+9. Wait for the LokiStack to be ready:
 
    ```bash
    oc get lokistack logging-loki -n openshift-logging -w
    ```
-9. Verify PVCs are bound:
+10. Verify PVCs are bound:
 
    ```bash
    oc get pvc -n openshift-logging
@@ -358,10 +361,10 @@ The log collector requires a service account with specific cluster roles to read
             - lokistack-out
     ```
 
-    !!! warning "TLS CA Block is Required"
-        The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
+!!! warning "TLS CA Block is Required"
+    The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
 
-    To also collect audit logs, add `audit` to `inputRefs`:
+15. To also collect audit logs, add `audit` to `inputRefs`:
 
     ```yaml
     pipelines:

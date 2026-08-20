@@ -23,8 +23,8 @@ The OpenShift internal image registry is deployed by default with ephemeral stor
     volumeMode: Filesystem
   ```
 
-  !!! warning "HA Filesystem Storage"
-      Your backing storage class requires ReadWriteMany (RWX) on file storage for the registry to run with multiple instances. If you are just using ReadWriteOnce (RWO) filesystem storage, change the `replicas` value in the `Config` to `1` instead.
+!!! warning "HA Filesystem Storage"
+    Your backing storage class requires ReadWriteMany (RWX) on file storage for the registry to run with multiple instances. If you are just using ReadWriteOnce (RWO) filesystem storage, change the `replicas` value in the `Config` to `1` instead.
 
 3. From the WebUI, go to Home -> API Explorer
 4. Filter for "Config", make sure to click on the one in Group of "imageregistry.operator.openshift.io"

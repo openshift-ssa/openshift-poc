@@ -43,8 +43,8 @@ oc new-project example-vms
     expire: false
   ```
 
-  !!! note
-      RHEL cloud images do not ship with a usable default password. Set a password or SSH key before first boot, or you will not be able to log in from the console.
+!!! note
+    RHEL cloud images do not ship with a usable default password. Set a password or SSH key before first boot, or you will not be able to log in from the console.
 
 ### Optional: Confirm Disk and Run Strategy
 

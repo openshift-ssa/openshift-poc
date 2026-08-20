@@ -186,8 +186,8 @@ This pattern matches the [ACM Multicluster Observability Operator MinIO example]
   oc rollout status deployment/minio -n open-cluster-management-observability --timeout=120s
   ```
 
-  !!! note
-      Change `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` before applying if you do not want the demo credentials. The Thanos secret in the next step must use the same values.
+!!! note
+    Change `MINIO_ROOT_USER` and `MINIO_ROOT_PASSWORD` before applying if you do not want the demo credentials. The Thanos secret in the next step must use the same values.
 
 4. Create the Thanos object storage secret pointing at the in-cluster MinIO service. The endpoint has no protocol, and `insecure: true` is required because this MinIO instance serves HTTP:
 

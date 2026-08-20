@@ -147,13 +147,15 @@ OADP requires an S3-compatible object storage bucket for backup data. If you hav
             key: cloud
   ```
 
-  !!! note "Plugin Descriptions"
-      | Plugin     | Purpose                                                    |
-      | ---------- | ---------------------------------------------------------- |
-      | `kubevirt` | Required for backing up and restoring VirtualMachines      |
-      | `openshift`| Required for OpenShift-specific resources (Routes, etc.)   |
-      | `csi`      | Enables CSI volume snapshots for PVC backups               |
-      | `aws`      | S3-compatible object storage provider (works with NooBaa)  |
+!!! note "Plugin Descriptions"
+    | Plugin     | Purpose                                                    |
+    | ---------- | ---------------------------------------------------------- |
+    | `kubevirt` | Required for backing up and restoring VirtualMachines      |
+    | `openshift`| Required for OpenShift-specific resources (Routes, etc.)   |
+    | `csi`      | Enables CSI volume snapshots for PVC backups               |
+    | `aws`      | S3-compatible object storage provider (works with NooBaa)  |
+
+5. Apply the DPA configuration:
 
   ```bash
   oc apply -f dpa.yaml

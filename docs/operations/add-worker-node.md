@@ -181,9 +181,11 @@ oc get csr | grep Pending
 
 Approve all pending CSRs:
 
+{% raw %}
 ```bash
 oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' | xargs oc adm certificate approve
 ```
+{% endraw %}
 
 !!! warning
     Wait a minute and check again — the second CSR (serving certificate) appears only after the first one is approved.

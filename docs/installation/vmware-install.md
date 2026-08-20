@@ -379,8 +379,8 @@ If your environment uses a proxy, add the proxy settings to `install-config.yaml
       -----END CERTIFICATE-----
     ```
 
-    !!! note
-        Always include the vCenter FQDN and machine network in `noProxy` to prevent the installer from trying to proxy vSphere API calls.
+!!! note
+    Always include the vCenter FQDN and machine network in `noProxy` to prevent the installer from trying to proxy vSphere API calls.
 
 ## Deploy the Cluster
 
@@ -396,18 +396,18 @@ If your environment uses a proxy, add the proxy settings to `install-config.yaml
     openshift-install create cluster --dir ~/ocp-vsphere --log-level=info
     ```
 
-    !!! info "What happens during installation"
-        The installer:
+!!! info "What happens during installation"
+    The installer:
 
-        1. Creates a temporary bootstrap VM in vSphere
-        2. Provisions 3 control plane VMs
-        3. Provisions 3 worker VMs
-        4. Configures networking and storage on each VM
-        5. Bootstraps the cluster (etcd, API server, etc.)
-        6. Destroys the bootstrap VM once the control plane is self-hosting
-        7. Completes cluster operator installation
+    1. Creates a temporary bootstrap VM in vSphere
+    2. Provisions 3 control plane VMs
+    3. Provisions 3 worker VMs
+    4. Configures networking and storage on each VM
+    5. Bootstraps the cluster (etcd, API server, etc.)
+    6. Destroys the bootstrap VM once the control plane is self-hosting
+    7. Completes cluster operator installation
 
-        The full process takes approximately 45-60 minutes.
+    The full process takes approximately 45-60 minutes.
 
 15. If the installation times out, you can resume monitoring:
 
