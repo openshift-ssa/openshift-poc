@@ -119,6 +119,7 @@ nav:
       - MultiCluster Observability: post-installation/multicluster-observability.md
       - Web Terminal: post-installation/web-terminal.md
       - Operators from Artifactory: post-installation/operators-from-artifactory.md
+      - Disconnected Registry (Artifactory): post-installation/disconnected-artifactory.md
       - Identity Providers: post-installation/configuring-identity-providers.md
       - POC Banner: post-installation/poc-banner.md
   - Workloads: 
@@ -140,6 +141,7 @@ nav:
       - Add Worker Node: operations/add-worker-node.md
       - Rotate SSH Keys: operations/rotate-ssh-keys.md
       - Machine Config: operations/machine-config.md
+      - Debugging MTU Mismatches: operations/debug-mtu.md
       
       
       
