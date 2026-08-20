@@ -297,7 +297,6 @@ doc.add_paragraph(
 
 add_section_heading('Goals and drivers')
 add_checklist_table([
-    'Define the core business problem OpenShift will address',
     'Document specific POC objectives with measurable outcomes',
     'Identify which applications or workloads will be evaluated',
     'Capture high-availability and recovery expectations',
@@ -330,23 +329,52 @@ add_validation_table([
 # Phase 2
 add_phase_heading('Phase 2: Prerequisites')
 doc.add_paragraph('Complete these before scheduling the installation.')
+
+add_section_heading('Infrastructure and compute')
 add_checklist_table([
     'Red Hat account created and subscriptions allocated',
     'Compute nodes provisioned and meet minimum specs',
     'Management access to nodes confirmed (BMC, vCenter, cloud API)',
     'Firmware/BIOS settings validated (UEFI, virtualization extensions)',
+    'Node details collected (MAC addresses, BMC IPs, disk hints, NIC names)',
+])
+
+add_section_heading('Networking')
+add_checklist_table([
     'Network subnets allocated for cluster traffic',
     'Firewall rules opened (API, ingress, registry access)',
+    'Outbound connectivity to Red Hat registries and services verified',
+    'HTTP proxy configured and CA bundle prepared (if proxied environment)',
     'NTP accessible from all nodes',
     'Load balancer configured (if required)',
+])
+
+add_section_heading('DNS')
+add_checklist_table([
     'api.<cluster>.<domain> DNS record resolves correctly',
+    'api-int.<cluster>.<domain> DNS record resolves correctly',
     '*.apps.<cluster>.<domain> wildcard DNS resolves correctly',
-    'Reverse DNS entries (PTR) configured',
+    'Reverse DNS entries (PTR) configured for node IPs',
+])
+
+add_section_heading('Storage')
+add_checklist_table([
     'Persistent storage backend provisioned and accessible',
     'Storage connectivity verified from node networks',
+])
+
+add_section_heading('Installation host')
+add_checklist_table([
     'oc CLI installed on installation host',
     'Pull secret downloaded from Red Hat console',
     'SSH key pair generated',
+    'Image mirroring configured (if disconnected environment)',
+])
+
+add_section_heading('VM migration prerequisites')
+add_checklist_table([
+    'VDDK access requested from Broadcom (support ticket required)',
+    'VDDK archive downloaded and version matched to vSphere version',
 ])
 
 # Phase 3
@@ -365,10 +393,10 @@ add_checklist_table([
 add_phase_heading('Phase 4: Post-installation (required)')
 doc.add_paragraph('These must be completed before deploying workloads.')
 add_checklist_table([
-    'Advanced networking operator installed (if using bonds/VLANs)',
+    'NMState operator installed (required for network configuration)',
     'Storage driver installed and StorageClasses created',
     'Default StorageClass set',
-    'RWO PVC created and bound successfully',
+    'RWO PVC created, bound, and data write/read verified',
     'RWX PVC created and bound successfully (if applicable)',
     'Internal image registry configured with persistent storage',
 ])
@@ -380,40 +408,55 @@ doc.add_paragraph('Install based on your POC goals. Each subsection is independe
 add_section_heading('Networking')
 add_checklist_table([
     'Additional network configuration applied (bridges, secondary NICs)',
-    'Pod-to-pod communication verified across nodes',
     'Ingress/Route exposes an application externally',
     'DNS resolution works from within pods (internal and external)',
+])
+
+add_section_heading('Workload availability')
+add_checklist_table([
+    'Node Health Check operator installed',
+    'NodeHealthCheck CRs created (workers and control plane)',
+    'Self Node Remediation operator installed',
+    'Kube Descheduler operator installed and configured',
 ])
 
 add_section_heading('Virtualization')
 add_checklist_table([
     'OpenShift Virtualization operator installed',
     'HyperConverged CR created',
+    'Virtualization StorageClass annotated as default virt class',
     'Live migration network configured (if applicable)',
-    'Node health check and remediation operators installed',
-    'Health check CRs created (workers and control plane)',
-    'Descheduler operator installed and configured',
 ])
 
 add_section_heading('Migration')
 add_checklist_table([
-    'Migration toolkit operator installed',
-    'Source virtualization provider added',
+    'Migration Toolkit for Virtualization (MTV) operator installed',
+    'VDDK image built and pushed to registry',
+    'Source virtualization provider added and healthy',
     'Network and storage mappings configured',
 ])
 
 add_section_heading('Backup and restore')
 add_checklist_table([
-    'Backup operator installed',
-    'Backup storage location configured',
+    'OADP (OpenShift API for Data Protection) operator installed',
+    'BackupStorageLocation CR created and showing Available',
     'DataProtectionApplication CR created',
 ])
 
 add_section_heading('Observability')
 add_checklist_table([
-    'Cluster logging configured',
-    'Network observability enabled',
+    'Logging operators installed (Loki Operator, OpenShift Logging)',
+    'LokiStack deployed with object storage backend',
+    'Log forwarding configured (ClusterLogForwarder)',
+    'Network observability operator enabled',
     'Multi-cluster observability configured (if multi-cluster)',
+])
+
+add_section_heading('GitOps')
+add_checklist_table([
+    'OpenShift GitOps operator installed',
+    'ArgoCD instance accessible',
+    'Sample application deployed via GitOps',
 ])
 
 add_section_heading('Security and access')
@@ -454,7 +497,7 @@ add_checklist_table([
     'Build from source \u2014 image built and app deploys',
     'Stateful application \u2014 data persists across pod restarts',
     'Multi-tier application \u2014 frontend and backend communicating',
-    'Event streaming workload deployed (if applicable)',
+    'Event streaming workload deployed, e.g. Kafka (if applicable)',
     'Customer application deployed (if provided)',
 ])
 
@@ -485,12 +528,6 @@ add_checklist_table([
     'Data integrity confirmed after restore',
 ])
 
-add_section_heading('Scaling')
-add_checklist_table([
-    'Worker node added \u2014 new node joins cluster successfully',
-    'Horizontal Pod Autoscaler validated (if applicable)',
-])
-
 add_section_heading('Cluster lifecycle')
 add_checklist_table([
     'SSH key rotation validated',
@@ -498,13 +535,14 @@ add_checklist_table([
     'Node drain and maintenance \u2014 cordon, drain, uncordon',
     'Cluster upgrade tested (minor version or z-stream)',
     'Workloads remained available during upgrade',
+    'Worker node added \u2014 new node joins cluster successfully',
 ])
 
 add_section_heading('Monitoring and troubleshooting')
 add_checklist_table([
     'Monitoring dashboards accessible',
     'Alerts fire correctly (trigger test alert, verify delivery)',
-    'Diagnostic bundle collected and reviewed',
+    'must-gather diagnostic bundle collected and reviewed',
     'Log collection validated (node, pod, operator logs)',
     'Common failure modes understood by the customer team',
 ])

@@ -53,24 +53,61 @@ Agree on pass/fail criteria before installation begins:
 
 Complete these before scheduling the installation.
 
-| Item                                                              | Status | Notes |
-| ----------------------------------------------------------------- | ------ | ----- |
-| Red Hat account created and subscriptions allocated               |        |       |
-| Compute nodes provisioned and meet minimum specs                  |        |       |
-| Management access to nodes confirmed (BMC, vCenter, cloud API)    |        |       |
-| Firmware/BIOS settings validated (UEFI, virtualization extensions) |        |       |
-| Network subnets allocated for cluster traffic                     |        |       |
-| Firewall rules opened (API, ingress, registry access)             |        |       |
-| NTP accessible from all nodes                                     |        |       |
-| Load balancer configured (if required)                            |        |       |
-| `api.<cluster>.<domain>` DNS record resolves correctly            |        |       |
-| `*.apps.<cluster>.<domain>` wildcard DNS resolves correctly       |        |       |
-| Reverse DNS entries (PTR) configured                              |        |       |
-| Persistent storage backend provisioned and accessible             |        |       |
-| Storage connectivity verified from node networks                  |        |       |
-| `oc` CLI installed on installation host                           |        |       |
-| Pull secret downloaded from Red Hat console                       |        |       |
-| SSH key pair generated                                            |        |       |
+### Infrastructure and Compute
+
+| Item                                                                          | Status | Notes |
+| ----------------------------------------------------------------------------- | ------ | ----- |
+| Red Hat account created and subscriptions allocated                            |        |       |
+| Compute nodes provisioned and meet minimum specs                              |        |       |
+| Management access to nodes confirmed (BMC, vCenter, cloud API)                |        |       |
+| Firmware/BIOS settings validated (UEFI, virtualization extensions)             |        |       |
+| Node details collected (MAC addresses, BMC IPs, disk hints, NIC names)        |        |       |
+
+### Networking
+
+| Item                                                                          | Status | Notes |
+| ----------------------------------------------------------------------------- | ------ | ----- |
+| Network subnets allocated for cluster traffic                                 |        |       |
+| Firewall rules opened (API, ingress, registry access)                         |        |       |
+| Outbound connectivity to Red Hat registries and services verified             |        |       |
+| HTTP proxy configured and CA bundle prepared (if proxied environment)         |        |       |
+| NTP accessible from all nodes                                                 |        |       |
+| Load balancer configured (if required)                                        |        |       |
+
+### DNS
+
+| Item                                                                          | Status | Notes |
+| ----------------------------------------------------------------------------- | ------ | ----- |
+| `api.<cluster>.<domain>` DNS record resolves correctly                        |        |       |
+| `api-int.<cluster>.<domain>` DNS record resolves correctly                    |        |       |
+| `*.apps.<cluster>.<domain>` wildcard DNS resolves correctly                   |        |       |
+| Reverse DNS entries (PTR) configured for node IPs                             |        |       |
+
+### Storage
+
+| Item                                                                          | Status | Notes |
+| ----------------------------------------------------------------------------- | ------ | ----- |
+| Persistent storage backend provisioned and accessible                         |        |       |
+| Storage connectivity verified from node networks                              |        |       |
+
+### Installation Host
+
+| Item                                                                          | Status | Notes |
+| ----------------------------------------------------------------------------- | ------ | ----- |
+| `oc` CLI installed on installation host                                       |        |       |
+| Pull secret downloaded from Red Hat console                                   |        |       |
+| SSH key pair generated                                                        |        |       |
+| Image mirroring configured (if disconnected environment)                      |        |       |
+
+### VM Migration Prerequisites
+
+!!! note
+    Complete these only if the POC includes migrating VMs from VMware vSphere.
+
+| Item                                                                          | Status | Notes |
+| ----------------------------------------------------------------------------- | ------ | ----- |
+| VDDK access requested from Broadcom (support ticket required — allow several business days) |        |       |
+| VDDK archive downloaded and version matched to vSphere version                |        |       |
 
 ---
 
@@ -94,10 +131,10 @@ These must be completed before deploying workloads.
 
 | Item                                                              | Status | Notes |
 | ----------------------------------------------------------------- | ------ | ----- |
-| Advanced networking operator installed (if using bonds/VLANs)     |        |       |
+| NMState operator installed (required for network configuration)   |        |       |
 | Storage driver installed and StorageClasses created               |        |       |
 | Default StorageClass set                                          |        |       |
-| RWO PVC created and bound successfully                            |        |       |
+| RWO PVC created, bound, and data write/read verified              |        |       |
 | RWX PVC created and bound successfully (if applicable)            |        |       |
 | Internal image registry configured with persistent storage        |        |       |
 
@@ -112,9 +149,20 @@ Install based on your POC goals. Each subsection is independent.
 | Item                                                              | Status | Notes |
 | ----------------------------------------------------------------- | ------ | ----- |
 | Additional network configuration applied (bridges, secondary NICs)|        |       |
-| Pod-to-pod communication verified across nodes                    |        |       |
 | Ingress/Route exposes an application externally                   |        |       |
 | DNS resolution works from within pods (internal and external)     |        |       |
+
+### Workload Availability
+
+!!! warning
+    If the POC includes OpenShift Virtualization, install Workload Availability **before** installing the Virtualization operator. The node health check and descheduler operators are what trigger live migrations when nodes become unhealthy.
+
+| Item                                                              | Status | Notes |
+| ----------------------------------------------------------------- | ------ | ----- |
+| Node Health Check operator installed                              |        |       |
+| NodeHealthCheck CRs created (workers and control plane)           |        |       |
+| Self Node Remediation operator installed                          |        |       |
+| Kube Descheduler operator installed and configured                |        |       |
 
 ### Virtualization
 
@@ -122,34 +170,43 @@ Install based on your POC goals. Each subsection is independent.
 | ----------------------------------------------------------------- | ------ | ----- |
 | OpenShift Virtualization operator installed                       |        |       |
 | HyperConverged CR created                                         |        |       |
+| Virtualization StorageClass annotated as default virt class       |        |       |
 | Live migration network configured (if applicable)                 |        |       |
-| Node health check and remediation operators installed             |        |       |
-| Health check CRs created (workers and control plane)              |        |       |
-| Descheduler operator installed and configured                     |        |       |
 
 ### Migration
 
 | Item                                                              | Status | Notes |
 | ----------------------------------------------------------------- | ------ | ----- |
-| Migration toolkit operator installed                              |        |       |
-| Source virtualization provider added                               |        |       |
+| Migration Toolkit for Virtualization (MTV) operator installed     |        |       |
+| VDDK image built and pushed to registry                           |        |       |
+| Source virtualization provider added and healthy                   |        |       |
 | Network and storage mappings configured                           |        |       |
 
 ### Backup and Restore
 
 | Item                                                              | Status | Notes |
 | ----------------------------------------------------------------- | ------ | ----- |
-| Backup operator installed                                         |        |       |
-| Backup storage location configured                                |        |       |
+| OADP (OpenShift API for Data Protection) operator installed       |        |       |
+| BackupStorageLocation CR created and showing Available            |        |       |
 | DataProtectionApplication CR created                              |        |       |
 
 ### Observability
 
 | Item                                                              | Status | Notes |
 | ----------------------------------------------------------------- | ------ | ----- |
-| Cluster logging configured                                        |        |       |
-| Network observability enabled                                     |        |       |
+| Logging operators installed (Loki Operator, OpenShift Logging)    |        |       |
+| LokiStack deployed with object storage backend                    |        |       |
+| Log forwarding configured (ClusterLogForwarder)                   |        |       |
+| Network observability operator enabled                            |        |       |
 | Multi-cluster observability configured (if multi-cluster)         |        |       |
+
+### GitOps
+
+| Item                                                              | Status | Notes |
+| ----------------------------------------------------------------- | ------ | ----- |
+| OpenShift GitOps operator installed                               |        |       |
+| ArgoCD instance accessible                                        |        |       |
+| Sample application deployed via GitOps                            |        |       |
 
 ### Security and Access
 
@@ -168,7 +225,7 @@ Validate that virtual machines can be migrated from an existing virtualization p
 
 | Item                                                              | Status | Notes |
 | ----------------------------------------------------------------- | ------ | ----- |
-| Source virtualization environment accessible from OpenShift        |        |       |
+| Source virtualization environment accessible from OpenShift       |        |       |
 | Migration provider connection healthy                             |        |       |
 | Target storage class selected                                     |        |       |
 | Target network mapping configured                                 |        |       |
@@ -194,7 +251,7 @@ Deploy workloads to validate platform capabilities.
 | Build from source — image built and app deploys                   |        |       |
 | Stateful application — data persists across pod restarts          |        |       |
 | Multi-tier application — frontend and backend communicating       |        |       |
-| Event streaming workload deployed (if applicable)                 |        |       |
+| Event streaming workload deployed, e.g. Kafka (if applicable)    |        |       |
 | Customer application deployed (if provided)                       |        |       |
 
 ### Virtual Machine Workloads
@@ -246,7 +303,7 @@ Demonstrate Day 2 operations and resilience.
 | ----------------------------------------------------------------- | ------ | ----- |
 | Monitoring dashboards accessible                                  |        |       |
 | Alerts fire correctly (trigger test alert, verify delivery)       |        |       |
-| Diagnostic bundle collected and reviewed                          |        |       |
+| must-gather diagnostic bundle collected and reviewed              |        |       |
 | Log collection validated (node, pod, operator logs)               |        |       |
 | Common failure modes understood by the customer team              |        |       |
 
