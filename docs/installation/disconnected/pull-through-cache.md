@@ -139,6 +139,16 @@ skopeo login {{ artifactory_host }}
 
 ### Test Image Pulls Through the Cache
 
+Verify that images can actually be pulled through the cache using `podman`:
+
+```bash
+podman image pull \
+  --authfile ~/merged-pull-secret.json \
+  {{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
+```
+
+If this succeeds, the cache is correctly proxying from `quay.io`. You can also inspect images without downloading all layers using `skopeo`:
+
 ```bash
 skopeo inspect \
   --authfile ~/merged-pull-secret.json \
@@ -148,6 +158,9 @@ skopeo inspect \
   --authfile ~/merged-pull-secret.json \
   docker://{{ artifactory_host }}/redhat-registry-remote/ubi9/ubi:latest
 ```
+
+!!! tip
+    If `podman pull` fails but `skopeo inspect` succeeds, the issue is usually TLS trust or credential format. Check that the CA is in `/etc/pki/ca-trust/source/anchors/` and that `update-ca-trust` has been run.
 
 ### Verify the Release Payload
 
