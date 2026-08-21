@@ -4,6 +4,8 @@ Welcome to the OpenShift Proof of Concept documentation.
 
 This site provides step-by-step instructions for installing, configuring, and validating Red Hat [OpenShift Container Platform](https://docs.redhat.com/en/documentation/openshift_container_platform) in on-premise environments.
 
+### USE THE SEARCH IN THE TOP RIGHT CORNER OF THE PAGE. It's very good!
+
 ## How to Use This Guide
 
 Follow the tabs left to right — each represents a phase of the POC:
