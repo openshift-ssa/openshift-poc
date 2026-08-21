@@ -17,7 +17,7 @@ In some environments, the bastion host has temporary internet access and direct 
 
 ## Prerequisites
 
-- Complete the [prerequisites](../prerequisites/index.md)
+- Complete the [prerequisites](../../prerequisites/index.md)
 - A bastion host with internet access (temporary or permanent) to download content
 - A container registry accessible from the cluster network (see [Set Up the Mirror Registry](#set-up-the-mirror-registry))
 - At least 200 GB of available disk for the mirror registry storage
@@ -521,7 +521,7 @@ oc adm upgrade
 
 ## Troubleshooting
 
-For common installation issues, see [Troubleshooting](troubleshooting.md).
+For common installation issues, see [Troubleshooting](../troubleshooting.md).
 
 | Symptom | Likely Cause | Fix |
 | ------- | ------------ | --- |

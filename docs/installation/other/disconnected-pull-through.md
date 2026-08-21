@@ -15,7 +15,7 @@ A pull-through cache acts as a transparent proxy. When the cluster requests an i
 
 ## Prerequisites
 
-- Complete the [prerequisites](../prerequisites/index.md)
+- Complete the [prerequisites](../../prerequisites/index.md)
 - Artifact repository (Artifactory or Nexus) accessible from all cluster nodes over HTTPS
 - Artifact repository has outbound access to:
     - `quay.io` / `cdn.quay.io`
@@ -635,7 +635,7 @@ oc run test --image={{ artifactory_host }}/redhat-registry-remote/ubi9/ubi:lates
 | Upgrade shows no available versions | Cincinnati service unreachable | Use `--to-image` with explicit release image |
 | Nodes not restarting after mirror set change | MachineConfigPool paused | Check `oc get mcp` for paused pools |
 
-For common installation issues, see [Troubleshooting](troubleshooting.md).
+For common installation issues, see [Troubleshooting](../troubleshooting.md).
 
 ## Documentation
 

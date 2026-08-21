@@ -89,7 +89,7 @@ The post-installation [Networking](../post-installation/networking.md) page has 
 
 ## Outbound Access
 
-The following external endpoints must be reachable from all cluster nodes (unless you are doing a [disconnected install](../installation/disconnected-airgapped.md)):
+The following external endpoints must be reachable from all cluster nodes (unless you are doing a [disconnected install](../installation/other/disconnected-airgapped.md)):
 
 **Container Registries**
 

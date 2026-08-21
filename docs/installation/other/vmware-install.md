@@ -4,7 +4,7 @@
 
 This guide covers installing an OpenShift cluster on VMware vSphere using Installer-Provisioned Infrastructure (IPI). With IPI, the installer provisions VMs, disks, and networking directly in vSphere — no manual VM creation is required.
 
-You should have completed the [prerequisites](../prerequisites/index.md) and have that information handy.
+You should have completed the [prerequisites](../../prerequisites/index.md) and have that information handy.
 
 ## Prerequisites
 
@@ -483,7 +483,7 @@ If your environment uses a proxy, add the proxy settings to `install-config.yaml
     oc delete pvc test-vsphere-pvc
     ```
 
-For common installation issues, see [Troubleshooting](troubleshooting.md).
+For common installation issues, see [Troubleshooting](../troubleshooting.md).
 
 ## Destroy the Cluster
 

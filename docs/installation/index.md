@@ -1,11 +1,12 @@
 # Installation
 
-We use the [Assisted Installer](assisted-installer.md) available in the Red Hat Hybrid Cloud Console. This is for organizations who want to look at OpenShift as an application platform and/or to run virtual machines, without the complexity of fleet management.
+For a POC, there are two primary installation methods:
 
-You can also use the [Agent-Based Installer](agent-based.md) for a fully CLI-driven bare metal installation, or the [VMware vSphere IPI](vmware-install.md) installer if deploying on VMware infrastructure.
+- **[Assisted Installer](assisted-installer.md)** — Web-based, guided installation via the Red Hat Hybrid Cloud Console. Best for organizations who want a straightforward setup without deep CLI expertise.
+- **[Agent-Based Installer](agent-based.md)** — Fully CLI-driven bare metal installation using a bootable ISO. Best for environments with strict network controls or no cloud console access.
 
-For air-gapped environments, see [Disconnected Install: Air-Gapped](disconnected-airgapped.md). If you have an artifact repository (Artifactory, Nexus) with outbound access, see [Disconnected Install: Pull-Through Cache](disconnected-pull-through.md).
+Both methods produce an identical cluster. Choose based on your environment's connectivity and operational preferences.
 
-For running nested OpenShift clusters, see [OpenShift on OpenShift (Hosted Control Planes)](openshift-on-openshift.md) to deploy guest clusters with their control planes running as pods on an existing management cluster.
+For other installation methods (VMware, disconnected/air-gapped, hosted control planes), see [Other Methods](other/index.md).
 
 For common issues during installation, see [Troubleshooting](troubleshooting.md).
