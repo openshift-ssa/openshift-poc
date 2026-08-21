@@ -12,8 +12,8 @@ Both methods produce an identical cluster. Choose based on your environment's co
 If your cluster nodes cannot reach the internet, you need to set up an internal registry first:
 
 1. **Set up the registry** — choose one:
-    - [Mirror Registry (oc-mirror)](disconnected/oc-mirror.md) — fully air-gapped, pre-stage all content
-    - [Pull-Through Cache](disconnected/pull-through-cache.md) — artifact repo proxies images on demand
+  - [Mirror Registry (oc-mirror)](disconnected/oc-mirror.md) — fully air-gapped, pre-stage all content
+  - [Pull-Through Cache](disconnected/pull-through-cache.md) — artifact repo proxies images on demand
 2. **[Configure OpenShift](disconnected/openshift-config.md)** — point `install-config.yaml` and operators at the registry
 
 ## Other Methods
