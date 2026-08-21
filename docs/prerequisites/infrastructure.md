@@ -40,7 +40,7 @@ Consider these minimum values — the more the better.
     For the POC, prefer the same vendor and generation CPU architectures across all machines. 
 
 !!! warning "etcd Disk Requirements"
-    For the install disk, run etcd on a block device that can write at least 50 IOPS of 8KB sequentially, including fdatasync, in under 10ms.
+    For the install disk, run etcd on a block device that can write at least 50 IOPS of 8 KB sequentially, including fdatasync, in under 10 ms. Heavily loaded clusters should target 500 sequential IOPS of 8 KB in 2 ms. See [etcd Storage](storage.md#etcd-storage) for the full disk performance requirements.
 
 ## Network Interface Requirements
 

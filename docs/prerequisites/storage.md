@@ -7,13 +7,13 @@ Persistent storage for OpenShift will be provided by a third-party storage vendo
 
 ## Storage Requirements
 
-| Component        | Access Mode | Minimum Size | Provider   |
-| ---------------- | ----------- | ------------ | ---------- |
-| etcd             | Local SSD   | 40 GB        | Local disk |
-| Internal Registry | RWX        | 100 GB       | CSI driver |
-| Monitoring       | RWO         | 50 GB        | CSI driver |
-| Logging          | RWO         | 200 GB       | CSI driver |
-| Application PVCs | RWO/RWX     | Varies       | CSI driver |
+| Component         | Access Mode    | Minimum Size | Provider   |
+| ----------------- | -------------- | ------------ | ---------- |
+| etcd              | Local NVMe/SSD | 40 GB        | Local disk |
+| Internal Registry | RWX            | 100 GB       | CSI driver |
+| Monitoring        | RWO            | 50 GB        | CSI driver |
+| Logging           | RWO            | 200 GB       | CSI driver |
+| Application PVCs  | RWO/RWX        | Varies       | CSI driver |
 
 ## Storage Network
 
@@ -45,7 +45,26 @@ Before installing OpenShift, coordinate with your storage vendor to ensure:
 
 ## etcd Storage
 
-etcd requires low-latency storage. Use locally-attached NVMe or SSD drives on control plane nodes if possible. Do not use network-attached storage for etcd unless it meets strict performance guarantees.
+etcd requires low-latency local storage on control plane nodes. Raft must persist the write-ahead log with `fdatasync` before a proposal can commit, so etcd is sensitive to disk-write latency even though it is not particularly I/O intensive. Slow disks cause missed heartbeats, leader elections, and API timeouts.
+
+Use locally-attached NVMe or SSD drives. Do not use network-attached storage for etcd unless it meets the disk performance requirements below.
+
+See [Recommended etcd practices](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/etcd/etcd-practices) for the official guidance.
+
+### Disk performance requirements
+
+| Requirement                                   | Minimum                    | Heavy-load recommendation |
+| --------------------------------------------- | -------------------------- | ------------------------- |
+| Sequential writes (8 KB, including fdatasync) | 50 IOPS in under 10 ms     | 500 IOPS in 2 ms          |
+| 99th percentile fdatasync / fsync latency     | Below 10 ms                | Below 10 ms (target 2 ms) |
+| Media                                         | SSD                        | Local NVMe                |
+
+The following practices help meet those numbers:
+
+- Use dedicated local SSD or NVMe drives on control plane nodes. Prefer NVMe in production.
+- Do not share etcd disks with log files or other I/O-intensive workloads.
+- Avoid NAS, SAN, iSCSI, NFS, and Ceph RBD. Network-attached storage introduces unpredictable latency.
+- If the control plane is virtualized, use PCI passthrough so NVMe devices are presented directly to the VMs.
 
 Verify disk performance:
 
@@ -58,4 +77,4 @@ podman run --privileged --rm -v /var/lib/etcd:/var/lib/etcd:Z \
 !!! note
     RHCOS is an immutable OS without `dnf`. The benchmark runs inside a container that bind-mounts `/var/lib/etcd`. If you are running this from a live RHEL ISO before installation, you can install `fio` directly with `dnf` instead.
 
-The 99th percentile fdatasync latency should be below 10ms.
+The 99th percentile fdatasync latency from this test must be below 10 ms. The disk is not suitable for etcd if that threshold is not met.
