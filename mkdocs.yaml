@@ -90,7 +90,8 @@ nav:
       - Assisted Installer: installation/assisted-installer.md
       - Agent-Based Installer: installation/agent-based.md
       - VMware vSphere IPI: installation/vmware-install.md
-      - Disconnected Install: installation/disconnected.md
+      - Disconnected (Air-Gapped): installation/disconnected-airgapped.md
+      - Disconnected (Pull-Through Cache): installation/disconnected-pull-through.md
       - OpenShift on OpenShift: installation/openshift-on-openshift.md
       - Troubleshooting: installation/troubleshooting.md
   - Post-Installation:
@@ -119,7 +120,6 @@ nav:
       - MultiCluster Observability: post-installation/multicluster-observability.md
       - Web Terminal: post-installation/web-terminal.md
       - Operators from Artifactory: post-installation/operators-from-artifactory.md
-      - Disconnected Registry (Artifactory): post-installation/disconnected-artifactory.md
       - Identity Providers: post-installation/configuring-identity-providers.md
       - POC Banner: post-installation/poc-banner.md
   - Workloads: 

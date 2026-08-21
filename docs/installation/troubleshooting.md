@@ -4,9 +4,11 @@
 
 If the installation times out during the bootstrap phase, gather diagnostic logs before the bootstrap node is destroyed:
 
+{% raw %}
 ```bash
 openshift-install gather bootstrap --dir=install/ --bootstrap={{ bootstrap_ip }} --master="{{ master0_ip } { master1_ip } { master2_ip }"
 ```
+{% endraw %}
 
 This creates a compressed archive containing journal logs, container logs, and bootstrap progress information.
 
@@ -52,8 +54,10 @@ This usually happens when you are using a web proxy and the certificate being pr
 
 ### DNS Validation Fails
 
+{% raw %}
 - Verify `api.{{ cluster_name }}.{{ base_domain }}` and `*.apps.{{ cluster_name }}.{{ base_domain }}` A records exist
 - Test resolution from the same network: `dig +short api.{{ cluster_name }}.{{ base_domain }}`
+{% endraw %}
 - Verify reverse DNS (PTR) records for node IPs if hosts are registering with incorrect hostnames
 
 ### NTP Validation Fails

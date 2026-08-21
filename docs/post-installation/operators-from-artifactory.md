@@ -48,7 +48,7 @@ oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson
 
 If you used a tool like `oc-mirror` to copy public operators (e.g., from `registry.redhat.io` or `quay.io`) into Artifactory, the internal manifests of those operators still point to their original public URLs.
 
-You must tell OpenShift to redirect those requests to Artifactory by applying an **ImageDigestMirrorSet** (for OpenShift 4.14+) or an **ImageContentSourcePolicy** (for OpenShift 4.13 and older).
+You must tell OpenShift to redirect those requests to Artifactory by applying an **ImageDigestMirrorSet**.
 
 If you used `oc-mirror`, it will have automatically generated this YAML file for you in its output directory (usually named `imageContentSourcePolicy.yaml` or `imageDigestMirrorSet.yaml`). Apply it:
 

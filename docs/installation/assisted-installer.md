@@ -4,7 +4,7 @@
 
 This guide covers installing a multi-node cluster using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters). This should all be done from the installation host.
 
-You should have completed the [prerequisites](../prerequisites/index.md) and you should have that information handy. You should also have a valid ssh key available.
+You should have completed the [prerequisites](../prerequisites/index.md) and you should have that information handy. 
 
 ## Create the Cluster in the Assisted Installer
 

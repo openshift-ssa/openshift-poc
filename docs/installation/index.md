@@ -4,7 +4,7 @@ We use the [Assisted Installer](assisted-installer.md) available in the Red Hat 
 
 You can also use the [Agent-Based Installer](agent-based.md) for a fully CLI-driven bare metal installation, or the [VMware vSphere IPI](vmware-install.md) installer if deploying on VMware infrastructure.
 
-For air-gapped environments, see [Disconnected Install](disconnected.md).
+For air-gapped environments, see [Disconnected Install: Air-Gapped](disconnected-airgapped.md). If you have an artifact repository (Artifactory, Nexus) with outbound access, see [Disconnected Install: Pull-Through Cache](disconnected-pull-through.md).
 
 For running nested OpenShift clusters, see [OpenShift on OpenShift (Hosted Control Planes)](openshift-on-openshift.md) to deploy guest clusters with their control planes running as pods on an existing management cluster.
 

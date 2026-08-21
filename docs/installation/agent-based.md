@@ -84,7 +84,7 @@ additionalTrustBundle: |
 
 ### Disconnected or Pull-Through Proxy Environments
 
-If your environment uses a mirror registry, pull-through cache, or artifact proxy (such as JFrog Artifactory or Sonatype Nexus), see the [Disconnected Install](disconnected.md) guide for the full `imageDigestSources` configuration and setup instructions.
+If your environment uses a mirror registry, pull-through cache, or artifact proxy (such as JFrog Artifactory or Sonatype Nexus), see the [Disconnected Install: Air-Gapped](disconnected-airgapped.md) or [Disconnected Install: Pull-Through Cache](disconnected-pull-through.md) guides for the full `imageDigestSources` configuration and setup instructions.
 
 ### Compact 3-Node Cluster (No Workers)
 
