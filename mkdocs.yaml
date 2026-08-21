@@ -68,7 +68,7 @@ markdown_extensions:
   - mdx_truly_sane_lists
 
 nav:
-  - Home: 
+  - Home:
       - Overview: home/index.md
       - Architecture: home/architecture.md
   - Prerequisites:
@@ -79,60 +79,75 @@ nav:
       - DNS: prerequisites/dns.md
       - Storage: prerequisites/storage.md
       - Installation Host: prerequisites/installation-host.md
-  - Installation:
+  - Install the Cluster:
       - Overview: installation/index.md
       - Assisted Installer: installation/assisted-installer.md
       - Agent-Based Installer: installation/agent-based.md
+      - Disconnected Environments:
+          - Mirror Registry (oc-mirror): installation/disconnected/oc-mirror.md
+          - Pull-Through Cache: installation/disconnected/pull-through-cache.md
+          - OpenShift Configuration: installation/disconnected/openshift-config.md
+      - Other Methods:
+          - Overview: installation/other/index.md
+          - VMware vSphere IPI: installation/other/vmware-install.md
+          - OpenShift on OpenShift: installation/other/openshift-on-openshift.md
+          - Fleet Management:
+              - Overview: installation/other/fleet-management/index.md
+              - Hub Install (SNO): installation/other/fleet-management/sno-hub.md
+              - Hub Storage: installation/other/fleet-management/hub-storage.md
+              - Advanced Cluster Management: installation/other/fleet-management/acm-install.md
+              - Provision Bare Metal Cluster: installation/other/fleet-management/acm-provision-bare-metal-cluster.md
       - Troubleshooting: installation/troubleshooting.md
-      - Other Methods: installation/other/index.md
-  - Post-Installation:
+  - Configure the Cluster:
       - Overview: post-installation/index.md
-      # required
-      - NMState Operator: post-installation/nmstate.md
-      - Storage:
-          - Overview: post-installation/storage/index.md
-          - OpenShift Data Foundation: post-installation/storage/odf.md
-          - NetApp Trident: post-installation/storage/netapp-trident.md
-          - Dell:
+      - Required:
+          - NMState Operator: post-installation/nmstate.md
+          - Storage:
+              - Overview: post-installation/storage/index.md
+              - OpenShift Data Foundation: post-installation/storage/odf.md
+              - NetApp Trident: post-installation/storage/netapp-trident.md
               - Dell Unity XT (iSCSI): post-installation/storage/dell/dell-unity.md
-          - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
-      - Registry: post-installation/registry.md
-      # optional
-      - Networking: post-installation/networking.md
-      - External Secrets Operator: post-installation/external-secrets-operator.md
-      - Workload Availability: post-installation/workload-availability.md
-      - Virtualization: post-installation/virtualization.md
-      - Migration Toolkit for Virtualization: post-installation/mtv.md
-      - OADP: post-installation/oadp.md
-      - Service Mesh: post-installation/service-mesh.md
-      - OpenShift GitOps: post-installation/openshift-gitops.md
-      - Logging: post-installation/logging.md
-      - Network Observability: post-installation/network-observability.md
-      - MultiCluster Observability: post-installation/multicluster-observability.md
-      - Web Terminal: post-installation/web-terminal.md
-      - Operators from Artifactory: post-installation/operators-from-artifactory.md
-      - Identity Providers: post-installation/configuring-identity-providers.md
-      - POC Banner: post-installation/poc-banner.md
-  - Workloads: 
+              - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
+          - Registry: post-installation/registry.md
+          - Identity Providers: post-installation/configuring-identity-providers.md
+      - Observability:
+          - Logging: post-installation/logging.md
+          - Network Observability: post-installation/network-observability.md
+          - MultiCluster Observability: post-installation/multicluster-observability.md
+      - Virtualization & Migration:
+          - OpenShift Virtualization: post-installation/virtualization.md
+          - Migration Toolkit for Virtualization: post-installation/mtv.md
+      - Workload Availability:
+          - Descheduler & Affinity: post-installation/workload-availability.md
+          - OADP (Backup & Restore): post-installation/oadp.md
+      - Optional:
+          - Networking: post-installation/networking.md
+          - OpenShift GitOps: post-installation/openshift-gitops.md
+          - External Secrets Operator: post-installation/external-secrets-operator.md
+          - Service Mesh: post-installation/service-mesh.md
+          - Web Terminal: post-installation/web-terminal.md
+          - Operators from Artifactory: post-installation/operators-from-artifactory.md
+          - POC Banner: post-installation/poc-banner.md
+  - Validate the POC:
       - Overview: workloads/index.md
-      - Deploying Containers: workloads/workload-containers.md
-      - Hello World Web Server: workloads/busybox-hello-world.md
-      - Spring PetClinic: workloads/spring-petclinic.md
-      - Kafka (Strimzi): workloads/kafka-strimzi.md
-      - Source-to-Image (S2I) Build: workloads/s2i-build.md
-      - PostgreSQL with Persistent Storage: workloads/postgresql.md
-      - PVC Read-Back Test: workloads/pvc-readback.md
-      - Bookinfo (Service Mesh): workloads/bookinfo.md
-      - Deploying Virtual Machines: workloads/workload-virtual-machines.md
-  - Operations:
-      - Overview: operations/index.md
-      - VM Failover Test: operations/vm-failover.md
-      - Container Failover Test: operations/container-failover.md
-      - VM Backup and Restore: operations/vm-backup-restore.md
-      - Add Worker Node: operations/add-worker-node.md
-      - Rotate SSH Keys: operations/rotate-ssh-keys.md
-      - Machine Config: operations/machine-config.md
-      - Debugging MTU Mismatches: operations/debug-mtu.md
-      
-      
-      
+      - Container Workloads:
+          - Overview: workloads/workload-containers.md
+          - Hello World Web Server: workloads/busybox-hello-world.md
+          - Spring PetClinic: workloads/spring-petclinic.md
+          - Kafka (Strimzi): workloads/kafka-strimzi.md
+          - Source-to-Image (S2I) Build: workloads/s2i-build.md
+          - PostgreSQL with Persistent Storage: workloads/postgresql.md
+          - PVC Read-Back Test: workloads/pvc-readback.md
+          - Bookinfo (Service Mesh): workloads/bookinfo.md
+      - Virtual Machine Workloads:
+          - Deploying Virtual Machines: workloads/workload-virtual-machines.md
+      - Operational Validation:
+          - VM Failover Test: operations/vm-failover.md
+          - Container Failover Test: operations/container-failover.md
+          - VM Backup and Restore: operations/vm-backup-restore.md
+      - Day-2 Operations:
+          - Overview: operations/index.md
+          - Add Worker Node: operations/add-worker-node.md
+          - Rotate SSH Keys: operations/rotate-ssh-keys.md
+          - Machine Config: operations/machine-config.md
+          - Debugging MTU Mismatches: operations/debug-mtu.md

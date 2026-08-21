@@ -84,7 +84,7 @@ additionalTrustBundle: |
 
 ### Disconnected or Pull-Through Proxy Environments
 
-If your environment uses a mirror registry, pull-through cache, or artifact proxy (such as JFrog Artifactory or Sonatype Nexus), see [Configuring OpenShift for a Disconnected Registry](other/disconnected-openshift-config.md) for the full `imageDigestSources` configuration and setup instructions.
+If your environment uses a mirror registry, pull-through cache, or artifact proxy (such as JFrog Artifactory or Sonatype Nexus), see [Configuring OpenShift for a Disconnected Registry](disconnected/openshift-config.md) for the full `imageDigestSources` configuration and setup instructions.
 
 ### Compact 3-Node Cluster (No Workers)
 

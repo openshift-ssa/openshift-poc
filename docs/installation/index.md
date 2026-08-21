@@ -1,4 +1,4 @@
-# Installation
+# Install the Cluster
 
 For a POC, there are two primary installation methods:
 
@@ -7,6 +7,19 @@ For a POC, there are two primary installation methods:
 
 Both methods produce an identical cluster. Choose based on your environment's connectivity and operational preferences.
 
-For other installation methods (VMware, disconnected/air-gapped, hosted control planes), see [Other Methods](other/index.md).
+## Disconnected Environments
+
+If your cluster nodes cannot reach the internet, you need to set up an internal registry first:
+
+1. **Set up the registry** — choose one:
+    - [Mirror Registry (oc-mirror)](disconnected/oc-mirror.md) — fully air-gapped, pre-stage all content
+    - [Pull-Through Cache](disconnected/pull-through-cache.md) — artifact repo proxies images on demand
+2. **[Configure OpenShift](disconnected/openshift-config.md)** — point `install-config.yaml` and operators at the registry
+
+## Other Methods
+
+For VMware, hosted control planes, or fleet management, see [Other Methods](other/index.md).
+
+## Troubleshooting
 
 For common issues during installation, see [Troubleshooting](troubleshooting.md).

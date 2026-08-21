@@ -2,7 +2,7 @@
 
 This guide covers configuring an artifact repository (JFrog Artifactory or Sonatype Nexus) as a pull-through cache for container images. Use this approach when **your artifact repository has outbound internet access** but cluster nodes do not.
 
-Once the cache is configured, see [Configuring OpenShift for a Disconnected Registry](disconnected-openshift-config.md) to configure the installer and operators to use it.
+Once the cache is configured, see [Configuring OpenShift for a Disconnected Registry](openshift-config.md) to configure the installer and operators to use it.
 
 ## Architecture
 
@@ -170,4 +170,4 @@ After running the above commands, verify in the repository UI that content has b
 
 ## Next Step
 
-Once the cache is validated, proceed to [Configuring OpenShift for a Disconnected Registry](disconnected-openshift-config.md) to set up `install-config.yaml` and post-install operator configuration.
+Once the cache is validated, proceed to [Configuring OpenShift for a Disconnected Registry](openshift-config.md) to set up `install-config.yaml` and post-install operator configuration.

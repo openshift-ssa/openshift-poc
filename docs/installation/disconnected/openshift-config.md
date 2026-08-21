@@ -4,8 +4,8 @@ This guide covers how to configure the OpenShift installer and post-install oper
 
 **Before you begin**, you must have an internal registry already set up and populated using one of these methods:
 
-- [Setting Up a Mirror Registry with oc-mirror](disconnected-oc-mirror.md) — for fully air-gapped environments
-- [Setting Up a Pull-Through Cache (Artifactory / Nexus)](disconnected-pull-through-cache.md) — for environments with a caching proxy
+- [Setting Up a Mirror Registry with oc-mirror](oc-mirror.md) — for fully air-gapped environments
+- [Setting Up a Pull-Through Cache (Artifactory / Nexus)](pull-through-cache.md) — for environments with a caching proxy
 
 ---
 

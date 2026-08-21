@@ -1,21 +1,27 @@
-# Prerequisites Overview
+# Prerequisites
 
-Before beginning an OpenShift installation, ensure all infrastructure, networking, DNS, and storage requirements are met. These prerequisites apply to both the [Installation](../installation/index.md) and [Fleet Management](../installation/other/fleet-management/index.md) approaches.
+Before beginning an OpenShift installation, ensure all infrastructure, networking, DNS, and storage requirements are met.
 
-For the installation, the documentation assumes a bare metal environment in an on-premise data center. Your network, security, and storage teams will need to be involved. If you have ticketing processes for making changes to networks, DNS, and other services, it will be imperative to get everything planned, submitted, and validated prior to the installation.
+For the installation, the documentation assumes a bare metal environment in an on-premise data center. Your network, security, and storage teams will need to be involved. If you have ticketing processes for making changes to networks, DNS, and other services, get everything planned, submitted, and validated prior to the installation.
 
 ## Red Hat Account
 
 - You need a [Red Hat account](https://www.redhat.com/wapps/ugc/register.html) associated with your organization. Do not use personal Red Hat accounts for business purposes.
 - Evaluation subscriptions are required for any proof of concept using Red Hat products. DO NOT START installation until the trial subscriptions have been created and allocated to the Red Hat user account of the person associated with doing the install.
 
-## Checklist
+## POC Checklist
 
-- [Infrastructure](infrastructure.md) - Compute resources provisioned
-- [Networking](networking.md) - Network topology and firewall rules configured
-- [DNS](dns.md) - Required DNS records created
-- [Storage](storage.md) - Persistent storage backend available
-- [Installation Host](installation-host.md) - Tools downloaded and environment validated
+Use the [POC Checklist](poc-checklist.md) as your master tracking document throughout the engagement. It covers every phase from discovery through closeout.
+
+## Requirements
+
+Complete each of the following before starting the install:
+
+- [Infrastructure](infrastructure.md) — Compute resources provisioned (bare metal or virtual)
+- [Networking](networking.md) — Network topology, VLANs, firewall rules, and outbound access
+- [DNS](dns.md) — API, Ingress wildcard, and node A/PTR records created
+- [Storage](storage.md) — Persistent storage backend available and validated
+- [Installation Host](installation-host.md) — CLI tools downloaded and environment validated
 
 ## VM Migration from VMware
 

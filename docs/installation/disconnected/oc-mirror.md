@@ -4,7 +4,7 @@
 
 This guide covers setting up an internal container registry and populating it with OpenShift content using `oc-mirror`. Use this approach when **no system on the cluster network has outbound internet access** (fully air-gapped).
 
-Once the registry is populated, see [Configuring OpenShift for a Disconnected Registry](disconnected-openshift-config.md) to configure the installer and operators to use it.
+Once the registry is populated, see [Configuring OpenShift for a Disconnected Registry](openshift-config.md) to configure the installer and operators to use it.
 
 ## Architecture
 
@@ -213,7 +213,7 @@ oc-mirror --config imageset-config.yaml \
 
 ## Next Step
 
-Once the mirror registry is populated, proceed to [Configuring OpenShift for a Disconnected Registry](disconnected-openshift-config.md) to set up `install-config.yaml` and post-install operator configuration.
+Once the mirror registry is populated, proceed to [Configuring OpenShift for a Disconnected Registry](openshift-config.md) to set up `install-config.yaml` and post-install operator configuration.
 
 ## Documentation
 
