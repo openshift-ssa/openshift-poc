@@ -258,7 +258,7 @@ EOF
 Replace `arrayId` and `storagepool` with your values from Step 1.
 
 !!! warning "ArrayID Must Be Lowercase"
-    The `arrayId` value in the StorageClass **must be lowercase**. The Unity CSI driver labels worker nodes with a lowercase ArrayID in the topology key (e.g. `csi-unity.dellemc.com/apx00241102102-iscsi=true`). If the StorageClass specifies it in uppercase (e.g. `APX00241102102`), the topology constraint will not match and PVCs will stay stuck in `Pending`. Kubernetes topology labels are case-sensitive.
+    The `arrayId` value in the StorageClass **must be lowercase**. The Unity CSI driver labels worker nodes with a lowercase ArrayID in the topology key (e.g. `csi-unity.dellemc.com/apx00xxxxxxxxx-iscsi=true`). If the StorageClass specifies it in uppercase (e.g. `APX00XXXXXXXXX`), the topology constraint will not match and PVCs will stay stuck in `Pending`. Kubernetes topology labels are case-sensitive.
 
 ```bash
 cat << 'EOF' | oc apply -f -
