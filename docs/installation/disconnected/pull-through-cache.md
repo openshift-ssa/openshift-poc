@@ -17,10 +17,10 @@ A pull-through cache acts as a transparent proxy. When the cluster requests an i
 
 - Artifact repository (Artifactory or Nexus) accessible from all cluster nodes over HTTPS
 - Artifact repository has outbound access to:
-    - `quay.io` / `cdn.quay.io`
-    - `registry.redhat.io`
-    - `registry.access.redhat.com`
-    - `registry.connect.redhat.com`
+  - `quay.io` / `cdn.quay.io`
+  - `registry.redhat.io`
+  - `registry.access.redhat.com`
+  - `registry.connect.redhat.com`
 - A Red Hat pull secret from [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret)
 - Credentials for the artifact repository
 - The CA certificate for the artifact repository (if using an internal CA)
