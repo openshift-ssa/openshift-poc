@@ -9,7 +9,7 @@ This guide covers using ACM to provision a new bare metal OpenShift cluster. ACM
 - ACM is [installed and configured](acm-install.md) on the hub cluster
 - Bare metal provisioning is enabled
 - BMC credentials available for all target hosts
-- [DNS records](../prerequisites/dns.md) configured for the spoke cluster (API, Ingress, nodes)
+- [DNS records](../../../prerequisites/dns.md) configured for the spoke cluster (API, Ingress, nodes)
 
 ## Create InfraEnv
 
@@ -58,7 +58,7 @@ The InfraEnv defines the discovery environment for spoke cluster hosts. ACM uses
 Once the InfraEnv is created, register bare metal hosts. ACM will automatically boot each host with the discovery ISO via Redfish virtual media — no manual ISO download or mounting is required.
 
 !!! info "BMC Address Formats"
-    The `bmc.address` field varies by hardware vendor. See [Infrastructure — BMC / Out-of-Band Management](../prerequisites/infrastructure.md#bmc-out-of-band-management) for the address format table and instructions on discovering the system ID via the Redfish API.
+    The `bmc.address` field varies by hardware vendor. See [Infrastructure — BMC / Out-of-Band Management](../../../prerequisites/infrastructure.md#bmc-out-of-band-management) for the address format table and instructions on discovering the system ID via the Redfish API.
 
 Repeat the following for each host in the spoke cluster:
 

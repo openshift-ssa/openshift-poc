@@ -1,15 +1,15 @@
 # Hub Install (SNO)
 
-A Single Node OpenShift (SNO) cluster runs the control plane and workloads on a single host. It serves as the management hub for the fleet. We use the [Assisted Installer](../installation/assisted-installer.md) to provision this cluster.
+A Single Node OpenShift (SNO) cluster runs the control plane and workloads on a single host. It serves as the management hub for the fleet. We use the [Assisted Installer](../../assisted-installer.md) to provision this cluster.
 
 ## Prerequisites
 
-* Complete the [prerequisites](../prerequisites/index.md)
-* Set up the [installation host](../prerequisites/installation-host.md).
+* Complete the [prerequisites](../../../prerequisites/index.md)
+* Set up the [installation host](../../../prerequisites/installation-host.md).
 
 ## Install Using the Assisted Installer
 
-Follow the [Assisted Installer](../installation/assisted-installer.md) guide with the following differences for SNO:
+Follow the [Assisted Installer](../../assisted-installer.md) guide with the following differences for SNO:
 
 | Setting                        | Full Cluster (6-node)           | SNO Hub                        |
 | ------------------------------ | ------------------------------- | ------------------------------ |

@@ -22,7 +22,7 @@ For [installation](../installation/index.md), we recommend using the [Assisted I
 
 ### Fleet Management 
 
-For [fleet management](../fleet-management/index.md), we recommend starting with a single node OpenShift installation using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). Once completed, you can then install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) and use it as your cluster installation hub.
+For [fleet management](../installation/other/fleet-management/index.md), we recommend starting with a single node OpenShift installation using the [Assisted Installer](https://console.redhat.com/openshift/assisted-installer/clusters) available to you in the [Red Hat Hybrid Cloud Console](https://console.redhat.com). Once completed, you can then install and configure [Red Hat Advanced Cluster Management for Kubernetes](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest) and use it as your cluster installation hub.
 
 ## Important First Steps
 

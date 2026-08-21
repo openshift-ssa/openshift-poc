@@ -1,6 +1,6 @@
 # Prerequisites Overview
 
-Before beginning an OpenShift installation, ensure all infrastructure, networking, DNS, and storage requirements are met. These prerequisites apply to both the [Installation](../installation/index.md) and [Fleet Management](../fleet-management/index.md) approaches.
+Before beginning an OpenShift installation, ensure all infrastructure, networking, DNS, and storage requirements are met. These prerequisites apply to both the [Installation](../installation/index.md) and [Fleet Management](../installation/other/fleet-management/index.md) approaches.
 
 For the installation, the documentation assumes a bare metal environment in an on-premise data center. Your network, security, and storage teams will need to be involved. If you have ticketing processes for making changes to networks, DNS, and other services, it will be imperative to get everything planned, submitted, and validated prior to the installation.
 

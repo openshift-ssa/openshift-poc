@@ -4,8 +4,8 @@ For fleet management, we recommend starting with a Single Node OpenShift (SNO) i
 
 ## Process Overview
 
-1. Complete all [prerequisites](../prerequisites/index.md)
-2. Set up the [installation host](../prerequisites/installation-host.md)
+1. Complete all [prerequisites](../../../prerequisites/index.md)
+2. Set up the [installation host](../../../prerequisites/installation-host.md)
 3. Install the [SNO hub cluster](sno-hub.md)
 4. Install [storage on the hub](hub-storage.md)
 5. Install [Advanced Cluster Management](acm-install.md)
