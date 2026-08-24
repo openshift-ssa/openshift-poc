@@ -49,14 +49,16 @@ To get started with the assisted installer, proceed to the [Red Hat Hybrid Cloud
 
 ### Operators
 
-Don't preinstall any operators.
+Don't preinstall any operators. Storage, NMState, and other day-2 operators need a running cluster and a StorageClass first — Assisted Installer operator checkboxes install too early and often fail or leave incomplete configuration.
 
 --> Click Next
 
 ### Host discovery
 
 - Click on the "Add hosts" button at the top of the page
-- For "Provisioning type", select "Minimal"
+- For "Provisioning type":
+    - **Full ISO** — required on restricted or disconnected networks. The discovery image contains everything the host needs to register.
+    - **Minimal ISO** — smaller download, but the host **must** have outbound access to pull remaining artifacts. Do not use Minimal on air-gapped or tightly firewalled networks.
 - Add the SSH public key
 - If you have a specific [proxy](../prerequisites/networking.md#proxy-configuration) configuration, use the "Show proxy settings" checkbox to enable the view and enter the information.
 - If you have a [MITM proxy](../prerequisites/networking.md#how-to-determine-if-you-have-a-mitm-proxy) which reencrypts traffic, click the "Configure cluster-wide trusted certificates" and add the MITM root/intermediate cert.

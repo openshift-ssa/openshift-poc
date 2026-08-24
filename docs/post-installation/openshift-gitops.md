@@ -45,10 +45,11 @@ spec:
 oc apply -f gitops-operator.yaml
 ```
 
-Wait for the operator to install:
+Wait for the operator CSV, then for the Argo CD pods (they run in `openshift-gitops`, not in the operator namespace):
 
 ```bash
-oc wait --for=condition=Ready pods --all -n openshift-gitops-operator --timeout=300s
+oc get csv -n openshift-gitops-operator
+oc wait --for=condition=Ready pods --all -n openshift-gitops --timeout=300s
 ```
 
 ## Verify the Installation

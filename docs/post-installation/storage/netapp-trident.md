@@ -56,7 +56,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.2.0
+      version: 3.4.0
     systemd:
       units:
       - enabled: true
@@ -71,7 +71,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.2.0
+      version: 3.4.0
     systemd:
       units:
       - enabled: true
@@ -96,7 +96,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.2.0
+      version: 3.4.0
     storage:
       files:
       - path: /etc/multipath.conf
@@ -114,7 +114,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.2.0
+      version: 3.4.0
     storage:
       files:
       - path: /etc/multipath.conf

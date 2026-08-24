@@ -2,6 +2,9 @@
 
 [Istio Bookinfo Sample](https://istio.io/latest/docs/examples/bookinfo/)
 
+!!! note "Out of POC baseline"
+    This demo requires [OpenShift Service Mesh](../post-installation/service-mesh.md). Skip it unless mesh is explicitly in scope.
+
 Bookinfo is the standard Istio sample application — a multi-service app that displays information about a book. It consists of four microservices that communicate over HTTP, making it ideal for demonstrating service mesh capabilities like mTLS, traffic management, and observability.
 
 ## Prerequisites

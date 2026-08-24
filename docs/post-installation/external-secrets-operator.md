@@ -99,7 +99,7 @@ oc create secret generic vault-token \
 ```
 
 ```yaml
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: SecretStore
 metadata:
   name: vault-store
@@ -126,7 +126,7 @@ oc create secret generic aws-credentials \
 ```
 
 ```yaml
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: SecretStore
 metadata:
   name: aws-store
@@ -149,7 +149,7 @@ spec:
 ## Create an ExternalSecret
 
 ```yaml
-apiVersion: external-secrets.io/v1beta1
+apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: my-secret

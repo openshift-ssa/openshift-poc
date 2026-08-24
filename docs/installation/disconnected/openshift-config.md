@@ -256,12 +256,15 @@ oc-mirror --config imageset-config.yaml \
   --v2
 ```
 
-Apply the updated cluster resources, then initiate the upgrade:
+Apply the updated cluster resources (including the `UpdateService` CR from `platform.graph: true`), then initiate the upgrade:
 
 ```bash
 oc apply -f oc-mirror-workspace/working-dir/cluster-resources/
+oc get updateservice -A
 oc adm upgrade
 ```
+
+The `UpdateService` provides the Cincinnati graph so `oc adm upgrade` can list and select versions without reaching `api.openshift.com`. Bump `minVersion`/`maxVersion` in `imageset-config.yaml` to `{{ new_ocp_release }}` before the mirror run.
 
 ### Pull-Through Cache
 
@@ -297,9 +300,10 @@ If no `.sig` tags appear, your registry is not caching signature attachments and
 
 ### Apply the ClusterImagePolicy
 
-Get the Red Hat release signing public key:
+Fetch the Red Hat release signing public key on a **connected** host (the disconnected bastion cannot reach `security.access.redhat.com`). Transfer the base64 string to the install host:
 
 ```bash
+# On a host with outbound internet
 curl -s https://security.access.redhat.com/data/63405576.txt | base64 -w0
 ```
 

@@ -1,6 +1,6 @@
 # VMware vSphere CSI
 
-[VMware vSphere CSI Driver Operator Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/storage/using-container-storage-interface-csi#persistent-storage-vsphere) | [Assisted Installer vSphere Post-Install Configuration](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/2026/html/installing_openshift_container_platform_with_the_assisted_installer/installing-on-vsphere)
+[VMware vSphere CSI Driver Operator Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/storage/using-container-storage-interface-csi#persistent-storage-vsphere) | [Assisted Installer vSphere Post-Install Configuration](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/2026/html/installing_openshift_container_platform_with_the_assisted_installer/installing-on-vsphere)
 
 When OpenShift is installed on vSphere with `platform: vsphere`, the **vSphere CSI Driver Operator** and CSI driver are installed automatically in the `openshift-cluster-csi-drivers` namespace. A default StorageClass called `thin-csi` is created and ready to use.
 
@@ -19,7 +19,7 @@ When OpenShift is installed on vSphere with `platform: vsphere`, the **vSphere C
 - No third-party vSphere CSI driver present in the cluster
 
 !!! warning "Third-party CSI drivers"
-    If a third-party vSphere CSI driver is already installed, OpenShift will not overwrite it and upgrades will be blocked. See the [official documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/storage/using-container-storage-interface-csi#persistent-storage-csi-vsphere-remove-third-party) for removal instructions.
+    If a third-party vSphere CSI driver is already installed, OpenShift will not overwrite it and upgrades will be blocked. See the [official documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/storage/using-container-storage-interface-csi#persistent-storage-csi-vsphere-remove-third-party) for removal instructions.
 
 ## Configure vSphere Connection
 
@@ -46,8 +46,8 @@ When using the Assisted Installer with vSphere platform integration, the cluster
 
 4. Click **Save Configuration**
 
-!!! warning
-    An incorrect username or password will make cluster nodes unschedulable. The credentials are stored in the `vsphere-creds` secret in the `kube-system` namespace.
+    !!! warning
+        An incorrect username or password will make cluster nodes unschedulable. The credentials are stored in the `vsphere-creds` secret in the `kube-system` namespace.
 
 ### Option 2: CLI
 
@@ -58,13 +58,14 @@ When using the Assisted Installer with vSphere platform integration, the cluster
     VCENTER_PASS_B64=$(echo -n "{{ vcenter_password }}" | base64 -w0)
     ```
 
-2. Back up and update the vSphere credentials secret:
+2. Back up the secret, then copy it to a working file you will edit:
 
     ```bash
     oc get secret vsphere-creds -o yaml -n kube-system > vsphere-creds-backup.yaml
+    cp vsphere-creds-backup.yaml vsphere-creds.yaml
     ```
 
-    Edit the secret to set your encoded credentials:
+    Edit `vsphere-creds.yaml` to set your encoded credentials:
 
     ```yaml
     apiVersion: v1
@@ -96,6 +97,7 @@ When using the Assisted Installer with vSphere platform integration, the cluster
 
     ```bash
     oc get cm cloud-provider-config -o yaml -n openshift-config > cloud-provider-config-backup.yaml
+    cp cloud-provider-config-backup.yaml cloud-provider-config.yaml
     ```
 
     Edit `cloud-provider-config.yaml`:
@@ -137,13 +139,14 @@ When using the Assisted Installer with vSphere platform integration, the cluster
 6. Update the infrastructure object with your vSphere topology:
 
     ```bash
-    oc get infrastructures.config.openshift.io -o yaml > infra-backup.yaml
+    oc get infrastructure cluster -o yaml > infra-backup.yaml
+    cp infra-backup.yaml infra.yaml
     ```
 
-    Edit the `spec.platformSpec` section to include your vSphere details (vcenters, failureDomains, topology), then apply:
+    Edit `spec.platformSpec` in `infra.yaml` to include your vSphere details (vcenters, failureDomains, topology), then apply:
 
     ```bash
-    oc apply -f infrastructures.config.openshift.io.yaml --overwrite=true
+    oc apply -f infra.yaml
     ```
 
 ### Wait for Configuration to Complete
@@ -360,7 +363,7 @@ allowVolumeExpansion: true
 volumeBindingMode: WaitForFirstConsumer
 ```
 
-6. Define failure domains in the OpenShift infrastructure object (see [Specifying multiple regions and zones](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/installing_on_vmware_vsphere/installer-provisioned-infrastructure#specifying-regions-zones-infrastructure-vsphere_ipi-vsphere-ipi))
+6. Define failure domains in the OpenShift infrastructure object (see [Specifying multiple regions and zones](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/installing_on_vmware_vsphere/installer-provisioned-infrastructure#specifying-regions-zones-infrastructure-vsphere_ipi-vsphere-ipi))
 
 ### Verify Topology
 

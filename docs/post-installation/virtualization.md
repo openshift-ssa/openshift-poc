@@ -10,8 +10,8 @@
 - Storage configured with a default virtualization storage class
 - Set annotation `storageclass.kubevirt.io/is-default-virt-class` to `true` on the storage class
 - RWX access mode required for live migration
-- [NMState Operator](nmstate.md) installed and [underlay networks created](networking.md)
-- Optional but recommended: [dedicated network for live migration](networking.md)
+- [NMState Operator](nmstate.md) installed
+- Optional: [underlay / CUDN networks](networking.md) for VM IP persistence and a [dedicated live-migration network](networking.md). Needed for failover IP-sameness tests; not required to install Virtualization.
 
 !!! note "Planning VM Migrations from VMware?"
     If you plan to migrate VMs from VMware vSphere using the [Migration Toolkit for Virtualization](mtv.md), you must obtain the VDDK image from Broadcom ahead of time. Broadcom has restricted access and requires a support ticket. See [Obtaining the VDDK](mtv.md#obtaining-the-vddk) for details.

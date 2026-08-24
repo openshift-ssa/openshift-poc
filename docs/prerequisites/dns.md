@@ -35,7 +35,7 @@ For SNO, all three DNS records point to the single node's IP address. No VIPs ar
 
 ### Reverse DNS (PTR Records)
 
-Reverse DNS records are recommended for all node IPs. Without PTR records, nodes may register with incorrect hostnames during provisioning.
+Node A records (for example `cp01.{{ cluster_name }}.{{ base_domain }}`) and reverse DNS (PTR) are **recommended**, not required for installation. Without PTR records, nodes may register with incorrect hostnames during provisioning.
 
 ```bash
 dig +noall +answer -x {{ node_ip }}

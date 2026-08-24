@@ -346,7 +346,7 @@ add_checklist_table([
     'Outbound connectivity to Red Hat registries and services verified',
     'HTTP proxy configured and CA bundle prepared (if proxied environment)',
     'NTP accessible from all nodes',
-    'Load balancer configured (if required)',
+    'API VIP and Ingress VIP assigned (bare metal) or user-managed load balancer configured',
 ])
 
 add_section_heading('DNS')
@@ -368,7 +368,8 @@ add_checklist_table([
     'oc CLI installed on installation host',
     'Pull secret downloaded from Red Hat console',
     'SSH key pair generated',
-    'Image mirroring configured (if disconnected environment)',
+    'Disconnected: registry set up (oc-mirror or pull-through cache)',
+    'Disconnected: install-config imageContentSources and OLM catalogs pointed at the registry',
 ])
 
 add_section_heading('VM migration prerequisites')
@@ -459,9 +460,18 @@ add_checklist_table([
     'Sample application deployed via GitOps',
 ])
 
+add_section_heading('Service Mesh (out of baseline)')
+doc.add_paragraph(
+    'Skip unless mesh (mTLS, traffic splitting) is explicitly in POC scope.'
+)
+add_checklist_table([
+    'OpenShift Service Mesh 3.x installed (Istio ambient)',
+    'Bookinfo (or equivalent) deployed and mTLS verified',
+])
+
 add_section_heading('Security and access')
 add_checklist_table([
-    'Identity provider configured (LDAP, OIDC, etc.)',
+    'Identity provider configured (LDAP, OIDC, etc.) — before demo day; keep kubeadmin until an IdP user has cluster-admin',
     'RBAC groups mapped correctly (members get expected roles)',
     'kubeadmin secret removed after IdP verification (if desired)',
     'Non-production banner applied to the console',

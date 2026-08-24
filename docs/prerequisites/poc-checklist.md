@@ -6,8 +6,6 @@ Use this as a tracker for your POC engagement. Not every item will apply to ever
 
 [Download as Word Document](../assets/downloads/poc-checklist.docx){ .md-button }
 
-The Word file is generated at site deploy (`python scripts/generate_checklist_docx.py`). Run that command locally if the button 404s in `mkdocs serve`.
-
 ---
 
 ## Phase 1: Discovery and Scoping
@@ -74,7 +72,7 @@ Complete these before scheduling the installation.
 | Outbound connectivity to Red Hat registries and services verified                           |        |       |
 | HTTP proxy configured and CA bundle prepared (if proxied environment)                       |        |       |
 | NTP accessible from all nodes                                                               |        |       |
-| Load balancer configured (if required)                                                      |        |       |
+| API VIP and Ingress VIP assigned (bare metal) **or** user-managed load balancer configured  |        |       |
 
 ### DNS
 
@@ -99,7 +97,8 @@ Complete these before scheduling the installation.
 | `oc` CLI installed on installation host                                                     |        |       |
 | Pull secret downloaded from Red Hat console                                                 |        |       |
 | SSH key pair generated                                                                      |        |       |
-| Image mirroring configured (if disconnected environment)                                    |        |       |
+| Disconnected: registry set up (oc-mirror **or** pull-through cache)                         |        |       |
+| Disconnected: install-config imageContentSources and OLM catalogs pointed at the registry   |        |       |
 
 ### VM Migration Prerequisites
 
@@ -210,11 +209,21 @@ Install based on your POC goals. Each subsection is independent.
 | ArgoCD instance accessible                                                                  |        |       |
 | Sample application deployed via GitOps                                                      |        |       |
 
+### Service Mesh (out of baseline)
+
+!!! note
+    Skip unless mesh (mTLS, traffic splitting) is explicitly in POC scope. See [Service Mesh](../post-installation/service-mesh.md) and [Bookinfo](../workloads/bookinfo.md).
+
+| Item                                                                                        | Status | Notes |
+| ------------------------------------------------------------------------------------------- | ------ | ----- |
+| OpenShift Service Mesh 3.x installed (Istio ambient)                                        |        |       |
+| Bookinfo (or equivalent) deployed and mTLS verified                                         |        |       |
+
 ### Security and Access
 
 | Item                                                                                        | Status | Notes |
 | ------------------------------------------------------------------------------------------- | ------ | ----- |
-| Identity provider configured (LDAP, OIDC, etc.)                                             |        |       |
+| Identity provider configured (LDAP, OIDC, etc.) — before demo day; keep `kubeadmin` until an IdP user has `cluster-admin` |        |       |
 | RBAC groups mapped correctly (members get expected roles)                                   |        |       |
 | `kubeadmin` secret removed after IdP verification (if desired)                              |        |       |
 | Non-production banner applied to the console                                                |        |       |

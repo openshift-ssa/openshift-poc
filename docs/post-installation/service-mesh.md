@@ -2,6 +2,9 @@
 
 [Red Hat OpenShift Service Mesh Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.3/html/installing/ossm-istio-ambient-mode)
 
+!!! note "Out of POC baseline"
+    Service Mesh is **not** part of the default POC checklist. Install it only if mesh (mTLS, traffic splitting) is explicitly in scope for this engagement.
+
 OpenShift Service Mesh 3.x provides Istio ambient mode — a sidecar-less architecture that uses node-level Layer 4 (L4) proxies (ZTunnel) and optional Layer 7 (L7) waypoint proxies. This reduces resource overhead and operational complexity compared to traditional sidecar injection.
 
 ## Prerequisites
@@ -12,12 +15,15 @@ OpenShift Service Mesh 3.x provides Istio ambient mode — a sidecar-less archit
 
 ## Install istioctl
 
-`istioctl` is the CLI tool for managing Istio. Install it on the installation host:
+Use the **Red Hat** `istioctl` that matches your installed OpenShift Service Mesh version — not the upstream binary from `istio.io`.
+
+1. In the web console, open the **?** menu → **Command Line Tools**
+2. Download **istioctl**, extract it, and place it on your `PATH`:
 
 ```bash
-curl -sL https://istio.io/downloadIstioctl | sh -
-export PATH=$HOME/.istioctl/bin:$PATH
-echo 'export PATH=$HOME/.istioctl/bin:$PATH' >> ~/.bashrc
+tar -xzf istioctl-linux-amd64.tar.gz
+sudo mv istioctl /usr/local/bin/
+istioctl version --remote=false
 ```
 
 Verify:
@@ -46,8 +52,8 @@ Ambient mode requires OVN-Kubernetes to use local gateway mode. This must be don
           routingViaHost: true
   ```
 
-!!! warning
-    Changing the gateway mode will cause a rolling restart of the OVN-Kubernetes pods across all nodes. Plan for a brief disruption window.
+    !!! warning
+        Changing the gateway mode will cause a rolling restart of the OVN-Kubernetes pods across all nodes. Plan for a brief disruption window.
 
 3. Wait for the network operator to reconcile:
 
@@ -166,8 +172,8 @@ The `PHASE` should show `Succeeded`.
   oc create namespace ztunnel
   ```
 
-!!! note
-    The namespace name must match the `trustedZtunnelNamespace` value in the Istio resource.
+    !!! note
+        The namespace name must match the `trustedZtunnelNamespace` value in the Istio resource.
 
 8. Create the ZTunnel resource:
 

@@ -221,7 +221,7 @@ Continue with [Create the MultiClusterObservability instance](#create-the-multic
     name: multi-cluster-observability
   spec:
     enableDownsampling: true
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
     imagePullSecret: multiclusterhub-operator-pull-secret
     observabilityAddonSpec:
       enableMetrics: true

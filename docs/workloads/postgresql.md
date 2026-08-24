@@ -1,8 +1,11 @@
 # PostgreSQL with Persistent Storage
 
-[Red Hat Hardened Images](https://docs.redhat.com/en/documentation/red_hat_hardened_images/1-latest/html/build_and_deploy_secure_minimal_containers_with_red_hat_hardened_images/index) | [Hardened PostgreSQL Image](https://images.redhat.com/?name=postgresql)
+[RHEL 9 PostgreSQL 16](https://catalog.redhat.com/en/software/containers/rhel9/postgresql-16/65de09b1b5ff7744d1651928)
 
-This example deploys PostgreSQL using a [Red Hat Hardened Image](https://www.redhat.com/en/products/hardened-images) with a PersistentVolumeClaim (PVC) to validate that the CSI driver and StorageClass are working end-to-end. It demonstrates stateful workloads, persistent storage, and how data survives pod restarts. The hardened image is distroless, minimal, and free of known CVEs.
+This example deploys PostgreSQL from the UBI-based `registry.redhat.io/rhel9/postgresql-16` image with a PersistentVolumeClaim (PVC). It validates that the CSI driver and StorageClass work end-to-end: stateful workloads, persistent storage, and data that survives pod restarts.
+
+!!! note
+    Distroless hardened images do not include a shell or `psql` client, so `oc rsh` into those images fails. This POC uses the UBI image so you can run the interactive checks below.
 
 ## Prerequisites
 
@@ -60,18 +63,16 @@ This example deploys PostgreSQL using a [Red Hat Hardened Image](https://www.red
       spec:
         containers:
           - name: postgresql
-            image: registry.access.redhat.com/hi/postgresql:16
+            image: registry.redhat.io/rhel9/postgresql-16
             ports:
               - containerPort: 5432
             env:
-              - name: POSTGRES_USER
+              - name: POSTGRESQL_USER
                 value: demo
-              - name: POSTGRES_PASSWORD
+              - name: POSTGRESQL_PASSWORD
                 value: demo123
-              - name: POSTGRES_DB
+              - name: POSTGRESQL_DATABASE
                 value: sampledb
-              - name: PGDATA
-                value: /var/lib/postgresql/data/pgdata
             resources:
               requests:
                 memory: "256Mi"
@@ -81,7 +82,7 @@ This example deploys PostgreSQL using a [Red Hat Hardened Image](https://www.red
                 cpu: "500m"
             volumeMounts:
               - name: postgresql-data
-                mountPath: /var/lib/postgresql/data
+                mountPath: /var/lib/pgsql/data
             readinessProbe:
               tcpSocket:
                 port: 5432

@@ -113,7 +113,7 @@ The Loki Operator must be installed first, before the Logging Operator.
 
 LokiStack requires an S3-compatible object storage secret. The secret must be named `logging-loki-s3` and created in the `openshift-logging` namespace.
 
-4. Create the `openshift-logging` namespace:
+1. Create the `openshift-logging` namespace:
 
    ```bash
    oc create namespace openshift-logging
@@ -121,7 +121,7 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
 
 ### Using ODF NooBaa
 
-5. If you have ODF with NooBaa available, create an ObjectBucketClaim:
+2. If you have ODF with NooBaa available, create an ObjectBucketClaim:
 
    ```yaml
    apiVersion: objectbucket.io/v1alpha1
@@ -137,7 +137,8 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
    ```bash
    oc apply -f loki-bucket.yaml
    ```
-6. Wait for the bucket to be bound, then create the secret:
+
+3. Wait for the bucket to be bound, then create the secret:
 
    ```bash
    ACCESS_KEY=$(oc get secret loki-bucket -n openshift-logging -o jsonpath='{.data.AWS_ACCESS_KEY_ID}' | base64 -d)
@@ -151,20 +152,20 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
      --from-literal=access_key_secret="$SECRET_KEY"
    ```
 
-!!! note "TLS for in-cluster NooBaa"
-    Include this in the LokiStack CR `spec.storage` so Loki trusts the service-serving certificate:
+    !!! note "TLS for in-cluster NooBaa"
+        Include this in the LokiStack CR `spec.storage` so Loki trusts the service-serving certificate:
 
-    ```yaml
-    spec:
-      storage:
-        tls:
-          caName: openshift-service-ca.crt
-          caKey: service-ca.crt
-    ```
+        ```yaml
+        spec:
+          storage:
+            tls:
+              caName: openshift-service-ca.crt
+              caKey: service-ca.crt
+        ```
 
 ### Using S3 Compatible Storage (NetApp StorageGRID, etc.)
 
-5. Create the secret directly with your storage credentials:
+1. Create the secret directly with your storage credentials:
 
    ```bash
    oc create secret generic logging-loki-s3 \
@@ -176,12 +177,12 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
      --from-literal=forcepathstyle="true"
    ```
 
-!!! note
-    The `forcepathstyle="true"` parameter is required for S3 Compatible storage (not needed for AWS S3).
+    !!! note
+        The `forcepathstyle="true"` parameter is required for S3 Compatible storage (not needed for AWS S3).
 
 ### TLS CA Bundle (If Required)
 
-6. If your object storage uses self-signed or internal certificates, create a ConfigMap with the CA bundle:
+1. If your object storage uses self-signed or internal certificates, create a ConfigMap with the CA bundle:
 
    ```bash
    oc create configmap loki-s3-ca-bundle \
@@ -193,7 +194,7 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
 
 ## Create the LokiStack
 
-7. Create the LokiStack custom resource:
+1. Create the LokiStack custom resource:
 
    ```yaml
    apiVersion: loki.grafana.com/v1
@@ -215,29 +216,30 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
        mode: openshift-logging
    ```
 
-!!! note "If using self-signed storage certificates"
-    Add the TLS section to the LokiStack CR. `caName` references a **ConfigMap** in the LokiStack namespace containing the CA bundle. `caKey` specifies the key within that ConfigMap (defaults to `service-ca.crt` if omitted).
+    !!! note "If using self-signed storage certificates"
+        Add the TLS section to the LokiStack CR. `caName` references a **ConfigMap** in the LokiStack namespace containing the CA bundle. `caKey` specifies the key within that ConfigMap (defaults to `service-ca.crt` if omitted).
 
-    ```yaml
-    spec:
-      storage:
-        tls:
-          caName: loki-s3-ca-bundle   # ConfigMap name
-          caKey: ca-bundle.crt        # must match the key used in --from-file=
-    ```
+        ```yaml
+        spec:
+          storage:
+            tls:
+              caName: loki-s3-ca-bundle   # ConfigMap name
+              caKey: ca-bundle.crt        # must match the key used in --from-file=
+        ```
 
-8. Apply the LokiStack CR:
+2. Apply the LokiStack CR:
 
    ```bash
    oc apply -f lokistack.yaml
    ```
 
-9. Wait for the LokiStack to be ready:
+3. Wait for the LokiStack to be ready:
 
    ```bash
    oc get lokistack logging-loki -n openshift-logging -w
    ```
-10. Verify PVCs are bound:
+
+4. Verify PVCs are bound:
 
    ```bash
    oc get pvc -n openshift-logging
@@ -249,17 +251,17 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
 
 ### Install via WebUI
 
-10. Go to Ecosystem -> Software Catalog -> filter for "Red Hat OpenShift Logging" -> click the tile
-11. Click Install
-12. Select `stable-6.5` as the Update channel
-13. Ensure the namespace is `openshift-logging`
-14. Select "Enable Operator-recommended cluster monitoring on this namespace"
-15. Click Install
-16. Wait for the Operator to install
+1. Go to Ecosystem -> Software Catalog -> filter for "Red Hat OpenShift Logging" -> click the tile
+2. Click Install
+3. Select `stable-6.5` as the Update channel
+4. Ensure the namespace is `openshift-logging`
+5. Select "Enable Operator-recommended cluster monitoring on this namespace"
+6. Click Install
+7. Wait for the Operator to install
 
 ### Install via YAML
 
-10. Create the operator group and subscription:
+1. Create the operator group and subscription:
 
     ```yaml
     apiVersion: operators.coreos.com/v1
@@ -286,7 +288,8 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
     ```bash
     oc apply -f logging-operator.yaml
     ```
-11. Wait for the operator:
+
+2. Wait for the operator:
 
     ```bash
     oc get csv -n openshift-logging -w
@@ -298,12 +301,13 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
 
 The log collector requires a service account with specific cluster roles to read container logs and write to the LokiStack.
 
-12. Create the service account:
+1. Create the service account:
 
     ```bash
     oc create sa logging-collector -n openshift-logging
     ```
-13. Assign the required cluster roles:
+
+2. Assign the required cluster roles:
 
     ```bash
     oc adm policy add-cluster-role-to-user logging-collector-logs-writer \
@@ -333,12 +337,12 @@ The log collector requires a service account with specific cluster roles to read
       -z logging-collector -n openshift-logging
     ```
 
-!!! warning
-    You must create the service account and grant the ClusterRoleBindings before creating the ClusterLogForwarder. Adding an input type to the CR without the required RBAC binding destroys the entire log collector DaemonSet.
+    !!! warning
+        You must create the service account and grant the ClusterRoleBindings before creating the ClusterLogForwarder. Adding an input type to the CR without the required RBAC binding destroys the entire log collector DaemonSet.
 
 ## Create the ClusterLogForwarder
 
-14. Create the ClusterLogForwarder to define how logs are collected and forwarded to the LokiStack:
+1. Create the ClusterLogForwarder to define how logs are collected and forwarded to the LokiStack:
 
     ```yaml
     apiVersion: observability.openshift.io/v1
@@ -376,10 +380,10 @@ The log collector requires a service account with specific cluster roles to read
     oc apply -f clusterlogforwarder.yaml
     ```
 
-!!! warning "TLS CA Block is Required"
-    The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
+    !!! warning "TLS CA Block is Required"
+        The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
 
-15. To also collect audit logs, add `audit` to `inputRefs` and re-apply:
+2. To also collect audit logs, add `audit` to `inputRefs` and re-apply:
 
     ```yaml
     pipelines:
@@ -398,26 +402,29 @@ The log collector requires a service account with specific cluster roles to read
 
 ## Verify
 
-15. Check that collector pods are running on all nodes:
+1. Check that collector pods are running on all nodes:
 
     ```bash
     oc get pods -n openshift-logging -l component=collector
     ```
 
     You should see one collector pod per node in `Running` state.
-16. Check the LokiStack components:
+
+2. Check the LokiStack components:
 
     ```bash
     oc get pods -n openshift-logging -l app.kubernetes.io/instance=logging-loki
     ```
-17. Verify the ClusterLogForwarder status:
+
+3. Verify the ClusterLogForwarder status:
 
     ```bash
     oc get clusterlogforwarder instance -n openshift-logging -o yaml | grep -A 5 conditions
     ```
 
     The status should show `Ready: True`.
-18. Test log ingestion by viewing recent logs:
+
+4. Test log ingestion by viewing recent logs:
 
     ```bash
     oc logs -l component=collector -n openshift-logging --tail=20
@@ -429,14 +436,14 @@ The Cluster Observability Operator (COO) adds a **Logs** tab under **Observe** i
 
 ### Install via WebUI
 
-19. Go to Ecosystem -> Software Catalog -> filter for "Cluster Observability Operator" -> click the tile
-20. Click Install
-21. Leave all defaults and click Install
-22. Wait for the Operator to install
+1. Go to Ecosystem -> Software Catalog -> filter for "Cluster Observability Operator" -> click the tile
+2. Click Install
+3. Leave all defaults and click Install
+4. Wait for the Operator to install
 
 ### Install via YAML
 
-19. Create the subscription:
+1. Create the subscription:
 
     ```yaml
     apiVersion: operators.coreos.com/v1alpha1
@@ -455,7 +462,8 @@ The Cluster Observability Operator (COO) adds a **Logs** tab under **Observe** i
     ```bash
     oc apply -f coo-operator.yaml
     ```
-20. Create the UIPlugin to enable the Logs tab:
+
+2. Create the UIPlugin to enable the Logs tab:
 
     ```yaml
     apiVersion: observability.openshift.io/v1alpha1
@@ -472,7 +480,8 @@ The Cluster Observability Operator (COO) adds a **Logs** tab under **Observe** i
     ```bash
     oc apply -f uiplugin-logging.yaml
     ```
-21. Verify the Logs tab is available:
+
+3. Verify the Logs tab is available:
 
     - Navigate to **Observe -> Logs** in the web console
     - You should be able to query application and infrastructure logs

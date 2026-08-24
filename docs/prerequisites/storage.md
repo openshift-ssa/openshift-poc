@@ -7,13 +7,13 @@ Persistent storage for OpenShift will be provided by a third-party storage vendo
 
 ## Storage Requirements
 
-| Component         | Access Mode    | Minimum Size | Provider   |
-| ----------------- | -------------- | ------------ | ---------- |
-| etcd              | Local NVMe/SSD | 40 GB        | Local disk |
-| Internal Registry | RWX            | 100 GB       | CSI driver |
-| Monitoring        | RWO            | 50 GB        | CSI driver |
-| Logging           | RWO            | 200 GB       | CSI driver |
-| Application PVCs  | RWO/RWX        | Varies       | CSI driver |
+| Component         | Access Mode    | Minimum Size | Provider   | Notes |
+| ----------------- | -------------- | ------------ | ---------- | ----- |
+| etcd              | Local NVMe/SSD | 40 GB        | Local disk | Not CSI |
+| Internal Registry | RWX (preferred) | 100 GB      | CSI driver | RWO works if you set `replicas: 1` and `rolloutStrategy: Recreate` — see [Registry](../post-installation/registry.md) |
+| Monitoring        | RWO            | 50 GB        | CSI driver | Prometheus / Alertmanager PVCs |
+| Logging           | Object storage | Sized by LokiStack | S3-compatible (NooBaa, StorageGRID, AWS) | Loki stores log chunks in **object storage**. Block RWO PVCs are only for Loki WAL/cache, not the 200 GB log data. |
+| Application PVCs  | RWO/RWX        | Varies       | CSI driver | |
 
 ## Storage Network
 

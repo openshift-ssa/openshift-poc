@@ -1,24 +1,27 @@
 # OpenShift on OpenShift (Hosted Control Planes)
 
-Hosted Control Planes (formerly HyperShift) allows you to run OpenShift control planes as workloads on an existing OpenShift cluster (the "management cluster"). Guest clusters get their own dedicated control plane running in pods, while worker nodes are provisioned separately. This drastically reduces infrastructure overhead and enables faster cluster provisioning.
+Hosted Control Planes (formerly HyperShift) runs OpenShift control planes as workloads on an existing OpenShift cluster (the **management cluster**). Guest clusters get a dedicated control plane in pods; worker nodes are provisioned separately.
+
+!!! warning "Not a first-day install path"
+    This page assumes you already have a management cluster with [Multicluster Engine (MCE) or Advanced Cluster Management (ACM)](fleet-management/acm-install.md) installed. Do not start here if you are installing the first cluster — use the [Assisted Installer](../assisted-installer.md) or [Agent-Based Installer](../agent-based.md) instead.
 
 ## Architecture Overview
 
 - **Management cluster** — The existing OpenShift cluster that hosts the control plane pods
 - **Hosted cluster** — The guest OpenShift cluster whose API server, etcd, and controllers run as pods on the management cluster
-- **NodePool** — Worker nodes that join the hosted cluster (can be bare metal, VMs, or agents)
+- **NodePool** — Worker nodes that join the hosted cluster
 
 ## Prerequisites
 
-- An existing OpenShift management cluster
-- Cluster-admin access on the management cluster
-- The `hcp` CLI (Hosted Control Planes CLI)
+- A running management cluster with cluster-admin access
+- [MCE or ACM](fleet-management/acm-install.md) installed on the management cluster
 - A pull secret from [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret)
-- Sufficient resources on the management cluster (each hosted control plane requires ~4 vCPUs and 16 GiB RAM)
+- DNS for the hosted cluster API and ingress (see [DNS Requirements](#dns-requirements))
+- Capacity on the management cluster: about **5.5 vCPU and 19 GiB RAM per hosted control plane**, plus worker capacity for the guest cluster
 
-## Install the HyperShift Operator
+## Enable Hosted Control Planes
 
-1. Enable the Hosted Control Planes feature in the `multicluster-engine` operator. If you already have MCE or ACM installed:
+1. Enable the HyperShift component in MCE:
 
   ```bash
   oc patch mce multiclusterengine --type=merge \
@@ -35,10 +38,15 @@ Hosted Control Planes (formerly HyperShift) allows you to run OpenShift control 
 
 ## Install the hcp CLI
 
-Download the `hcp` CLI from the management cluster:
+Download `hcp` from the management cluster web console (**? → Command Line Tools → hcp**), or resolve the download URL:
 
 ```bash
-oc extract configmap/hcp-cli-download -n hypershift --to=- > hcp
+oc get consoleclidownload hcp-cli-download -o jsonpath='{.spec.links[0].href}{"\n"}'
+```
+
+Extract the binary, put it on your `PATH`, and confirm:
+
+```bash
 chmod +x hcp
 sudo mv hcp /usr/local/bin/
 hcp version
@@ -46,42 +54,12 @@ hcp version
 
 Alternatively, download from the [OpenShift mirror](https://mirror.openshift.com/pub/openshift-v4/clients/hcp/).
 
-## Create a Hosted Cluster (Agent-Based Workers)
-
 !!! note
-    Before creating the cluster, configure the DNS records described in the [DNS Requirements](#dns-requirements) section below. The `--api-server-address` value must be resolvable before the API server certificates are generated.
+    Do not use `oc extract configmap/hcp-cli-download`. That ConfigMap is not a reliable source for the 4.21 CLI.
 
-This approach uses the Agent platform, where workers are provisioned via the Discovery/Infrastructure environment (bare metal or VMs booted with a discovery ISO).
+## Create a Hosted Cluster (KubeVirt workers)
 
-1. Create the hosted cluster:
-
-  ```bash
-  hcp create cluster agent \
-    --name=hosted-cluster-01 \
-    --base-domain=ocp.basedomain.com \
-    --pull-secret=/path/to/pull-secret.json \
-    --ssh-key=/path/to/ssh-key.pub \
-    --agent-namespace=hardware-inventory \
-    --api-server-address=api.hosted-cluster-01.ocp.basedomain.com \
-    --release-image=quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64 \
-    --node-pool-replicas=3
-  ```
-
-2. Monitor the hosted cluster rollout:
-
-  ```bash
-  oc get hostedcluster -n clusters hosted-cluster-01 -w
-  ```
-
-3. Watch the control plane pods come up on the management cluster:
-
-  ```bash
-  oc get pods -n clusters-hosted-cluster-01
-  ```
-
-## Create a Hosted Cluster (KubeVirt Workers)
-
-If your management cluster has OpenShift Virtualization installed, you can provision workers as VMs directly on the management cluster:
+This is the complete, supported path when the management cluster has [OpenShift Virtualization](../../post-installation/virtualization.md). Workers are VMs on the management cluster.
 
 ```bash
 hcp create cluster kubevirt \
@@ -96,20 +74,48 @@ hcp create cluster kubevirt \
   --release-image=quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
 ```
 
-This creates KubeVirt VirtualMachines as worker nodes for the hosted cluster.
+Monitor rollout:
+
+```bash
+oc get hostedcluster -n clusters hosted-cluster-kv -w
+oc get pods -n clusters-hosted-cluster-kv
+```
+
+## Create a Hosted Cluster (Agent-based workers)
+
+The Agent platform is for bare metal or VMs booted with a discovery ISO. `--agent-namespace` is not enough by itself: you must also create an **InfraEnv**, register hosts (BareMetalHosts or discovery ISO), and approve agents before the NodePool can scale.
+
+See [Provisioning a bare metal cluster with ACM](fleet-management/acm-provision-bare-metal-cluster.md) and the [Hosted Control Planes documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/hosted_control_planes/index) for InfraEnv and agent inventory.
+
+Once agents are available in the hardware inventory namespace:
+
+```bash
+hcp create cluster agent \
+  --name=hosted-cluster-01 \
+  --base-domain=ocp.basedomain.com \
+  --pull-secret=/path/to/pull-secret.json \
+  --ssh-key=/path/to/ssh-key.pub \
+  --agent-namespace=hardware-inventory \
+  --api-server-address=api.hosted-cluster-01.ocp.basedomain.com \
+  --release-image=quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64 \
+  --node-pool-replicas=3
+```
+
+!!! note
+    Configure the DNS records in [DNS Requirements](#dns-requirements) before creating the cluster. The `--api-server-address` value must resolve before API server certificates are generated.
 
 ## Access the Hosted Cluster
 
 1. Retrieve the kubeconfig:
 
   ```bash
-  hcp create kubeconfig --name=hosted-cluster-01 --namespace=clusters > hosted-cluster-01-kubeconfig
+  hcp create kubeconfig --name=hosted-cluster-kv --namespace=clusters > hosted-cluster-kv-kubeconfig
   ```
 
 2. Verify access:
 
   ```bash
-  export KUBECONFIG=hosted-cluster-01-kubeconfig
+  export KUBECONFIG=hosted-cluster-kv-kubeconfig
   oc get nodes
   oc get clusterversion
   oc get clusteroperators
@@ -121,14 +127,14 @@ Create DNS records for the hosted cluster:
 
 | Record | Value |
 |--------|-------|
-| `api.hosted-cluster-01.ocp.basedomain.com` | Load balancer or IP for the API server service |
-| `*.apps.hosted-cluster-01.ocp.basedomain.com` | Load balancer or IP for the ingress service |
+| `api.hosted-cluster-kv.ocp.basedomain.com` | Load balancer or IP for the API server service |
+| `*.apps.hosted-cluster-kv.ocp.basedomain.com` | Load balancer or IP for the ingress service |
 
 Retrieve the service addresses:
 
 ```bash
-oc get svc -n clusters-hosted-cluster-01 kube-apiserver -o jsonpath='{.status.loadBalancer.ingress[0]}'
-oc get svc -n clusters-hosted-cluster-01 router-default -o jsonpath='{.status.loadBalancer.ingress[0]}'
+oc get svc -n clusters-hosted-cluster-kv kube-apiserver -o jsonpath='{.status.loadBalancer.ingress[0]}'
+oc get svc -n clusters-hosted-cluster-kv router-default -o jsonpath='{.status.loadBalancer.ingress[0]}'
 ```
 
 ## Scaling NodePools
@@ -136,7 +142,7 @@ oc get svc -n clusters-hosted-cluster-01 router-default -o jsonpath='{.status.lo
 Add or remove workers by scaling the NodePool:
 
 ```bash
-oc scale nodepool/hosted-cluster-01 -n clusters --replicas=5
+oc scale nodepool/hosted-cluster-kv -n clusters --replicas=5
 ```
 
 Or create an additional NodePool with different characteristics:
@@ -145,15 +151,15 @@ Or create an additional NodePool with different characteristics:
 apiVersion: hypershift.openshift.io/v1beta1
 kind: NodePool
 metadata:
-  name: hosted-cluster-01-workers-gpu
+  name: hosted-cluster-kv-workers-gpu
   namespace: clusters
 spec:
-  clusterName: hosted-cluster-01
+  clusterName: hosted-cluster-kv
   replicas: 2
   release:
     image: quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
   platform:
-    type: Agent
+    type: KubeVirt
 ```
 
 ```bash
@@ -163,10 +169,10 @@ oc apply -f nodepool-gpu.yaml
 ## Destroy a Hosted Cluster
 
 ```bash
-hcp destroy cluster agent --name=hosted-cluster-01
+hcp destroy cluster kubevirt --name=hosted-cluster-kv
 ```
 
-This removes the control plane pods and associated resources from the management cluster. Worker nodes will need to be decommissioned separately depending on the platform.
+This removes the control plane pods and associated resources from the management cluster. Worker nodes need to be decommissioned separately depending on the platform.
 
 ## Documentation
 

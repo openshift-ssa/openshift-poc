@@ -4,8 +4,6 @@ Welcome to the OpenShift Proof of Concept documentation.
 
 This site provides step-by-step instructions for installing, configuring, and validating Red Hat [OpenShift Container Platform](https://docs.redhat.com/en/documentation/openshift_container_platform) in on-premise environments.
 
-### USE THE SEARCH IN THE TOP RIGHT CORNER OF THE PAGE. It's very good!
-
 ## How to Use This Guide
 
 Follow the tabs left to right — each represents a phase of the POC:
@@ -26,9 +24,6 @@ Follow the tabs left to right — each represents a phase of the POC:
 !!! info
     You must have an active Red Hat account for your organization.
 
-## Installation Approaches
-
-- **[Standard Installation](../installation/index.md)** — Single cluster for application workloads and/or virtual machines using [OpenShift Virtualization](https://docs.redhat.com/en/documentation/red_hat_openshift_virtualization)
-- **[Fleet Management](../installation/other/fleet-management/index.md)** — Multi-cluster management with [Red Hat Advanced Cluster Management](https://docs.redhat.com/en/documentation/red_hat_advanced_cluster_management_for_kubernetes/latest), starting with a SNO hub
+The primary install path is [Assisted](../installation/assisted-installer.md) or [Agent-Based](../installation/agent-based.md). For VMware IPI, hosted control planes, or ACM fleet management, see [Other Methods](../installation/other/index.md).
 
 [Get Started →](../prerequisites/index.md){ .md-button .md-button--primary }

@@ -2,7 +2,7 @@
 
 [Authentication and Authorization Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/authentication_and_authorization/index)
 
-By default, only the `kubeadmin` user exists on the cluster. To allow users from your organization to log in, configure one or more identity providers in the OAuth custom resource.
+By default, only the `kubeadmin` user exists on the cluster. An identity provider is **not** required to finish the POC baseline — you can install operators and run workloads as `kubeadmin`. Configure one before demo day so customer users can log in.
 
 !!! warning
     For a POC, keep the `kubeadmin` user as a fallback. Only remove it after confirming that at least one identity provider user has `cluster-admin` access and can log in successfully.
@@ -82,13 +82,13 @@ The `mappingMethod` controls how identities from the provider are mapped to Open
           url: "ldaps://ldap.example.com/OU=Users,DC=example,DC=com?sAMAccountName?sub?(memberOf=CN=OpenShift-Users,OU=Groups,DC=example,DC=com)"
   ```
 
-!!! info "LDAP URL Format"
-    The URL follows the format: `ldaps://host/baseDN?attribute?scope?(filter)`
+    !!! info "LDAP URL Format"
+        The URL follows the format: `ldaps://host/baseDN?attribute?scope?(filter)`
 
-    - **baseDN** — Where to start searching for users
-    - **attribute** — The attribute to use as the username (e.g., `sAMAccountName` for AD, `uid` for OpenLDAP)
-    - **scope** — `sub` for subtree search
-    - **filter** — Optional filter to restrict which users can log in (e.g., membership in a specific group)
+        - **baseDN** — Where to start searching for users
+        - **attribute** — The attribute to use as the username (e.g., `sAMAccountName` for AD, `uid` for OpenLDAP)
+        - **scope** — `sub` for subtree search
+        - **filter** — Optional filter to restrict which users can log in (e.g., membership in a specific group)
 
 4. Apply the OAuth configuration:
 
@@ -115,9 +115,12 @@ The `mappingMethod` controls how identities from the provider are mapped to Open
 
 OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access control based on your existing directory structure.
 
+!!! warning
+    Active Directory is **not** RFC 2307. Use `activeDirectory` or `augmentedActiveDirectory` for AD. Use `rfc2307` only for OpenLDAP or FreeIPA.
+
 #### Create the Group Sync Configuration
 
-6. Create a sync configuration file. This example uses the RFC 2307 schema (common with Active Directory):
+6. Create a sync configuration file. This example uses Active Directory (`augmentedActiveDirectory`):
 
   ```yaml
   kind: LDAPSyncConfig
@@ -128,43 +131,57 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
     file: "/etc/secrets/bindPassword"
   ca: "/etc/config/ca.crt"
   insecure: false
-  rfc2307:
+  augmentedActiveDirectory:
     groupsQuery:
       baseDN: "OU=Groups,DC=example,DC=com"
       scope: sub
-      filter: "(objectClass=group)"
       derefAliases: never
+      filter: "(objectClass=group)"
     groupUIDAttribute: dn
     groupNameAttributes:
       - cn
-    groupMembershipAttributes:
-      - member
     usersQuery:
       baseDN: "OU=Users,DC=example,DC=com"
       scope: sub
       derefAliases: never
-    userUIDAttribute: dn
     userNameAttributes:
       - sAMAccountName
-    tolerateMemberNotFoundErrors: true
-    tolerateMemberOutOfScopeErrors: true
+    groupMembershipAttributes:
+      - memberOf
   ```
+
+  For OpenLDAP or FreeIPA, replace the `augmentedActiveDirectory` block with `rfc2307` (groups own a `member` / `memberUid` attribute).
+
+7. Create a dedicated namespace, ConfigMap (sync YAML + CA), and bind-password secret:
+
+  ```bash
+  oc create namespace ldap-sync
+
+  oc create configmap ldap-group-sync-config -n ldap-sync \
+    --from-file=sync.yaml=sync.yaml \
+    --from-file=ca.crt={{ path_to_ca_cert }}
+
+  oc create secret generic ldap-secret -n ldap-sync \
+    --from-literal=bindPassword={{ ldap_bind_password }}
+  ```
+
+  The CronJob mounts this ConfigMap at `/etc/config`, so `sync.yaml` and `ca.crt` match the paths in the sync config.
 
 #### Run the Sync
 
-7. Preview what will be synced (dry run):
+8. Preview what will be synced (dry run):
 
   ```bash
   oc adm groups sync --sync-config=sync.yaml
   ```
 
-8. Run the sync:
+9. Run the sync:
 
   ```bash
   oc adm groups sync --sync-config=sync.yaml --confirm
   ```
 
-9. Verify the groups were created:
+10. Verify the groups were created:
 
   ```bash
   oc get groups
@@ -172,19 +189,19 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
 
 #### Assign Roles to Groups
 
-10. Grant cluster-admin to an admin group:
+11. Grant cluster-admin to an admin group:
 
   ```bash
   oc adm policy add-cluster-role-to-group cluster-admin {{ admin_group_name }}
   ```
 
-11. Grant view access to a read-only group across the cluster:
+12. Grant view access to a read-only group across the cluster:
 
   ```bash
   oc adm policy add-cluster-role-to-group view {{ readonly_group_name }}
   ```
 
-12. Grant edit access to a developer group in a specific namespace:
+13. Grant edit access to a developer group in a specific namespace:
 
   ```bash
   oc adm policy add-role-to-group edit {{ dev_group_name }} -n {{ namespace }}
@@ -192,14 +209,50 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
 
 #### Automate Group Sync with a CronJob
 
-To keep groups in sync automatically, create a CronJob:
+To keep groups in sync automatically, create a ServiceAccount and a **dedicated** ClusterRole (do not grant `cluster-admin` to the syncer):
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ldap-group-syncer
+  namespace: ldap-sync
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ldap-group-syncer
+rules:
+  - apiGroups: ["user.openshift.io"]
+    resources: ["groups"]
+    verbs: ["get", "list", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ldap-group-syncer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ldap-group-syncer
+subjects:
+  - kind: ServiceAccount
+    name: ldap-group-syncer
+    namespace: ldap-sync
+```
+
+```bash
+oc apply -f ldap-group-syncer-rbac.yaml
+```
+
+Then create the CronJob in `ldap-sync`:
 
 ```yaml
 apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: ldap-group-sync
-  namespace: openshift-authentication
+  namespace: ldap-sync
 spec:
   schedule: "*/30 * * * *"
   jobTemplate:
@@ -229,13 +282,8 @@ spec:
                 secretName: ldap-secret
 ```
 
-Create the required ServiceAccount and ClusterRoleBinding:
-
 ```bash
-oc create serviceaccount ldap-group-syncer -n openshift-authentication
-
-oc adm policy add-cluster-role-to-user cluster-admin \
-  system:serviceaccount:openshift-authentication:ldap-group-syncer
+oc apply -f ldap-group-sync-cronjob.yaml
 ```
 
 ## Configure OpenID Connect Identity Provider
@@ -303,15 +351,15 @@ OpenID Connect (OIDC) integrates with providers like Keycloak, Microsoft Entra I
               - groups
   ```
 
-!!! info "Claims Mapping"
-    | Field                | Purpose                                          | Common Values                    |
-    | -------------------- | ------------------------------------------------ | -------------------------------- |
-    | `preferredUsername`  | Username in OpenShift                            | `preferred_username`, `email`, `upn` |
-    | `name`              | Display name                                     | `name`, `given_name`             |
-    | `email`             | Email address                                    | `email`                          |
-    | `groups`            | Group memberships (maps to OpenShift Groups)     | `groups`, `roles`                |
+    !!! info "Claims Mapping"
+        | Field                | Purpose                                          | Common Values                    |
+        | -------------------- | ------------------------------------------------ | -------------------------------- |
+        | `preferredUsername`  | Username in OpenShift                            | `preferred_username`, `email`, `upn` |
+        | `name`              | Display name                                     | `name`, `given_name`             |
+        | `email`             | Email address                                    | `email`                          |
+        | `groups`            | Group memberships (maps to OpenShift Groups)     | `groups`, `roles`                |
 
-    The `groups` claim allows the OIDC provider to pass group memberships directly in the token. OpenShift will automatically create Groups and assign users to them based on this claim.
+        The `groups` claim allows the OIDC provider to pass group memberships directly in the token. OpenShift will automatically create Groups and assign users to them based on this claim.
 
 5. Apply the OAuth configuration:
 
@@ -426,8 +474,8 @@ HTPasswd is a simple file-based identity provider useful for POC environments, b
   htpasswd -B -b /tmp/htpasswd viewer {{ viewer_password }}
   ```
 
-!!! info
-    The `-B` flag uses bcrypt hashing which is the recommended algorithm. The `-b` flag takes the password from the command line (omit it for interactive prompts).
+    !!! info
+        The `-B` flag uses bcrypt hashing which is the recommended algorithm. The `-b` flag takes the password from the command line (omit it for interactive prompts).
 
 ### Create the Secret
 

@@ -7,14 +7,14 @@ This guide covers installing a multi-node cluster. All steps should be performed
 ## Create the Working Directory
 
 ```bash
-mkdir -p ocp && cd ocp
+mkdir -p ~/ocp && cd ~/ocp
 git init
 echo "install/" > .gitignore
 echo "# POC install notes" > notes.md
 touch install-config.yaml
 touch agent-config.yaml
 git add -A
-git commit -m "repo initialized"
+git -c user.name="POC Install" -c user.email="poc@localhost" commit -m "repo initialized"
 ```
 
 ## install-config.yaml
@@ -52,8 +52,8 @@ platform:
     ingressVIPs:
         - 10.0.0.4
     additionalNTPServers:
-      - 0.us.pool.ntp.org
-      - 1.us.pool.ntp.org
+      - {{ ntp_server_1 }}
+      - {{ ntp_server_2 }}
 pullSecret: 'value from ~/pull-secret.txt'
 sshKey: 'value from ~/.ssh/ocp.pub'
 ```
@@ -90,6 +90,8 @@ If your environment uses a mirror registry, pull-through cache, or artifact prox
 
 For a compact cluster where control plane nodes are schedulable and also run workloads, set `compute[0].replicas` to `0`. The three control plane nodes will handle both control plane and worker duties.
 
+Do **not** add worker hosts to `agent-config.yaml`. List only the three control plane nodes with `role: master`.
+
 ## agent-config.yaml
 
 The `agent-config.yaml` defines host-level configurations. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN.
@@ -101,8 +103,8 @@ metadata:
   name: poc
 rendezvousIP: 10.0.0.7
 additionalNtpSources:
-  - 0.us.pool.ntp.org
-  - 1.us.pool.ntp.org
+  - {{ ntp_server_1 }}
+  - {{ ntp_server_2 }}
 hosts:
   - hostname: ocp-poc-cp-01
     role: master
@@ -157,7 +159,10 @@ hosts:
             table-id: 254
 ```
 
-Repeat the host entry for each control plane and worker node, updating hostname, MAC addresses, IP addresses, and role (`master` or `worker`). 
+Repeat the host entry for each control plane and worker node, updating hostname, MAC addresses, IP addresses, and role (`master` or `worker`). For a compact 3-node cluster, omit worker hosts entirely.
+
+!!! note "NTP"
+    Use the customer's NTP servers. `pool.ntp.org` only works if nodes have outbound internet, which most on-prem POCs do not. 
 
 !!! note
     Notice the inconsistent labels and spellings in the OpenShift configs: `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza. `additionalNtpSources` is used in agent-config, but `additionalNTPServers` in install-config.
@@ -279,7 +284,7 @@ Serve the ISO from the installation host using Podman:
 podman run -d --name iso-http \
   -p 8080:8080 \
   -v ~/ocp/install/agent.x86_64.iso:/var/www/html/agent.x86_64.iso:Z \
-  registry.redhat.io/rhel9/httpd-24:9.6
+  registry.redhat.io/rhel9/httpd-24:latest
 ```
 
 Verify the ISO is accessible:

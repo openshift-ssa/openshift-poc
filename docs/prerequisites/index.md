@@ -19,7 +19,7 @@ Complete each of the following before starting the install:
 
 - [Infrastructure](infrastructure.md) — Compute resources provisioned (bare metal or virtual)
 - [Networking](networking.md) — Network topology, VLANs, firewall rules, and outbound access
-- [DNS](dns.md) — API, Ingress wildcard, and node A/PTR records created
+- [DNS](dns.md) — API, Ingress wildcard (`api`, `api-int`, `*.apps`); node A/PTR records are recommended
 - [Storage](storage.md) — Persistent storage backend available and validated
 - [Installation Host](installation-host.md) — CLI tools downloaded and environment validated
 

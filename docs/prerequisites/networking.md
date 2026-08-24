@@ -101,6 +101,17 @@ The post-installation [Networking](../post-installation/networking.md) page has 
 | 4500        | UDP      | All nodes     | All nodes     | IPsec NAT-T             |
 | 30000-32767 | TCP/UDP  | All nodes     | All nodes     | NodePort services       |
 
+The table above is **node-to-node**. Also open these paths from clients, the install host, and infrastructure services:
+
+| Port | Protocol | Source | Destination | Purpose |
+| ---- | -------- | ------ | ----------- | ------- |
+| 6443 | TCP | Operators, `oc`, CI | API VIP | Kubernetes API |
+| 80, 443 | TCP | Users and apps | Ingress VIP | OpenShift console and application Routes |
+| 53 | TCP/UDP | All nodes, install host | DNS servers | Name resolution |
+| 123 | UDP | All nodes | NTP servers | Time sync |
+| 443, 623 | TCP/UDP | Install host | BMC / iLO / iDRAC | Virtual media and power control |
+| 8080 | TCP | BMC / nodes | Install host | Agent-based ISO HTTP serve (if used) |
+
 ## Outbound Access
 
 The following external endpoints must be reachable from all cluster nodes (unless you are doing a [disconnected install](../installation/disconnected/openshift-config.md)):

@@ -13,7 +13,7 @@ The [Spring Pet Clinic](https://github.com/spring-projects/spring-petclinic) is 
 2. Deploy the application using S2I:
 
 ```bash
-  oc new-app --image-stream="openshift/java:openjdk-17-ubi8" \
+  oc new-app --image-stream="openshift/java:latest" \
     https://github.com/spring-projects/spring-petclinic.git \
     --name=petclinic
 ```

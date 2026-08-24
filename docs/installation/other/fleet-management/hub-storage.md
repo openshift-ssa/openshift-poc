@@ -11,11 +11,7 @@ After installing the SNO hub cluster, configure storage before installing ACM. T
 3. Leave all the defaults and click Install
 4. Wait for the Operator to install
 
-Label the node as a storage node:
-
-```bash
-oc label node {{ node_name }} cluster.ocs.openshift.io/openshift-storage=
-```
+Label the node as a storage node **only if you are installing OpenShift Data Foundation** (see the optional section below). LVM Storage does not use this label.
 
 ## Create LVM Storage
 
@@ -52,7 +48,13 @@ oc label node {{ node_name }} cluster.ocs.openshift.io/openshift-storage=
 
 [OpenShift Data Foundation Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/latest)
 
-This is only needed if you are planning to use ODF as part of your OPP subscription. ODF is used here specifically for object storage required by [MultiCluster Observability](../../../post-installation/multicluster-observability.md). If your storage provider does not offer object storage, you can deploy MinIO instead. See [Using MinIO](../../../post-installation/multicluster-observability.md#using-minio). 
+This is only needed if you are planning to use ODF as part of your OPP subscription. ODF is used here specifically for object storage required by [MultiCluster Observability](../../../post-installation/multicluster-observability.md). If your storage provider does not offer object storage, you can deploy MinIO instead. See [Using MinIO](../../../post-installation/multicluster-observability.md#using-minio).
+
+Label the hub node for ODF before creating the StorageCluster:
+
+```bash
+oc label node {{ node_name }} cluster.ocs.openshift.io/openshift-storage=
+```
 
 1. Go to Ecosystem -> Software Catalog -> filter for "OpenShift Data Foundation" -> click the tile
 2. Click Install

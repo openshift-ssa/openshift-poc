@@ -2,6 +2,9 @@
 
 [Strimzi](https://strimzi.io/) provides a way to run Apache Kafka on OpenShift via the Strimzi Cluster Operator. It manages Kafka clusters, topics, users, and connectors using custom resources.
 
+!!! note
+    This page uses the **community** Strimzi operator from `community-operators`. It is not [Red Hat AMQ Streams](https://docs.redhat.com/en/documentation/red_hat_amq_streams). Use AMQ Streams when the customer needs a supported Kafka operator.
+
 ## Prerequisites
 
 - Cluster-admin access (for installing the operator)

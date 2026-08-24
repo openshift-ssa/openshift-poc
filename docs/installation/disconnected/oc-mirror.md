@@ -94,6 +94,7 @@ apiVersion: mirror.openshift.io/v2alpha1
 kind: ImageSetConfiguration
 mirror:
   platform:
+    graph: true
     channels:
       - name: stable-{{ ocp_version }}
         minVersion: {{ ocp_release }}
@@ -102,6 +103,7 @@ mirror:
     - catalog: registry.redhat.io/redhat/redhat-operator-index:v{{ ocp_version }}
       packages:
         - name: local-storage-operator
+        - name: lvms-operator
         - name: odf-operator
         - name: kubernetes-nmstate-operator
         - name: kubevirt-hyperconverged
@@ -110,6 +112,11 @@ mirror:
         - name: openshift-gitops-operator
         - name: cluster-logging
         - name: loki-operator
+        - name: node-health-check-operator
+        - name: self-node-remediation
+        - name: cluster-kube-descheduler-operator
+        - name: netobserv-operator
+        - name: web-terminal
   additionalImages:
     - name: registry.redhat.io/ubi9/ubi:latest
 ```
@@ -165,7 +172,7 @@ oc-mirror v2 writes cluster resources to `oc-mirror-workspace/working-dir/cluste
 | ---- | ------- |
 | `idms-oc-mirror.yaml` | `ImageDigestMirrorSet` — tells the cluster where to find mirrored images |
 | CatalogSource YAML | Points OLM to the mirrored operator catalog |
-| UpdateService YAML | Present if you set `platform.graph: true`; used for disconnected upgrades |
+| UpdateService YAML | Cincinnati graph for disconnected upgrades (`platform.graph: true` in this example) |
 
 ```bash
 ls oc-mirror-workspace/working-dir/cluster-resources/

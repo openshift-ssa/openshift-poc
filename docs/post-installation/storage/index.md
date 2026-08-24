@@ -50,3 +50,11 @@ If you are targeting ODF as your storage provider, see the dedicated [OpenShift 
 ## NetApp Trident
 
 If you are using NetApp ONTAP storage, see the [NetApp Trident](netapp-trident.md) installation guide. Trident supports NFS (FlexVol and FlexGroup), iSCSI, NVMe/TCP, and Fibre Channel protocols.
+
+## Dell Unity XT
+
+If you are using Dell Unity XT over iSCSI, see the [Dell Unity XT](dell/dell-unity.md) installation guide.
+
+## VMware vSphere CSI
+
+If the cluster is VMs on vSphere with `platform: vsphere`, see the [VMware vSphere CSI](vsphere-csi.md) guide.

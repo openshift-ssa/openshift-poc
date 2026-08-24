@@ -368,7 +368,9 @@ Once providers are configured, create a migration plan using the WebUI wizard:
 | Warm | Pre-copies data while VM is running, then does a final cutover (less downtime) |
 
 !!! tip "Start with Cold Migrations"
-    For POC environments, use cold migrations. They are simpler to troubleshoot and don't require VMware Changed Block Tracking (CBT) or VDDK configuration.
+    For POC environments, start with cold migrations. They are simpler to troubleshoot and do not require VMware Changed Block Tracking (CBT).
+
+    Cold migration of **non-vSAN** disks can run without VDDK (slower). **vSAN-backed VMs still require a VDDK image** — without it those migrations fail. See [Obtaining the VDDK](#obtaining-the-vddk).
 
 ## Run the Migration
 

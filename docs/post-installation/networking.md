@@ -268,7 +268,9 @@ Builds a dedicated storage bond with jumbo frames and a tagged VLAN for storage 
 !!! note
     Set MTU on the bond (ports inherit it) and explicitly on any VLAN interface on top. Verify after applying with:
 
-    ``bash     oc debug node/{{ node_name }} -- chroot /host ip link show bond-storage     ``
+    ```bash
+    oc debug node/{{ node_name }} -- chroot /host ip link show bond-storage
+    ```
 
 ### OVS Bridge Trunk
 

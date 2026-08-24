@@ -7,13 +7,13 @@ This section contains workloads and operational tests that demonstrate OpenShift
 Deploy sample applications to validate the platform's container orchestration, storage, networking, and build capabilities:
 
 - [Overview](workload-containers.md) — Summary of container workload types and deployment patterns
-- [Hello World Web Server](busybox-hello-world.md) — Minimal Nginx deployment to confirm basic pod scheduling and routing
+- [Hello World Web Server](hello-world-web-server.md) — Minimal Nginx deployment to confirm basic pod scheduling and routing
 - [Spring PetClinic](spring-petclinic.md) — Multi-tier Java application with a PostgreSQL backend
 - [Kafka (Strimzi)](kafka-strimzi.md) — Event streaming platform to validate stateful workloads
 - [Source-to-Image (S2I) Build](s2i-build.md) — Build and deploy directly from source code
 - [PostgreSQL with Persistent Storage](postgresql.md) — Validate CSI storage with a stateful database
 - [PVC Read-Back Test](pvc-readback.md) — Write-then-read PVC test to confirm storage I/O
-- [Bookinfo (Service Mesh)](bookinfo.md) — Multi-service application demonstrating traffic management
+- [Bookinfo (Service Mesh)](bookinfo.md) — Multi-service mesh demo (**only if Service Mesh is in scope**)
 
 ## Virtual Machine Workloads
 

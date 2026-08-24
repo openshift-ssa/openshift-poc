@@ -23,8 +23,8 @@ The OpenShift internal image registry is deployed by default with ephemeral stor
     volumeMode: Filesystem
   ```
 
-!!! warning "HA Filesystem Storage"
-    RWX file storage is required for `replicas: 2` (the default RollingUpdate strategy). If you only have ReadWriteOnce (RWO) block or filesystem storage, set `replicas: 1` and `rolloutStrategy: Recreate` in the Config below.
+    !!! warning "HA Filesystem Storage"
+        RWX file storage is required for `replicas: 2` (the default RollingUpdate strategy). If you only have ReadWriteOnce (RWO) block or filesystem storage, set `replicas: 1` and `rolloutStrategy: Recreate` in the Config below.
 
 3. From the WebUI, go to Home -> API Explorer
 4. Filter for "Config", make sure to click on the one in Group of "imageregistry.operator.openshift.io"

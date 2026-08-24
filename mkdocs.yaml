@@ -109,18 +109,18 @@ nav:
               - Dell Unity XT (iSCSI): post-installation/storage/dell/dell-unity.md
               - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
           - Registry: post-installation/registry.md
-          - Identity Providers: post-installation/configuring-identity-providers.md
+      - Workload Availability:
+          - Descheduler & Affinity: post-installation/workload-availability.md
+          - OADP (Backup & Restore): post-installation/oadp.md
+      - Virtualization & Migration:
+          - OpenShift Virtualization: post-installation/virtualization.md
+          - Migration Toolkit for Virtualization: post-installation/mtv.md
       - Observability:
           - Logging: post-installation/logging.md
           - Network Observability: post-installation/network-observability.md
           - MultiCluster Observability: post-installation/multicluster-observability.md
-      - Virtualization & Migration:
-          - OpenShift Virtualization: post-installation/virtualization.md
-          - Migration Toolkit for Virtualization: post-installation/mtv.md
-      - Workload Availability:
-          - Descheduler & Affinity: post-installation/workload-availability.md
-          - OADP (Backup & Restore): post-installation/oadp.md
       - Optional:
+          - Identity Providers: post-installation/configuring-identity-providers.md
           - Networking: post-installation/networking.md
           - OpenShift GitOps: post-installation/openshift-gitops.md
           - External Secrets Operator: post-installation/external-secrets-operator.md
@@ -132,7 +132,7 @@ nav:
       - Overview: workloads/index.md
       - Container Workloads:
           - Overview: workloads/workload-containers.md
-          - Hello World Web Server: workloads/busybox-hello-world.md
+          - Hello World Web Server: workloads/hello-world-web-server.md
           - Spring PetClinic: workloads/spring-petclinic.md
           - Kafka (Strimzi): workloads/kafka-strimzi.md
           - Source-to-Image (S2I) Build: workloads/s2i-build.md
