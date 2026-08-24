@@ -157,7 +157,7 @@ hosts:
             table-id: 254
 ```
 
-Repeat the host entry for each control plane and worker node, updating hostname, MAC addresses, IP addresses, and role (`master` or `worker`).
+Repeat the host entry for each control plane and worker node, updating hostname, MAC addresses, IP addresses, and role (`master` or `worker`). 
 
 !!! note
     Notice the inconsistent labels and spellings in the OpenShift configs: `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza. `additionalNtpSources` is used in agent-config, but `additionalNTPServers` in install-config.
@@ -167,24 +167,13 @@ Repeat the host entry for each control plane and worker node, updating hostname,
 If your environment uses active-backup bonding instead of LACP:
 
 ```yaml
+    interfaces:
+      - name: eno1
+        macAddress: A1:B2:3C:4D:1E:11
+      - name: eno2
+        macAddress: A1:B2:3C:4D:2E:11
     networkConfig:
       interfaces:
-        - name: eno1
-          type: ethernet
-          state: up
-          mac-address: A1:B2:3C:4D:1E:11
-          ipv4:
-            enabled: false
-          ipv6:
-            enabled: false
-        - name: eno2
-          type: ethernet
-          state: up
-          mac-address: A1:B2:3C:4D:2E:11
-          ipv4:
-            enabled: false
-          ipv6:
-            enabled: false
         - name: bond0
           type: bond
           state: up
@@ -296,13 +285,15 @@ Verify the ISO is accessible:
 wget http://{{ installation_host }}:8080/agent.x86_64.iso
 ```
 
-## Boot and Install
+## Boot
 
 Mount the ISO on each node via BMC virtual media (Redfish, iLO, iDRAC) and boot. 
 
 !!! warning
     If you decide to use the BMC web UI to attach a virtual drive using the iso, make a separate copy of the ISO file (ocp-1, ocp-2, ocp-3, etc) for each of the hosts. If more than one host starts booting against the same file, the BMCs will sometimes have issues. 
 
+
+## Monitor the Install 
 
 When all hosts are booted, monitor the install:
 
