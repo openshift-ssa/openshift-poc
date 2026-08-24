@@ -19,12 +19,12 @@ The OpenShift internal image registry is deployed by default with ephemeral stor
     resources:
       requests:
         storage: 100Gi
-    storageClassName: ocs-storagecluster-cephfs
+    storageClassName: {{ storage_class }}
     volumeMode: Filesystem
   ```
 
 !!! warning "HA Filesystem Storage"
-    Your backing storage class requires ReadWriteMany (RWX) on file storage for the registry to run with multiple instances. If you are just using ReadWriteOnce (RWO) filesystem storage, change the `replicas` value in the `Config` to `1` instead.
+    RWX file storage is required for `replicas: 2` (the default RollingUpdate strategy). If you only have ReadWriteOnce (RWO) block or filesystem storage, set `replicas: 1` and `rolloutStrategy: Recreate` in the Config below.
 
 3. From the WebUI, go to Home -> API Explorer
 4. Filter for "Config", make sure to click on the one in Group of "imageregistry.operator.openshift.io"
@@ -38,7 +38,6 @@ The OpenShift internal image registry is deployed by default with ephemeral stor
   spec:
     managementState: Managed
     replicas: 2
-    rolloutStrategy: Recreate
     storage:
       pvc:
         claim: openshift-image-registry-storage

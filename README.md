@@ -16,6 +16,7 @@ pip install -r requirements.txt
 
 ```bash
 source .venv/bin/activate
+python scripts/generate_checklist_docx.py
 mkdocs serve --dev-addr 0.0.0.0:8000 --livereload
 ```
 
@@ -25,6 +26,7 @@ The site will be available at http://localhost:8000/openshift-poc/
 
 ```bash
 source .venv/bin/activate
+python scripts/generate_checklist_docx.py
 mkdocs build
 ```
 
@@ -34,18 +36,19 @@ The static site is output to the `site/` directory.
 
 ```
 docs/
-├── home/                      # Landing page and architecture overview
-├── prerequisites/             # Infrastructure, networking, DNS, storage, POC checklist
-├── fleet-management/          # ACM hub install, storage, and spoke provisioning
-├── installation/              # Assisted Installer, agent-based, vSphere IPI, disconnected
-├── post-installation/         # Day 2 operators, storage, networking, virtualization
-│   └── storage/               # ODF, NetApp Trident, Dell Unity, vSphere CSI
-├── workloads/                 # Container and VM workload examples
-├── operations/                # Failover tests, backup/restore, node management
+├── home/                         # Landing page and architecture overview
+├── prerequisites/                # Infrastructure, networking, DNS, storage, POC checklist
+├── installation/                 # Assisted Installer, agent-based, troubleshooting
+│   ├── disconnected/             # oc-mirror, pull-through cache, OpenShift config
+│   └── other/                    # vSphere IPI, hosted control planes, fleet management
+├── post-installation/            # Day-2 operators, storage, networking, virtualization
+│   └── storage/                  # ODF, NetApp Trident, Dell Unity, vSphere CSI
+├── workloads/                    # Container and VM workload examples
+├── operations/                   # Failover tests, backup/restore, node management
 └── assets/
-    ├── downloads/             # Downloadable files (POC checklist .docx)
-    ├── images/                # Logos and diagrams
-    └── stylesheets/           # Custom CSS
+    ├── downloads/                # Generated POC checklist .docx (created at build/deploy)
+    ├── images/                   # Logos and diagrams
+    └── stylesheets/              # Custom CSS
 ```
 
 ## Documentation Sections
@@ -53,11 +56,9 @@ docs/
 | Section | Description |
 | ------- | ----------- |
 | [Prerequisites](docs/prerequisites/) | Infrastructure, networking, DNS, storage, and a full POC checklist |
-| [Installation](docs/installation/) | Assisted Installer, Agent-Based, VMware IPI, disconnected |
-| [Fleet Management](docs/fleet-management/) | ACM hub, spoke provisioning, multi-cluster |
-| [Post-Installation](docs/post-installation/) | Storage, virtualization, MTV, OADP, logging, GitOps, service mesh |
-| [Workloads](docs/workloads/) | Sample containers (S2I, PetClinic, Kafka) and VMs |
-| [Operations](docs/operations/) | Failover, backup/restore, scaling, SSH key rotation |
+| [Install the Cluster](docs/installation/) | Assisted Installer, Agent-Based, disconnected, other methods |
+| [Configure the Cluster](docs/post-installation/) | Storage, virtualization, MTV, OADP, logging, GitOps |
+| [Validate the POC](docs/workloads/) | Sample containers, VMs, failover, and day-2 operations |
 
 ## Sitewide Variables
 

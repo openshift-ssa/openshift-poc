@@ -73,7 +73,7 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
     <td>eno1</td>
     <td>A0:B1:C2:D3:E4:E0</td>
     <td>-</td>
-    <td>10.0.0.2</td>
+    <td>10.0.0.5</td>
   </tr>
 </table>
 
@@ -100,7 +100,7 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
     <td>eno1</td>
     <td>A0:B1:C2:D3:E4:E1</td>
     <td>-</td>
-    <td>10.0.0.3</td>
+    <td>10.0.0.6</td>
   </tr>
 </table>
 
@@ -125,9 +125,9 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
   </tr>
   <tr>
     <td>eno1</td>
-    <td>A0:B1:C2:D3:E4:E1</td>
+    <td>A0:B1:C2:D3:E4:ED</td>
     <td>bond0</td>
-    <td>10.0.0.4</td>
+    <td>10.0.0.7</td>
   </tr>
   <tr>
     <td>eno2</td>
@@ -172,7 +172,7 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
     <td>eno1</td>
     <td>A0:B1:C2:D3:E4:E5</td>
     <td>bond0</td>
-    <td>10.0.0.5</td>
+    <td>10.0.0.8</td>
   </tr>
   <tr>
     <td>eno2</td>
@@ -217,7 +217,7 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
     <td>eno1</td>
     <td>A0:B1:C2:D3:E4:E9</td>
     <td>bond0</td>
-    <td>10.0.0.6</td>
+    <td>10.0.0.9</td>
   </tr>
   <tr>
     <td>eno2</td>
@@ -262,7 +262,7 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
     <td>eno1</td>
     <td>A0:B1:C2:D3:E4:F1</td>
     <td>bond0</td>
-    <td>10.0.0.7</td>
+    <td>10.0.0.10</td>
   </tr>
   <tr>
     <td>eno2</td>
@@ -307,7 +307,7 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
     <td>eno1</td>
     <td>A0:B1:C2:D3:E4:F5</td>
     <td>bond0</td>
-    <td>10.0.0.8</td>
+    <td>10.0.0.11</td>
   </tr>
   <tr>
     <td>eno2</td>
@@ -352,7 +352,7 @@ Collect the interface names, MAC addresses for ALL NICs, and the install disk lo
     <td>eno1</td>
     <td>A0:B1:C2:D3:E4:F9</td>
     <td>bond0</td>
-    <td>10.0.0.9</td>
+    <td>10.0.0.12</td>
   </tr>
   <tr>
     <td>eno2</td>

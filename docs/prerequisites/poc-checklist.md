@@ -6,6 +6,8 @@ Use this as a tracker for your POC engagement. Not every item will apply to ever
 
 [Download as Word Document](../assets/downloads/poc-checklist.docx){ .md-button }
 
+The Word file is generated at site deploy (`python scripts/generate_checklist_docx.py`). Run that command locally if the button 404s in `mkdocs serve`.
+
 ---
 
 ## Phase 1: Discovery and Scoping

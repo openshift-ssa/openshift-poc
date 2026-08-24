@@ -1,6 +1,6 @@
 # Adding a Worker Node
 
-[Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/nodes/working-with-nodes#adding-node-iso)
+[Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/nodes/working-with-nodes#adding-node-iso)
 
 ## Prerequisites
 
@@ -93,7 +93,7 @@ hosts:
           ipv4:
             enabled: true
             address:
-              - ip: 10.0.0.10
+              - ip: 10.0.0.13
                 prefix-length: 28
             dhcp: false
           ipv6:

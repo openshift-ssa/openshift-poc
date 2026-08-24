@@ -97,7 +97,7 @@ Once the `CatalogSource` is running, the operators hosted in Artifactory will ap
 
 ### Via the Web Console
 
-1. Navigate to **Operators** > **OperatorHub**
+1. Navigate to **Ecosystem** > **Software Catalog**
 2. Filter the sources by your custom `displayName` (e.g., "Artifactory Custom Catalog")
 3. Click on the operator you want, select your target namespace, and click **Install**
 

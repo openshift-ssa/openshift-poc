@@ -52,7 +52,7 @@ metadata:
 spec:
   sourceNamespace: openshift-marketplace
   source: redhat-operators
-  channel: release-2.12
+  channel: release-2.15
   installPlanApproval: Automatic
   name: advanced-cluster-management
 ```

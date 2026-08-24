@@ -4,11 +4,13 @@
 
 If the installation times out during the bootstrap phase, gather diagnostic logs before the bootstrap node is destroyed:
 
-{% raw %}
 ```bash
-openshift-install gather bootstrap --dir=install/ --bootstrap={{ bootstrap_ip }} --master="{{ master0_ip } { master1_ip } { master2_ip }"
+openshift-install gather bootstrap --dir=install \
+  --bootstrap={{ bootstrap_ip }} \
+  --master={{ master0_ip }} \
+  --master={{ master1_ip }} \
+  --master={{ master2_ip }}
 ```
-{% endraw %}
 
 This creates a compressed archive containing journal logs, container logs, and bootstrap progress information.
 
@@ -68,7 +70,7 @@ This usually happens when you are using a web proxy and the certificate being pr
 ### Image Pull Failures (Disconnected)
 
 - Verify the mirror registry is accessible from all nodes
-- Check the `ImageDigestMirrorSet` or `ImageContentSourcePolicy` is applied correctly
+- Check the `ImageDigestMirrorSet` is applied correctly
 - Confirm the registry CA is in `additionalTrustBundle`
 - Verify credentials in the pull secret can authenticate to the mirror
 

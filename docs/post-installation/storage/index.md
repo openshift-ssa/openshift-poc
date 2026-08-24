@@ -11,7 +11,7 @@ If you are planning on running virtual machines using OpenShift Virtualization, 
 
 ## CSI Driver Installation
 
-Most vendors provide an Operator available through OperatorHub or a Helm chart. The general process is:
+Most vendors provide an Operator available through the Software Catalog or a Helm chart. The general process is:
 
 1. Install the CSI driver Operator (or deploy via manifests provided by the vendor)
 2. Configure the driver with storage array credentials and connectivity details

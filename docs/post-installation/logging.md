@@ -146,10 +146,21 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
    oc create secret generic logging-loki-s3 \
      -n openshift-logging \
      --from-literal=bucketnames="loki-bucket" \
-     --from-literal=endpoint="https://s3-openshift-storage.apps.{{ cluster_name }}.{{ base_domain }}" \
+     --from-literal=endpoint="https://s3.openshift-storage.svc:443" \
      --from-literal=access_key_id="$ACCESS_KEY" \
      --from-literal=access_key_secret="$SECRET_KEY"
    ```
+
+!!! note "TLS for in-cluster NooBaa"
+    Include this in the LokiStack CR `spec.storage` so Loki trusts the service-serving certificate:
+
+    ```yaml
+    spec:
+      storage:
+        tls:
+          caName: openshift-service-ca.crt
+          caKey: service-ca.crt
+    ```
 
 ### Using S3 Compatible Storage (NetApp StorageGRID, etc.)
 
@@ -212,7 +223,7 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
       storage:
         tls:
           caName: loki-s3-ca-bundle   # ConfigMap name
-          caKey: service-ca.crt       # key within the ConfigMap holding the CA cert
+          caKey: ca-bundle.crt        # must match the key used in --from-file=
     ```
 
 8. Apply the LokiStack CR:
@@ -361,10 +372,14 @@ The log collector requires a service account with specific cluster roles to read
             - lokistack-out
     ```
 
+    ```bash
+    oc apply -f clusterlogforwarder.yaml
+    ```
+
 !!! warning "TLS CA Block is Required"
     The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
 
-15. To also collect audit logs, add `audit` to `inputRefs`:
+15. To also collect audit logs, add `audit` to `inputRefs` and re-apply:
 
     ```yaml
     pipelines:

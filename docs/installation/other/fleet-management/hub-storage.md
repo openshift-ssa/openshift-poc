@@ -1,6 +1,6 @@
 # Hub Storage
 
-[OpenShift Storage - Persistent Storage using LVMS](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms)
+[OpenShift Storage - Persistent Storage using LVMS](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/storage/persistent-storage-using-local-storage#persistent-storage-using-lvms)
 
 After installing the SNO hub cluster, configure storage before installing ACM. These examples are for environments without existing external storage on the hub node.
 

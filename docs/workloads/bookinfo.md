@@ -34,14 +34,37 @@ This multi-version setup is what makes Bookinfo useful for traffic management de
   oc label namespace bookinfo istio.io/dataplane-mode=ambient
   ```
 
-2. Deploy the Bookinfo application:
+2. Deploy a waypoint proxy. Ambient ZTunnel is L4 only — HTTPRoute traffic splitting requires a waypoint:
+
+  ```yaml
+  apiVersion: gateway.networking.k8s.io/v1
+  kind: Gateway
+  metadata:
+    name: waypoint
+    namespace: bookinfo
+    labels:
+      istio.io/waypoint-for: service
+  spec:
+    gatewayClassName: istio-waypoint
+    listeners:
+      - name: mesh
+        port: 15008
+        protocol: HBONE
+  ```
+
+  ```bash
+  oc apply -f waypoint.yaml
+  oc label namespace bookinfo istio.io/use-waypoint=waypoint
+  ```
+
+3. Deploy the Bookinfo application:
 
   ```bash
   oc apply -n bookinfo \
     -f https://raw.githubusercontent.com/istio/istio/release-1.26/samples/bookinfo/platform/kube/bookinfo.yaml
   ```
 
-3. Wait for all pods to be running:
+4. Wait for all pods to be running:
 
   ```bash
   oc get pods -n bookinfo -w
@@ -49,7 +72,7 @@ This multi-version setup is what makes Bookinfo useful for traffic management de
 
   You should see pods for `productpage`, `details`, `reviews-v1`, `reviews-v2`, `reviews-v3`, and `ratings`.
 
-4. Verify the app works internally:
+5. Verify the app works internally:
 
   ```bash
   oc exec deploy/productpage-v1 -n bookinfo \
@@ -214,7 +237,7 @@ oc apply -f reviews-v3-route.yaml
 With ambient mode, mTLS is automatic. Verify that traffic between services is encrypted:
 
 ```bash
-istioctl ztunnel-config workloads -n bookinfo
+istioctl ztunnel-config workloads --namespace ztunnel
 ```
 
 The output should show all workloads with `PROTOCOL: HBONE`, indicating traffic is flowing through the encrypted ZTunnel.

@@ -30,7 +30,7 @@ sudo tar -xvzf /tmp/openshift-install-linux.tar.gz -C /usr/local/bin
 wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-${OCP_VERSION}/openshift-client-linux.tar.gz" -P /tmp
 sudo tar -xvzf /tmp/openshift-client-linux.tar.gz -C /usr/local/bin
 rm -f /tmp/openshift-install-linux.tar.gz /tmp/openshift-client-linux.tar.gz
-sudo dnf install -y nmstate git podman
+sudo dnf install -y nmstate git podman wget jq skopeo nmap-ncat
 ```
 
 Verify the tools are installed:
@@ -41,15 +41,26 @@ oc version
 nmstatectl version
 git -v
 podman --version
+skopeo --version
+jq --version
+nc -h >/dev/null && echo "ncat: ok"
 ```
 
 ## Download the Pull Secret
 
-Download the pull secret from [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret) and save it:
+Download the pull secret from [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret). On the download page, click **Download pull secret** and save the JSON file:
 
 ```bash
-# Save the pull secret file to your home directory
+# Paste the downloaded JSON into this file, then restrict permissions
+cat > ~/pull-secret.txt
+# Press Ctrl+D when finished pasting
 chmod 600 ~/pull-secret.txt
+```
+
+Confirm it is valid JSON:
+
+```bash
+jq -e . ~/pull-secret.txt >/dev/null && echo "pull secret OK"
 ```
 
 ## Create an SSH Key
@@ -75,10 +86,10 @@ sudo firewall-cmd --reload
 
 The required ports between cluster nodes are listed on the [Networking — Required Firewall Ports](networking.md#required-firewall-ports) page.
 
-To verify ports are not blocked between hosts, start a temporary listener on the target host and connect from the source host:
+To verify ports are not blocked between hosts, boot the target from a RHEL live ISO (the same ISO used for NIC/disk discovery) so it has a shell. Then start a temporary listener on the target and connect from the source:
 
 ```bash
-# On the target host - start a listener on port 6443
+# On the target host (live ISO) - start a listener on port 6443
 nc -l 6443
 ```
 

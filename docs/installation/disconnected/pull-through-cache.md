@@ -108,14 +108,16 @@ This produces `~/merged-pull-secret.json` containing credentials for all registr
 
 ## Pre-Warm the Cache (Recommended)
 
-While a pull-through cache populates on demand, pre-warming avoids slow first pulls during installation:
+While a pull-through cache populates on demand, pre-warming avoids slow first pulls during installation. **Pull** through the cache — do not `oc adm release mirror` / push into a remote (proxy) repository; those repos typically reject pushes.
 
 ```bash
-oc adm release mirror \
-  --from=quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64 \
-  --to={{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release \
-  --to-release-image={{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64 \
-  -a ~/merged-pull-secret.json
+podman image pull \
+  --authfile ~/merged-pull-secret.json \
+  {{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
+
+podman image pull \
+  --authfile ~/merged-pull-secret.json \
+  {{ artifactory_host }}/redhat-registry-remote/redhat/redhat-operator-index:v{{ ocp_version }}
 ```
 
 ---

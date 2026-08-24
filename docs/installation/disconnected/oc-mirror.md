@@ -92,9 +92,6 @@ The `ImageSetConfiguration` defines what content to mirror. Create `imageset-con
 ```yaml
 apiVersion: mirror.openshift.io/v2alpha1
 kind: ImageSetConfiguration
-storageConfig:
-  local:
-    path: /tmp/oc-mirror-metadata
 mirror:
   platform:
     channels:
@@ -117,6 +114,9 @@ mirror:
     - name: registry.redhat.io/ubi9/ubi:latest
 ```
 
+!!! warning
+    Do not include `storageConfig` in an oc-mirror **v2** `ImageSetConfiguration`. That field is v1-only and will cause the mirror to fail. v2 stores incremental state in the `--workspace` directory.
+
 !!! tip
     Only mirror the operators you plan to install. Mirroring the entire catalog is very large (hundreds of GBs) and takes a long time. You can always re-run `oc-mirror` later to add more.
 
@@ -125,7 +125,9 @@ mirror:
 === "Direct (bastion has access to both networks)"
 
     ```bash
+    mkdir -p oc-mirror-workspace
     oc-mirror --config imageset-config.yaml \
+      --workspace file://oc-mirror-workspace \
       docker://{{ mirror_host }}:8443/openshift \
       --authfile ~/merged-pull-secret.json \
       --v2
@@ -136,16 +138,20 @@ mirror:
     On the internet-connected host, mirror to disk:
 
     ```bash
+    mkdir -p oc-mirror-workspace
     oc-mirror --config imageset-config.yaml \
+      --workspace file://oc-mirror-workspace \
       file:///mnt/mirror-data \
       --authfile ~/merged-pull-secret.json \
       --v2
     ```
 
-    Transfer `/mnt/mirror-data` to the disconnected network, then load into the registry:
+    Transfer `/mnt/mirror-data` and `oc-mirror-workspace` to the disconnected network, then load into the registry:
 
     ```bash
-    oc-mirror --from file:///mnt/mirror-data \
+    oc-mirror --config imageset-config.yaml \
+      --workspace file://oc-mirror-workspace \
+      --from file:///mnt/mirror-data \
       docker://{{ mirror_host }}:8443/openshift \
       --authfile ~/merged-pull-secret.json \
       --v2
@@ -153,16 +159,20 @@ mirror:
 
 ## Output Files
 
-`oc-mirror` generates output files in the `oc-mirror-workspace/results-*` directory:
+oc-mirror v2 writes cluster resources to `oc-mirror-workspace/working-dir/cluster-resources/`:
 
 | File | Purpose |
 | ---- | ------- |
-| `imageDigestMirrorSet.yaml` | Tells the cluster where to find mirrored images |
-| `catalogSource.yaml` | Points OLM to the mirrored operator catalog |
-| `updateService.yaml` | Points the update service to the mirror |
+| `idms-oc-mirror.yaml` | `ImageDigestMirrorSet` — tells the cluster where to find mirrored images |
+| CatalogSource YAML | Points OLM to the mirrored operator catalog |
+| UpdateService YAML | Present if you set `platform.graph: true`; used for disconnected upgrades |
+
+```bash
+ls oc-mirror-workspace/working-dir/cluster-resources/
+```
 
 !!! warning
-    The `imageDigestSources` values in your `install-config.yaml` must match the repository paths used by `oc-mirror`. Check the generated `imageDigestMirrorSet.yaml` for the exact mirror paths.
+    The `imageDigestSources` values in your `install-config.yaml` must match the repository paths used by `oc-mirror`. Copy the mirror paths from the generated `idms-oc-mirror.yaml` — do not guess them.
 
 ## Extract the openshift-install Binary
 
@@ -204,6 +214,7 @@ Re-run `oc-mirror` with an updated `ImageSetConfiguration` to add new operators 
 
 ```bash
 oc-mirror --config imageset-config.yaml \
+  --workspace file://oc-mirror-workspace \
   docker://{{ mirror_host }}:8443/openshift \
   --authfile ~/merged-pull-secret.json \
   --v2

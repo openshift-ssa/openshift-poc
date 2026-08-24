@@ -15,7 +15,7 @@
   oc new-project kafka
   ```
 
-2. Install Strimzi from OperatorHub:
+2. Install Strimzi from the Software Catalog:
 
   ```bash
   cat <<EOF | oc apply -f -
@@ -42,77 +42,86 @@
 
 ## Deploy a Kafka Cluster
 
-1. Create a Kafka cluster with 3 brokers and 3 ZooKeeper nodes:
+Strimzi now requires KRaft (no ZooKeeper). Create a dual-role node pool and a Kafka cluster:
 
-  ```yaml
-  apiVersion: kafka.strimzi.io/v1beta2
-  kind: Kafka
-  metadata:
-    name: my-cluster
-    namespace: kafka
-  spec:
-    kafka:
-      version: 3.7.0
-      replicas: 3
-      listeners:
-        - name: plain
-          port: 9092
-          type: internal
-          tls: false
-        - name: tls
-          port: 9093
-          type: internal
-          tls: true
-      config:
-        offsets.topic.replication.factor: 3
-        transaction.state.log.replication.factor: 3
-        transaction.state.log.min.isr: 2
-        default.replication.factor: 3
-        min.insync.replicas: 2
-      storage:
+```yaml
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  name: dual-role
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: my-cluster
+spec:
+  replicas: 3
+  roles:
+    - controller
+    - broker
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
         type: persistent-claim
         size: 10Gi
-      resources:
-        requests:
-          memory: "2Gi"
-          cpu: "500m"
-        limits:
-          memory: "4Gi"
-          cpu: "1"
-    zookeeper:
-      replicas: 3
-      storage:
-        type: persistent-claim
-        size: 5Gi
-      resources:
-        requests:
-          memory: "1Gi"
-          cpu: "250m"
-        limits:
-          memory: "2Gi"
-          cpu: "500m"
-    entityOperator:
-      topicOperator: {}
-      userOperator: {}
-  ```
+        kraftMetadata: shared
+        deleteClaim: false
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: my-cluster
+  namespace: kafka
+  annotations:
+    strimzi.io/node-pools: enabled
+    strimzi.io/kraft: enabled
+spec:
+  kafka:
+    version: 3.9.0
+    metadataVersion: 3.9-IV0
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+    config:
+      offsets.topic.replication.factor: 3
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+      default.replication.factor: 3
+      min.insync.replicas: 2
+    resources:
+      requests:
+        memory: "2Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "1"
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+```
 
-  ```bash
-  oc apply -f kafka-cluster.yaml
-  ```
+```bash
+oc apply -f kafka-cluster.yaml
+```
 
 2. Wait for the cluster to become ready:
 
-  ```bash
-  oc wait kafka/my-cluster --for=condition=Ready --timeout=300s -n kafka
-  ```
+```bash
+oc wait kafka/my-cluster --for=condition=Ready --timeout=300s -n kafka
+```
 
 3. Verify all pods are running:
 
-  ```bash
-  oc get pods -n kafka
-  ```
+```bash
+oc get pods -n kafka
+```
 
-  You should see pods for ZooKeeper, Kafka brokers, and the Entity Operator.
+You should see pods for the dual-role brokers and the Entity Operator.
 
 ## Create a Topic
 
@@ -141,7 +150,7 @@ oc apply -f kafka-topic.yaml
 
   ```bash
   oc run kafka-producer -ti \
-    --image=quay.io/strimzi/kafka:latest-kafka-3.7.0 \
+    --image=quay.io/strimzi/kafka:latest-kafka-3.9.0 \
     --rm=true --restart=Never \
     -- bin/kafka-console-producer.sh \
     --bootstrap-server my-cluster-kafka-bootstrap:9092 \
@@ -152,7 +161,7 @@ oc apply -f kafka-topic.yaml
 
   ```bash
   oc run kafka-consumer -ti \
-    --image=quay.io/strimzi/kafka:latest-kafka-3.7.0 \
+    --image=quay.io/strimzi/kafka:latest-kafka-3.9.0 \
     --rm=true --restart=Never \
     -- bin/kafka-console-consumer.sh \
     --bootstrap-server my-cluster-kafka-bootstrap:9092 \

@@ -48,9 +48,9 @@ networking:
 platform:
   baremetal:
     apiVIPs:
-        - 10.0.0.2
-    ingressVIPs:
         - 10.0.0.3
+    ingressVIPs:
+        - 10.0.0.4
     additionalNTPServers:
       - 0.us.pool.ntp.org
       - 1.us.pool.ntp.org
@@ -99,7 +99,7 @@ apiVersion: v1beta1
 kind: AgentConfig
 metadata:
   name: poc
-rendezvousIP: 10.0.0.4
+rendezvousIP: 10.0.0.7
 additionalNtpSources:
   - 0.us.pool.ntp.org
   - 1.us.pool.ntp.org
@@ -139,7 +139,7 @@ hosts:
           ipv4:
             enabled: true
             address:
-              - ip: 10.0.0.4
+              - ip: 10.0.0.7
                 prefix-length: 28
             dhcp: false
           ipv6:
@@ -180,7 +180,7 @@ If your environment uses active-backup bonding instead of LACP:
           ipv4:
             enabled: true
             address:
-              - ip: 10.0.0.4
+              - ip: 10.0.0.7
                 prefix-length: 28
             dhcp: false
           link-aggregation:
@@ -219,7 +219,7 @@ For hosts with a single network interface:
           ipv4:
             enabled: true
             address:
-              - ip: 10.0.0.4
+              - ip: 10.0.0.7
                 prefix-length: 28
             dhcp: false
           ipv6:
@@ -237,13 +237,16 @@ For hosts with a single network interface:
             table-id: 254
 ```
 
-## Cluster Manifests
+## Extra Manifests
 
-If you have additional manifests to apply at install time (e.g., MachineConfigs, NMState configs), place them in a `cluster-manifests` folder at the same level as `install-config.yaml` and `agent-config.yaml`.
+If you have additional manifests to apply at install time (for example MachineConfigs or a `ClusterImagePolicy`), place them in an `openshift/` folder at the same level as `install-config.yaml` and `agent-config.yaml`. The agent installer embeds files from `openshift/` into the ISO.
 
 ```bash
-mkdir -p cluster-manifests
+mkdir -p openshift
 ```
+
+!!! note
+    Do not use a `cluster-manifests/` directory for this. That name is installer **output** from `openshift-install agent create cluster-manifests` (ZTP), not a user drop-in folder.
 
 ## Generate the ISO
 
@@ -257,7 +260,7 @@ Create a script `create-iso.sh` in your working directory:
 rm -rf install
 mkdir install
 cp install-config.yaml agent-config.yaml install
-[ -d cluster-manifests ] && cp -r cluster-manifests install
+[ -d openshift ] && cp -r openshift install
 openshift-install agent create image --dir=install --log-level=debug
 ```
 

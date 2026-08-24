@@ -17,7 +17,7 @@ Symptoms that point to MTU problems rather than routing or firewall issues:
 
 ## Understanding the MTU Stack
 
-OpenShift uses an overlay network (OVN-Kubernetes or OpenShift SDN) which encapsulates pod traffic. Each layer adds overhead:
+OpenShift uses an overlay network (OVN-Kubernetes) which encapsulates pod traffic. Each layer adds overhead:
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -52,12 +52,6 @@ If empty, check the status for the effective value:
 
 ```bash
 oc get network.operator cluster -o jsonpath='{.status.defaultNetwork.ovnKubernetesConfig.mtu}'
-```
-
-For OpenShift SDN clusters:
-
-```bash
-oc get network.operator cluster -o jsonpath='{.spec.defaultNetwork.openshiftSDNConfig.mtu}'
 ```
 
 ## Step 2: Verify the Pod-Level MTU

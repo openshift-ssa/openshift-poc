@@ -209,11 +209,11 @@ For disconnected installation instructions, see the offline install methods in t
 
 [Trident Installation Overview](https://docs.netapp.com/us-en/trident/trident-install/kubernetes-deploy.html)
 
-Trident can be installed using the Trident operator (manually or via Helm) or with `tridentctl`. For OpenShift, the operator via OperatorHub is the recommended approach. For all methods and modes (standard, offline, remote), see the [installation overview](https://docs.netapp.com/us-en/trident/trident-install/kubernetes-deploy.html).
+Trident can be installed using the Trident operator (manually or via Helm) or with `tridentctl`. For OpenShift, the operator via the Software Catalog is the recommended approach. For all methods and modes (standard, offline, remote), see the [installation overview](https://docs.netapp.com/us-en/trident/trident-install/kubernetes-deploy.html).
 
 ### Install via WebUI
 
-1. Go to Operators -> OperatorHub -> filter for "Trident" -> click the "NetApp Trident" tile
+1. Go to Ecosystem -> Software Catalog -> filter for "Trident" -> click the "NetApp Trident" tile
 2. Click Install
 3. Leave all the defaults and click Install
 4. Wait for the Operator to install

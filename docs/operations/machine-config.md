@@ -92,7 +92,7 @@ Butane transpiles human-readable configs into MachineConfig resources, avoiding 
 
 ```yaml
 variant: openshift
-version: 4.17.0
+version: 4.21.0
 metadata:
   name: 99-worker-example
   labels:
@@ -125,7 +125,7 @@ Instead of `inline`, reference a local file:
 
 ```yaml
 variant: openshift
-version: 4.17.0
+version: 4.21.0
 metadata:
   name: 99-worker-example
   labels:

@@ -7,7 +7,7 @@ OpenShift requires specific network configurations and firewall rules between no
 | Network         | Purpose                        | CIDR Example  |
 | --------------- | ------------------------------ | ------------- |
 | Machine Network | Node-to-node communication     | 10.0.0.0/28   |
-| Pod Network     | Pod-to-pod communication (SDN) | 10.128.0.0/14 |
+| Pod Network     | Pod-to-pod communication       | 10.128.0.0/14 |
 | Service Network | Kubernetes service IPs         | 172.30.0.0/16 |
 
 !!! warning "Machine Network Isolation"
@@ -22,13 +22,28 @@ Since there is no DHCP, every node requires a pre-assigned static IP. Gather the
 
 | Field         | Example           |
 | ------------- | ----------------- |
-| IP Address    | 10.0.0.10         |
+| IP Address    | 10.0.0.7          |
 | Subnet Mask   | 255.255.255.240   |
 | Gateway       | 10.0.0.1          |
 | Primary DNS   | 10.0.0.2          |
 | Secondary DNS | 1.1.1.1           |
 | NIC Interface | eno1              |
 | MAC Address   | aa:bb:cc:dd:ee:00 |
+
+Do not reuse node addresses for VIPs or DNS. In the `10.0.0.0/28` examples used throughout this site:
+
+| Role | Example |
+| ---- | ------- |
+| Gateway | `10.0.0.1` |
+| DNS | `10.0.0.2` |
+| API VIP | `10.0.0.3` |
+| Ingress VIP | `10.0.0.4` |
+| Installation host | `10.0.0.5` |
+| Hub (SNO, if used) | `10.0.0.6` |
+| Control plane 1 (rendezvous) | `10.0.0.7` |
+| Control plane 2–3 | `10.0.0.8`–`10.0.0.9` |
+| Workers 1–3 | `10.0.0.10`–`10.0.0.12` |
+| Additional worker | `10.0.0.13` |
 
 !!! tip
     Document all static IP assignments in a spreadsheet or table before starting installation. The Assisted Installer will require this information for each host.
@@ -80,7 +95,6 @@ The post-installation [Networking](../post-installation/networking.md) page has 
 | 22623       | TCP      | Nodes         | Control Plane | Machine Config Server   |
 | 2379-2380   | TCP      | Control Plane | Control Plane | etcd                    |
 | 10250       | TCP      | All nodes     | All nodes     | Kubelet                 |
-| 4789        | UDP      | All nodes     | All nodes     | VXLAN (OpenShift SDN — legacy) |
 | 6081        | UDP      | All nodes     | All nodes     | Geneve (OVN-Kubernetes) |
 | 9000-9999   | TCP      | All nodes     | All nodes     | Node services           |
 | 500         | UDP      | All nodes     | All nodes     | IPsec IKE               |

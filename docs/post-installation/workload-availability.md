@@ -347,8 +347,11 @@ spec:
   deschedulingIntervalSeconds: 3600
   profiles:
     - KubeVirtRelieveAndMigrate
-  mode: Predictive
+  mode: Automatic
 ```
+
+!!! note
+    `Automatic` is required for the descheduler to actually evict pods and trigger VM live migration. `Predictive` is dry-run only.
 
 ### Descheduler Profiles
 

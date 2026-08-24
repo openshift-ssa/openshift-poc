@@ -13,7 +13,7 @@ An OpenShift cluster consists of two types of nodes working together:
 **Worker Nodes** (minimum 3 recommended)
 
 - Run application workloads (containers and virtual machines)
-- Host the OpenShift SDN (OVN-Kubernetes) for pod networking
+- Host OVN-Kubernetes (Geneve overlay) for pod networking
 - Scale horizontally to increase cluster capacity
 
 ```mermaid
