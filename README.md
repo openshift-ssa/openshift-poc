@@ -55,10 +55,10 @@ docs/
 
 | Section | Description |
 | ------- | ----------- |
-| [Prerequisites](docs/prerequisites/) | Infrastructure, networking, DNS, storage, and a full POC checklist |
-| [Install the Cluster](docs/installation/) | Assisted Installer, Agent-Based, disconnected, other methods |
-| [Configure the Cluster](docs/post-installation/) | Storage, virtualization, MTV, OADP, logging, GitOps |
-| [Validate the POC](docs/workloads/) | Sample containers, VMs, failover, and day-2 operations |
+| [Prerequisites](docs/prerequisites/index.md) | Infrastructure, networking, DNS, storage, and a full POC checklist |
+| [Install the Cluster](docs/installation/index.md) | Assisted Installer, Agent-Based, disconnected, other methods |
+| [Configure the Cluster](docs/post-installation/index.md) | Storage, virtualization, MTV, OADP, logging, GitOps |
+| [Validate the POC](docs/workloads/index.md) | Sample containers, VMs, failover, and day-2 operations |
 
 ## Sitewide Variables
 

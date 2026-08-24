@@ -89,7 +89,7 @@ Look for `mtu XXXX` in the output. This must match what the upstream switch port
 From a pod, send packets of increasing size to the external service with the "Don't Fragment" bit set. This isolates exactly where the path breaks.
 
 ```bash
-oc run mtu-test --image=registry.access.redhat.com/ubi9/ubi --rm -it --restart=Never -- bash
+oc run mtu-test --image=registry.redhat.io/ubi9/ubi --rm -it --restart=Never -- bash
 ```
 
 Inside the pod:

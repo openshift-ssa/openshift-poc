@@ -166,8 +166,10 @@ Once all hosts are registered as agents, create the cluster resources to trigger
       controlPlaneAgents: 3
       workerAgents: 3
     sshPublicKey: {{ public_key }}
-    apiVIP: {{ api_vip }}
-    ingressVIP: {{ ingress_vip }}
+    apiVIPs:
+      - {{ api_vip }}
+    ingressVIPs:
+      - {{ ingress_vip }}
   ```
 
   ```bash

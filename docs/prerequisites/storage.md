@@ -70,7 +70,7 @@ Verify disk performance:
 
 ```bash
 podman run --privileged --rm -v /var/lib/etcd:/var/lib/etcd:Z \
-  registry.access.redhat.com/ubi9/ubi-minimal:latest \
+  registry.redhat.io/ubi9/ubi-minimal:latest \
   sh -c "microdnf install -y fio && fio --rw=write --ioengine=sync --fdatasync=1 --directory=/var/lib/etcd --size=22m --bs=2300 --name=etcd-benchmark"
 ```
 

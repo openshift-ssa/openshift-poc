@@ -140,7 +140,7 @@ OADP requires an S3-compatible object storage bucket for backup data. If you hav
           config:
             region: noobaa
             s3ForcePathStyle: "true"
-            s3Url: https://s3-openshift-storage.apps.{{ cluster_name }}.{{ base_domain }}
+            s3Url: https://s3.openshift-storage.svc:443
             insecureSkipTLSVerify: "true"
           credential:
             name: cloud-credentials

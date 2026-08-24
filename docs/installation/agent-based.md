@@ -23,7 +23,7 @@ The `install-config.yaml` defines cluster-level settings.
 
 ```yaml
 apiVersion: v1
-baseDomain: ocp.basedomain.com
+baseDomain: {{ base_domain }}
 metadata:
   name: poc
 controlPlane:
@@ -66,7 +66,7 @@ If your environment requires a proxy, append to the end of `install-config.yaml`
 proxy:
   httpProxy: http://user:password@proxy.example.com:3128
   httpsProxy: http://user:password@proxy.example.com:3128
-  noProxy: .basedomain.com,10.0.0.0/28,10.128.0.0/14,172.30.0.0/16,localhost,127.0.0.1,.cluster.local,.svc
+  noProxy: .{{ base_domain }},10.0.0.0/28,10.128.0.0/14,172.30.0.0/16,localhost,127.0.0.1,.cluster.local,.svc
 ```
 
 ### Additional Trust Bundle (MITM Proxy)
@@ -149,8 +149,7 @@ hosts:
       dns-resolver:
         config:
           server:
-            - dns1.basedomain.com
-            - dns2.basedomain.com
+            - {{ nameserver_ip }}
       routes:
         config:
           - destination: 0.0.0.0/0
@@ -232,8 +231,7 @@ For hosts with a single network interface:
       dns-resolver:
         config:
           server:
-            - dns1.basedomain.com
-            - dns2.basedomain.com
+            - {{ nameserver_ip }}
       routes:
         config:
           - destination: 0.0.0.0/0
@@ -315,7 +313,7 @@ At the end of the process, you will be presented with the URL for the cluster en
 ## Validate the Install
 
 ```bash
-oc login --server=https://api.poc.ocp.basedomain.com:6443 -u kubeadmin -p {{ password }}
+oc login --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443 -u kubeadmin -p {{ password }}
 oc get nodes
 oc get clusterversion
 oc get clusteroperators

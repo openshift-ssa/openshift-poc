@@ -61,7 +61,7 @@ metadata:
   name: mtv-operator
   namespace: openshift-mtv
 spec:
-  channel: release-v2.11
+  channel: stable
   installPlanApproval: Automatic
   name: mtv-operator
   source: redhat-operators
@@ -239,7 +239,7 @@ Create a `Containerfile`:
 
 ```bash
 cat > Containerfile <<'EOF'
-FROM registry.access.redhat.com/ubi9/ubi-minimal
+FROM registry.redhat.io/ubi9/ubi-minimal
 USER 1001
 COPY vmware-vix-disklib-distrib /vmware-vix-disklib-distrib
 RUN mkdir -p /opt

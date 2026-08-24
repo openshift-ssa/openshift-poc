@@ -75,15 +75,12 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
   spec:
     includedNamespaces:
       - vm-backup-test
-    labelSelector:
-      matchLabels:
-        app: backup-test-vm
     storageLocation: dpa-1
     ttl: 720h0m0s
   ```
 
 !!! note
-    The label `app: backup-test-vm` is automatically applied by OpenShift Virtualization when creating from a template.
+    This backs up **all** resources in the `vm-backup-test` namespace. Namespace-scoped backup ensures the VirtualMachine, its DataVolumes, PVCs, and associated secrets are all captured together.
 
 !!! info "Crash-Consistent Backups"
     OADP with the `kubevirt` and `csi` plugins can back up running VMs using CSI volume snapshots. The resulting backup is crash-consistent — equivalent to an unexpected power loss. This is sufficient for most workloads. If you need application-consistent backups (e.g., databases), either stop the VM first or use the QEMU guest agent for filesystem freeze/thaw.

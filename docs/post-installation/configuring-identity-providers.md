@@ -263,7 +263,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync
-              image: registry.redhat.io/openshift4/ose-cli:latest
+              image: registry.redhat.io/openshift4/ose-cli:v{{ ocp_version }}
               command:
                 - /bin/bash
                 - -c

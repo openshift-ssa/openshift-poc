@@ -125,7 +125,7 @@ This pattern matches the [ACM Multicluster Observability Operator MinIO example]
       spec:
         containers:
           - name: minio
-            image: quay.io/minio/minio:RELEASE.2025-09-07T16-13-09Z
+            image: quay.io/minio/minio:latest
             command:
               - /bin/sh
               - -c

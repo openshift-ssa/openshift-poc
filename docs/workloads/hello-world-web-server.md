@@ -36,7 +36,7 @@ A simple "Hello World" web server using the [Red Hat Hardened](https://www.redha
       spec:
         containers:
           - name: nginx
-            image: registry.access.redhat.com/hi/nginx:latest
+            image: registry.redhat.io/hi/nginx:latest
             ports:
               - containerPort: 8080
             resources:

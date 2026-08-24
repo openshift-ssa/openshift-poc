@@ -6,39 +6,39 @@ The [Spring Pet Clinic](https://github.com/spring-projects/spring-petclinic) is 
 
 1. Create a namespace:
 
-```bash
+  ```bash
   oc new-project petclinic
-```
+  ```
 
 2. Deploy the application using S2I:
 
-```bash
-  oc new-app --image-stream="openshift/java:latest" \
+  ```bash
+  oc new-app --image-stream="openshift/java:openjdk-21-ubi8" \
     https://github.com/spring-projects/spring-petclinic.git \
     --name=petclinic
-```
+  ```
 
   This builds the application from source using the OpenShift Java builder image.
 
 3. Watch the build progress:
 
-```bash
+  ```bash
   oc logs -f buildconfig/petclinic
-```
+  ```
 
 4. Expose the application with a Route:
 
-```bash
+  ```bash
   oc expose service petclinic
-```
+  ```
 
 5. Verify the deployment:
 
-```bash
+  ```bash
   oc get pods -n petclinic
   ROUTE=$(oc get route petclinic -o jsonpath='{.spec.host}')
   echo "Application available at: http://$ROUTE"
-```
+  ```
 
 ## Deploy from Container Image
 
@@ -46,13 +46,13 @@ Alternatively, deploy a pre-built image:
 
 1. Create a namespace:
 
-```bash
+  ```bash
   oc new-project petclinic
-```
+  ```
 
 2. Create the Deployment:
 
-```yaml
+  ```yaml
   apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -94,26 +94,26 @@ Alternatively, deploy a pre-built image:
                 port: 8080
               initialDelaySeconds: 60
               periodSeconds: 10
-```
+  ```
 
-```bash
+  ```bash
   oc apply -f petclinic-deployment.yaml
-```
+  ```
 
 3. Create a Service and Route:
 
-```bash
+  ```bash
   oc expose deployment petclinic --port=8080
   oc expose service petclinic
-```
+  ```
 
 4. Verify it's running:
 
-```bash
+  ```bash
   oc get pods -n petclinic
   ROUTE=$(oc get route petclinic -o jsonpath='{.spec.host}')
   curl -s -o /dev/null -w "%{http_code}" http://$ROUTE
-```
+  ```
 
   You should see HTTP status `200` once the application has started.
 
@@ -123,32 +123,32 @@ By default, Pet Clinic uses an in-memory H2 database. For a persistent setup, de
 
 1. Deploy PostgreSQL:
 
-```bash
+  ```bash
   oc new-app --name=petclinic-db \
     -e POSTGRESQL_USER=petclinic \
     -e POSTGRESQL_PASSWORD=petclinic \
     -e POSTGRESQL_DATABASE=petclinic \
     postgresql:latest
-```
+  ```
 
 2. Deploy Pet Clinic with the PostgreSQL profile:
 
-```bash
+  ```bash
   oc new-app --name=petclinic \
     -e SPRING_PROFILES_ACTIVE=postgres \
     -e SPRING_DATASOURCE_URL=jdbc:postgresql://petclinic-db:5432/petclinic \
     -e SPRING_DATASOURCE_USERNAME=petclinic \
     -e SPRING_DATASOURCE_PASSWORD=petclinic \
     java~https://github.com/spring-projects/spring-petclinic.git
-```
+  ```
 
 3. Expose and verify:
 
-```bash
+  ```bash
   oc expose service petclinic
   ROUTE=$(oc get route petclinic -o jsonpath='{.spec.host}')
   echo "Application available at: http://$ROUTE"
-```
+  ```
 
 ## Cleanup
 

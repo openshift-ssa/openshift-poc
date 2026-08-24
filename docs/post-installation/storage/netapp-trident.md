@@ -350,7 +350,6 @@ Create backends in the `trident` namespace for each protocol you need. You can d
     provisioner: csi.trident.netapp.io
     parameters:
       storagePools: "netapp-nfs-backend:.*"
-      fsType: "nfs"
       backendType: "ontap-nas"
     mountOptions:
       - sec=sys
@@ -443,7 +442,6 @@ Create backends in the `trident` namespace for each protocol you need. You can d
     provisioner: csi.trident.netapp.io
     parameters:
       storagePools: "netapp-nfsflexgroup-backend:.*"
-      fsType: "nfs"
       backendType: "ontap-nas-flexgroup"
     mountOptions:
       - sec=sys

@@ -57,6 +57,9 @@ spec:
   name: advanced-cluster-management
 ```
 
+!!! note
+    The ACM channel must match your OCP version. Verify the default channel: `oc get packagemanifest advanced-cluster-management -o jsonpath='{.status.defaultChannel}'`
+
 ```bash
 oc apply -f acm-operator.yaml
 ```

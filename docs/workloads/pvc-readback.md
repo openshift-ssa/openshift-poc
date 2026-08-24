@@ -46,7 +46,7 @@ A minimal workload that writes a file to a PersistentVolumeClaim, then spins up 
     restartPolicy: Never
     containers:
       - name: writer
-        image: registry.access.redhat.com/ubi9/ubi-minimal
+        image: registry.redhat.io/ubi9/ubi-minimal
         command:
           - sh
           - -c
@@ -90,7 +90,7 @@ A minimal workload that writes a file to a PersistentVolumeClaim, then spins up 
     restartPolicy: Never
     containers:
       - name: reader
-        image: registry.access.redhat.com/ubi9/ubi-minimal
+        image: registry.redhat.io/ubi9/ubi-minimal
         command:
           - sh
           - -c

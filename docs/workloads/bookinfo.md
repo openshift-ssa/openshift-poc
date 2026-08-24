@@ -64,7 +64,7 @@ This multi-version setup is what makes Bookinfo useful for traffic management de
 
   ```bash
   oc apply -n bookinfo \
-    -f https://raw.githubusercontent.com/istio/istio/release-1.26/samples/bookinfo/platform/kube/bookinfo.yaml
+    -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/platform/kube/bookinfo.yaml
   ```
 
 4. Wait for all pods to be running:
@@ -148,6 +148,38 @@ echo "Application available at: http://$GATEWAY_HOST/productpage"
 Open the URL in a browser. Refresh the page multiple times — you should see the reviews section alternate between no stars (v1), black stars (v2), and red stars (v3) as traffic round-robins across the three versions.
 
 ## Demonstrate Traffic Management
+
+Traffic splitting requires per-version Services. The default Bookinfo deployment creates only the `reviews` Service. Create version-specific Services:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews-v1
+  namespace: bookinfo
+spec:
+  selector:
+    app: reviews
+    version: v1
+  ports:
+    - port: 9080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews-v3
+  namespace: bookinfo
+spec:
+  selector:
+    app: reviews
+    version: v3
+  ports:
+    - port: 9080
+```
+
+```bash
+oc apply -f reviews-version-services.yaml
+```
 
 ### Route All Traffic to v1
 
@@ -240,10 +272,15 @@ oc apply -f reviews-v3-route.yaml
 With ambient mode, mTLS is automatic. Verify that traffic between services is encrypted:
 
 ```bash
-istioctl ztunnel-config workloads --namespace ztunnel
+oc get pods -n istio-system -l app=ztunnel -o wide
+oc logs -n istio-system -l app=ztunnel --tail=50 | grep HBONE
 ```
 
-The output should show all workloads with `PROTOCOL: HBONE`, indicating traffic is flowing through the encrypted ZTunnel.
+The log output should show `HBONE` connections, indicating traffic is flowing through the encrypted ZTunnel. You can also use `istioctl` if installed (see [Service Mesh — Install istioctl](../post-installation/service-mesh.md#install-istioctl)):
+
+```bash
+istioctl ztunnel-config workloads -n istio-system
+```
 
 ## What to Show in a Demo
 

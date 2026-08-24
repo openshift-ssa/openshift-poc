@@ -3,7 +3,7 @@
 [Strimzi](https://strimzi.io/) provides a way to run Apache Kafka on OpenShift via the Strimzi Cluster Operator. It manages Kafka clusters, topics, users, and connectors using custom resources.
 
 !!! note
-    This page uses the **community** Strimzi operator from `community-operators`. It is not [Red Hat AMQ Streams](https://docs.redhat.com/en/documentation/red_hat_amq_streams). Use AMQ Streams when the customer needs a supported Kafka operator.
+    This page uses the **community** Strimzi operator from `community-operators`. It is not [Red Hat Streams for Apache Kafka](https://docs.redhat.com/en/documentation/red_hat_streams_for_apache_kafka). Use Red Hat Streams for Apache Kafka when the customer needs a supported Kafka operator.
 
 ## Prerequisites
 
@@ -47,82 +47,84 @@
 
 Strimzi now requires KRaft (no ZooKeeper). Create a dual-role node pool and a Kafka cluster:
 
-```yaml
-apiVersion: kafka.strimzi.io/v1beta2
-kind: KafkaNodePool
-metadata:
-  name: dual-role
-  namespace: kafka
-  labels:
-    strimzi.io/cluster: my-cluster
-spec:
-  replicas: 3
-  roles:
-    - controller
-    - broker
-  storage:
-    type: jbod
-    volumes:
-      - id: 0
-        type: persistent-claim
-        size: 10Gi
-        kraftMetadata: shared
-        deleteClaim: false
----
-apiVersion: kafka.strimzi.io/v1beta2
-kind: Kafka
-metadata:
-  name: my-cluster
-  namespace: kafka
-  annotations:
-    strimzi.io/node-pools: enabled
-    strimzi.io/kraft: enabled
-spec:
-  kafka:
-    version: 3.9.0
-    metadataVersion: 3.9-IV0
-    listeners:
-      - name: plain
-        port: 9092
-        type: internal
-        tls: false
-      - name: tls
-        port: 9093
-        type: internal
-        tls: true
-    config:
-      offsets.topic.replication.factor: 3
-      transaction.state.log.replication.factor: 3
-      transaction.state.log.min.isr: 2
-      default.replication.factor: 3
-      min.insync.replicas: 2
-    resources:
-      requests:
-        memory: "2Gi"
-        cpu: "500m"
-      limits:
-        memory: "4Gi"
-        cpu: "1"
-  entityOperator:
-    topicOperator: {}
-    userOperator: {}
-```
+1. Apply the Kafka cluster manifest:
 
-```bash
-oc apply -f kafka-cluster.yaml
-```
+  ```yaml
+  apiVersion: kafka.strimzi.io/v1beta2
+  kind: KafkaNodePool
+  metadata:
+    name: dual-role
+    namespace: kafka
+    labels:
+      strimzi.io/cluster: my-cluster
+  spec:
+    replicas: 3
+    roles:
+      - controller
+      - broker
+    storage:
+      type: jbod
+      volumes:
+        - id: 0
+          type: persistent-claim
+          size: 10Gi
+          kraftMetadata: shared
+          deleteClaim: false
+  ---
+  apiVersion: kafka.strimzi.io/v1beta2
+  kind: Kafka
+  metadata:
+    name: my-cluster
+    namespace: kafka
+    annotations:
+      strimzi.io/node-pools: enabled
+      strimzi.io/kraft: enabled
+  spec:
+    kafka:
+      version: 3.9.0
+      metadataVersion: 3.9-IV0
+      listeners:
+        - name: plain
+          port: 9092
+          type: internal
+          tls: false
+        - name: tls
+          port: 9093
+          type: internal
+          tls: true
+      config:
+        offsets.topic.replication.factor: 3
+        transaction.state.log.replication.factor: 3
+        transaction.state.log.min.isr: 2
+        default.replication.factor: 3
+        min.insync.replicas: 2
+      resources:
+        requests:
+          memory: "2Gi"
+          cpu: "500m"
+        limits:
+          memory: "4Gi"
+          cpu: "1"
+    entityOperator:
+      topicOperator: {}
+      userOperator: {}
+  ```
+
+  ```bash
+  oc apply -f kafka-cluster.yaml
+  ```
 
 2. Wait for the cluster to become ready:
 
-```bash
-oc wait kafka/my-cluster --for=condition=Ready --timeout=300s -n kafka
-```
+  ```bash
+  oc wait kafka/my-cluster --for=condition=Ready --timeout=300s -n kafka
+  ```
 
 3. Verify all pods are running:
 
-```bash
-oc get pods -n kafka
-```
+  ```bash
+  oc get pods -n kafka
+  ```
 
 You should see pods for the dual-role brokers and the Entity Operator.
 
@@ -174,21 +176,26 @@ oc apply -f kafka-topic.yaml
 
 ## Expose Kafka Outside the Cluster (Optional)
 
-To access Kafka from outside OpenShift, add a Route listener:
+To access Kafka from outside OpenShift, add a Route listener to the existing Kafka CR. Do **not** apply the snippet below as a standalone resource — it would replace your working cluster.
 
-```yaml
-apiVersion: kafka.strimzi.io/v1beta2
-kind: Kafka
-metadata:
-  name: my-cluster
-  namespace: kafka
+```bash
+oc patch kafka my-cluster -n kafka --type merge -p '
 spec:
   kafka:
     listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
       - name: external
         port: 9094
         type: route
         tls: true
+'
 ```
 
 Retrieve the bootstrap address:

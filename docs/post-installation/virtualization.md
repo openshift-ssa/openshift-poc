@@ -94,7 +94,9 @@ networkData: |
       dhcp4: no
       addresses:
         - 10.37.0.50/24
-      gateway4: 10.37.0.1
+      routes:
+        - to: default
+          via: 10.37.0.1
       nameservers:
         addresses:
           - 10.3.0.3

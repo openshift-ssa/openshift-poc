@@ -312,7 +312,7 @@ For environments without DHCP (which is our assumption), configure static IPs us
           - role: bootstrap
             networkDevice:
               ipAddrs:
-                - 10.0.0.5/28
+                - 10.0.0.14/28
               gateway: 10.0.0.1
               nameservers:
                 - {{ nameserver_ip }}

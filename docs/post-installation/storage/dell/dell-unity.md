@@ -320,7 +320,7 @@ metadata:
 spec:
   containers:
     - name: app
-      image: registry.access.redhat.com/ubi9/ubi-minimal
+      image: registry.redhat.io/ubi9/ubi-minimal
       command: ["sh", "-c", "echo hello > /data/test && sleep 3600"]
       volumeMounts:
         - name: vol
