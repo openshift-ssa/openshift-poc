@@ -23,6 +23,9 @@ The standard installation process follows the [Agent-Based Installer](../agent-b
 
 This tells the cluster to pull images from your internal registry instead of the upstream source.
 
+!!! warning "Order matters — most specific sources first"
+    CRI-O evaluates mirror rules sequentially from top to bottom. If a broad entry like `registry.redhat.io` appears before a more specific subpath like `registry.redhat.io/odf4`, the runtime matches the broad rule first and never reaches the specific one. Always list **more specific source paths above less specific ones**.
+
 === "Mirror Registry (oc-mirror)"
 
     The exact values come from `oc-mirror-workspace/working-dir/cluster-resources/idms-oc-mirror.yaml`. A typical configuration:
@@ -248,6 +251,9 @@ spec:
     Use this pattern only when operator images live in **dedicated repository paths** (for example `{{ artifactory_host }}/odf4`) rather than the full-registry remotes configured in Step 1 (`redhat-registry-remote`, etc.). If you already mirrored `registry.redhat.io` wholesale via `imageDigestSources` / CatalogSource above, skip this section — install ODF from that catalog normally.
 
 When operators are staged under separate Artifactory paths, you need an additional `ImageDigestMirrorSet` for those paths **and** a CatalogSource that points at the mirrored index.
+
+!!! tip "IDMS ordering with mixed mirrors"
+    If you have both a broad mirror for `registry.redhat.io` (from your install-config `imageDigestSources`) and a per-operator IDMS for a subpath like `registry.redhat.io/odf4`, the **per-operator IDMS must be applied separately** or its entries must appear **above** the broad entry. CRI-O evaluates rules top-to-bottom; the first match wins. A broad `registry.redhat.io` rule before `registry.redhat.io/odf4` will route ODF pulls to the wrong mirror path.
 
 1. Disable default catalog sources (if not already done):
 
