@@ -19,7 +19,7 @@ The OpenShift internal image registry is deployed by default with ephemeral stor
     resources:
       requests:
         storage: 100Gi
-    storageClassName: {{ storage_class }}
+    storageClassName: {{ storage_class }}     # Make sure this is the Filesystem storage class (cephfs)
     volumeMode: Filesystem
   ```
 
