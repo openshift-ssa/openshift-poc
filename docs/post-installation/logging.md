@@ -152,16 +152,16 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
      --from-literal=access_key_secret="$SECRET_KEY"
    ```
 
-    !!! note "TLS for in-cluster NooBaa"
-        Include this in the LokiStack CR `spec.storage` so Loki trusts the service-serving certificate:
+!!! note "TLS for in-cluster NooBaa"
+    Include this in the LokiStack CR `spec.storage` so Loki trusts the service-serving certificate:
 
-        ```yaml
-        spec:
-          storage:
-            tls:
-              caName: openshift-service-ca.crt
-              caKey: service-ca.crt
-        ```
+    ```yaml
+    spec:
+      storage:
+        tls:
+          caName: openshift-service-ca.crt
+          caKey: service-ca.crt
+    ```
 
 ### Using S3 Compatible Storage (NetApp StorageGRID, etc.)
 
@@ -177,8 +177,8 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
      --from-literal=forcepathstyle="true"
    ```
 
-    !!! note
-        The `forcepathstyle="true"` parameter is required for S3 Compatible storage (not needed for AWS S3).
+!!! note
+    The `forcepathstyle="true"` parameter is required for S3 Compatible storage (not needed for AWS S3).
 
 ### TLS CA Bundle (If Required)
 
@@ -216,16 +216,16 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
        mode: openshift-logging
    ```
 
-    !!! note "If using self-signed storage certificates"
-        Add the TLS section to the LokiStack CR. `caName` references a **ConfigMap** in the LokiStack namespace containing the CA bundle. `caKey` specifies the key within that ConfigMap (defaults to `service-ca.crt` if omitted).
+!!! note "If using self-signed storage certificates"
+    Add the TLS section to the LokiStack CR. `caName` references a **ConfigMap** in the LokiStack namespace containing the CA bundle. `caKey` specifies the key within that ConfigMap (defaults to `service-ca.crt` if omitted).
 
-        ```yaml
-        spec:
-          storage:
-            tls:
-              caName: loki-s3-ca-bundle   # ConfigMap name
-              caKey: ca-bundle.crt        # must match the key used in --from-file=
-        ```
+    ```yaml
+    spec:
+      storage:
+        tls:
+          caName: loki-s3-ca-bundle   # ConfigMap name
+          caKey: ca-bundle.crt        # must match the key used in --from-file=
+    ```
 
 2. Apply the LokiStack CR:
 
@@ -337,8 +337,8 @@ The log collector requires a service account with specific cluster roles to read
       -z logging-collector -n openshift-logging
     ```
 
-    !!! warning
-        You must create the service account and grant the ClusterRoleBindings before creating the ClusterLogForwarder. Adding an input type to the CR without the required RBAC binding destroys the entire log collector DaemonSet.
+!!! warning
+    You must create the service account and grant the ClusterRoleBindings before creating the ClusterLogForwarder. Adding an input type to the CR without the required RBAC binding destroys the entire log collector DaemonSet.
 
 ## Create the ClusterLogForwarder
 
@@ -380,8 +380,8 @@ The log collector requires a service account with specific cluster roles to read
     oc apply -f clusterlogforwarder.yaml
     ```
 
-    !!! warning "TLS CA Block is Required"
-        The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
+!!! warning "TLS CA Block is Required"
+    The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
 
 2. To also collect audit logs, add `audit` to `inputRefs` and re-apply:
 

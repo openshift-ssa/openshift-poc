@@ -82,13 +82,13 @@ The `mappingMethod` controls how identities from the provider are mapped to Open
           url: "ldaps://ldap.example.com/OU=Users,DC=example,DC=com?sAMAccountName?sub?(memberOf=CN=OpenShift-Users,OU=Groups,DC=example,DC=com)"
   ```
 
-    !!! info "LDAP URL Format"
-        The URL follows the format: `ldaps://host/baseDN?attribute?scope?(filter)`
+!!! info "LDAP URL Format"
+    The URL follows the format: `ldaps://host/baseDN?attribute?scope?(filter)`
 
-        - **baseDN** — Where to start searching for users
-        - **attribute** — The attribute to use as the username (e.g., `sAMAccountName` for AD, `uid` for OpenLDAP)
-        - **scope** — `sub` for subtree search
-        - **filter** — Optional filter to restrict which users can log in (e.g., membership in a specific group)
+    - **baseDN** — Where to start searching for users
+    - **attribute** — The attribute to use as the username (e.g., `sAMAccountName` for AD, `uid` for OpenLDAP)
+    - **scope** — `sub` for subtree search
+    - **filter** — Optional filter to restrict which users can log in (e.g., membership in a specific group)
 
 4. Apply the OAuth configuration:
 
@@ -351,15 +351,15 @@ OpenID Connect (OIDC) integrates with providers like Keycloak, Microsoft Entra I
               - groups
   ```
 
-    !!! info "Claims Mapping"
-        | Field                | Purpose                                          | Common Values                    |
-        | -------------------- | ------------------------------------------------ | -------------------------------- |
-        | `preferredUsername`  | Username in OpenShift                            | `preferred_username`, `email`, `upn` |
-        | `name`              | Display name                                     | `name`, `given_name`             |
-        | `email`             | Email address                                    | `email`                          |
-        | `groups`            | Group memberships (maps to OpenShift Groups)     | `groups`, `roles`                |
+!!! info "Claims Mapping"
+    | Field                | Purpose                                          | Common Values                    |
+    | -------------------- | ------------------------------------------------ | -------------------------------- |
+    | `preferredUsername`  | Username in OpenShift                            | `preferred_username`, `email`, `upn` |
+    | `name`              | Display name                                     | `name`, `given_name`             |
+    | `email`             | Email address                                    | `email`                          |
+    | `groups`            | Group memberships (maps to OpenShift Groups)     | `groups`, `roles`                |
 
-        The `groups` claim allows the OIDC provider to pass group memberships directly in the token. OpenShift will automatically create Groups and assign users to them based on this claim.
+    The `groups` claim allows the OIDC provider to pass group memberships directly in the token. OpenShift will automatically create Groups and assign users to them based on this claim.
 
 5. Apply the OAuth configuration:
 
@@ -474,8 +474,8 @@ HTPasswd is a simple file-based identity provider useful for POC environments, b
   htpasswd -B -b /tmp/htpasswd viewer {{ viewer_password }}
   ```
 
-    !!! info
-        The `-B` flag uses bcrypt hashing which is the recommended algorithm. The `-b` flag takes the password from the command line (omit it for interactive prompts).
+!!! info
+    The `-B` flag uses bcrypt hashing which is the recommended algorithm. The `-b` flag takes the password from the command line (omit it for interactive prompts).
 
 ### Create the Secret
 

@@ -283,8 +283,8 @@ When operators are staged under separate Artifactory paths, you need an addition
   oc apply -f odf-idms.yaml
   ```
 
-    !!! warning
-        Applying an IDMS triggers a rolling reboot of all nodes as the Machine Config Operator updates `/etc/containers/registries.conf`. Wait for all nodes to return to `Ready` (`oc get nodes -w`) before proceeding.
+!!! warning
+    Applying an IDMS triggers a rolling reboot of all nodes as the Machine Config Operator updates `/etc/containers/registries.conf`. Wait for all nodes to return to `Ready` (`oc get nodes -w`) before proceeding.
 
 3. Deploy a CatalogSource pointing at the mirrored operator index. Adjust the image path to match your Artifactory layout:
 

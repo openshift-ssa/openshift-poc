@@ -46,8 +46,8 @@ When using the Assisted Installer with vSphere platform integration, the cluster
 
 4. Click **Save Configuration**
 
-    !!! warning
-        An incorrect username or password will make cluster nodes unschedulable. The credentials are stored in the `vsphere-creds` secret in the `kube-system` namespace.
+!!! warning
+    An incorrect username or password will make cluster nodes unschedulable. The credentials are stored in the `vsphere-creds` secret in the `kube-system` namespace.
 
 ### Option 2: CLI
 

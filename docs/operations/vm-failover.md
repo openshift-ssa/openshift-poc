@@ -37,8 +37,8 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
     - StorageClass: your RWX-capable StorageClass
     - Access Mode: ReadWriteMany (RWX)
 
-    !!! warning
-        Both the root disk and the data disk must use RWX access mode for failover to work. If either disk is RWO, the VM cannot start on a new node until the old node's lease expires (6+ minutes).
+!!! warning
+    Both the root disk and the data disk must use RWX access mode for failover to work. If either disk is RWO, the VM cannot start on a new node until the old node's lease expires (6+ minutes).
 
 9. Click Add
 10. Also verify the root disk is using RWX access mode — edit it if necessary
@@ -84,8 +84,8 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
   date +%T && oc debug node/$NODE -- chroot /host systemctl reboot
   ```
 
-    !!! note
-        This simulates an unexpected node reboot. In a real failure scenario (power loss, kernel panic), the node would simply stop responding without a graceful shutdown.
+!!! note
+    This simulates an unexpected node reboot. In a real failure scenario (power loss, kernel panic), the node would simply stop responding without a graceful shutdown.
 
 ## Watch the Failover
 

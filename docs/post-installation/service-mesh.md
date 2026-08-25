@@ -52,8 +52,8 @@ Ambient mode requires OVN-Kubernetes to use local gateway mode. This must be don
           routingViaHost: true
   ```
 
-    !!! warning
-        Changing the gateway mode will cause a rolling restart of the OVN-Kubernetes pods across all nodes. Plan for a brief disruption window.
+!!! warning
+    Changing the gateway mode will cause a rolling restart of the OVN-Kubernetes pods across all nodes. Plan for a brief disruption window.
 
 3. Wait for the network operator to reconcile:
 
@@ -172,8 +172,8 @@ The `PHASE` should show `Succeeded`.
   oc create namespace ztunnel
   ```
 
-    !!! note
-        The namespace name must match the `trustedZtunnelNamespace` value in the Istio resource.
+!!! note
+    The namespace name must match the `trustedZtunnelNamespace` value in the Istio resource.
 
 8. Create the ZTunnel resource:
 
