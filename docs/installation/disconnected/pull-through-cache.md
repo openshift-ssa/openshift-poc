@@ -22,7 +22,7 @@ A pull-through cache acts as a transparent proxy. When the cluster requests an i
   - `registry.access.redhat.com`
   - `registry.connect.redhat.com`
 - A Red Hat pull secret from [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret)
-- Credentials for the artifact repository
+- Credentials for the artifact repository (only if it requires authentication for pulls; anonymous access still needs a blank pull-secret entry — see below)
 - The CA certificate for the artifact repository (if using an internal CA)
 
 ---
@@ -94,41 +94,47 @@ sudo update-ca-trust
 
 ## Create a Merged Pull Secret
 
-Create a combined pull secret that includes credentials for both Red Hat registries and your artifact repository:
+The pull secret used in `install-config.yaml` must include:
+
+1. Your Red Hat pull secret (from [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret))
+2. An entry for your artifact repository hostname — **even if the cache allows anonymous pulls**
+
+!!! warning "CRI-O requires a registry entry even for anonymous access"
+    Without an `auths` entry for the artifact repository hostname, CRI-O will not attempt to pull from it at all — even when Artifactory/Nexus requires no credentials. The entry must exist; the `auth` value may be empty.
+
+### Artifact repository requires authentication
 
 ```bash
 cp ~/pull-secret.txt ~/merged-pull-secret.json
-
 podman login {{ artifactory_host }} --authfile ~/merged-pull-secret.json
 ```
 
-This produces `~/merged-pull-secret.json` containing credentials for all registries. You will use this file in `install-config.yaml`.
+### Artifact repository allows anonymous access
 
-!!! warning "Anonymous pull-through caches still need a pull-secret entry"
-    Even if Artifactory/Nexus allows **anonymous** image pulls (no credentials required), you **must** include a blank `auth` entry for the registry hostname in the pull secret. Without it, CRI-O will not attempt to pull from the host at all.
+Add a blank `auth` entry for the registry hostname. Do **not** use `podman login` or `oc registry login --auth-basic=":"` — those write a non-empty credential.
 
-    If your cache does not require authentication, manually add a blank entry:
+```bash
+jq --arg host "{{ artifactory_host }}" \
+  '.auths[$host] = {"auth": ""}' \
+  ~/pull-secret.txt > ~/merged-pull-secret.json
+```
 
-    ```bash
-    oc registry login --registry {{ artifactory_host }} \
-      --auth-basic=":"  --to ~/merged-pull-secret.json
-    ```
+The resulting file looks like:
 
-    Or manually merge the entry into your pull secret JSON:
+```json
+{
+  "auths": {
+    "cloud.openshift.com": {"auth": "<redhat-token>"},
+    "quay.io": {"auth": "<redhat-token>"},
+    "registry.redhat.io": {"auth": "<redhat-token>"},
+    "registry.connect.redhat.com": {"auth": "<redhat-token>"},
+    "{{ artifactory_host }}": {"auth": ""}
+  }
+}
+```
 
-    ```json
-    {
-      "auths": {
-        "{{ artifactory_host }}": {"auth": ""},
-        "cloud.openshift.com": {"auth": "<redhat-token>"},
-        "quay.io": {"auth": "<redhat-token>"},
-        "registry.redhat.io": {"auth": "<redhat-token>"},
-        "registry.connect.redhat.com": {"auth": "<redhat-token>"}
-      }
-    }
-    ```
-
-    The Red Hat credentials are still required so that Artifactory can authenticate to upstream registries on your behalf.
+!!! note
+    The Red Hat credentials remain in the pull secret for install-time use. Upstream authentication from Artifactory to Red Hat registries is configured separately on each remote repository (see [Configure Upstream Authentication](#configure-upstream-authentication)).
 
 ---
 

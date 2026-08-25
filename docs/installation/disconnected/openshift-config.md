@@ -87,7 +87,7 @@ pullSecret: '< contents of ~/merged-pull-secret.json >'
 ```
 
 !!! warning "Anonymous registries require a blank auth entry"
-    If your pull-through cache allows anonymous access, the pull secret must still contain an entry for the registry with an empty `auth` value (e.g., `"{{ artifactory_host }}": {"auth": ""}`). CRI-O will not pull from any registry that has no entry in the pull secret, even if the registry requires no credentials. See [Pull-Through Cache — Create a Merged Pull Secret](pull-through-cache.md#create-a-merged-pull-secret) for details.
+    If your pull-through cache allows anonymous access, the pull secret must still contain an entry for the registry with an empty `auth` value — for example `"{{ artifactory_host }}": {"auth": ""}`. Do not use `podman login` or `oc registry login --auth-basic=":"` for this case; those write a non-empty credential. See [Pull-Through Cache — Create a Merged Pull Secret](pull-through-cache.md#create-a-merged-pull-secret).
 
 ### Complete Example
 
@@ -241,6 +241,92 @@ spec:
   sourceNamespace: openshift-marketplace
   installPlanApproval: Automatic
 ```
+
+### Worked Example: Per-Operator Mirror Paths (ODF)
+
+!!! note
+    Use this pattern only when operator images live in **dedicated repository paths** (for example `{{ artifactory_host }}/odf4`) rather than the full-registry remotes configured in Step 1 (`redhat-registry-remote`, etc.). If you already mirrored `registry.redhat.io` wholesale via `imageDigestSources` / CatalogSource above, skip this section — install ODF from that catalog normally.
+
+When operators are staged under separate Artifactory paths, you need an additional `ImageDigestMirrorSet` for those paths **and** a CatalogSource that points at the mirrored index.
+
+1. Disable default catalog sources (if not already done):
+
+  ```bash
+  oc patch operatorhub.config.openshift.io/cluster --type=merge \
+    -p '{"spec":{"disableAllDefaultSources":true}}'
+  ```
+
+2. Create an `ImageDigestMirrorSet` for the operator image paths:
+
+  ```yaml
+  apiVersion: config.openshift.io/v1
+  kind: ImageDigestMirrorSet
+  metadata:
+    name: odf-artifactory-mirror
+  spec:
+    imageDigestMirrors:
+      - mirrors:
+          - {{ artifactory_host }}/odf4
+        source: registry.redhat.io/odf4
+      - mirrors:
+          - {{ artifactory_host }}/rhel9
+        source: registry.redhat.io/rhel9
+  ```
+
+  ```bash
+  oc apply -f odf-idms.yaml
+  ```
+
+    !!! warning
+        Applying an IDMS triggers a rolling reboot of all nodes as the Machine Config Operator updates `/etc/containers/registries.conf`. Wait for all nodes to return to `Ready` (`oc get nodes -w`) before proceeding.
+
+3. Deploy a CatalogSource pointing at the mirrored operator index. Adjust the image path to match your Artifactory layout:
+
+  ```yaml
+  apiVersion: operators.coreos.com/v1alpha1
+  kind: CatalogSource
+  metadata:
+    name: odf-catalog
+    namespace: openshift-marketplace
+  spec:
+    sourceType: grpc
+    image: {{ artifactory_host }}/olm/redhat-operator-index:v{{ ocp_version }}
+    displayName: "Local ODF Artifactory Catalog"
+    publisher: "Internal Artifactory"
+    updateStrategy:
+      registryPoll:
+        interval: 30m
+  ```
+
+  ```bash
+  oc apply -f odf-catalog.yaml
+  ```
+
+4. Verify the catalog pod starts:
+
+  ```bash
+  oc get pods -n openshift-marketplace
+  oc get catalogsource odf-catalog -n openshift-marketplace
+  ```
+
+5. Install the operator:
+
+  - **Web Console**: **Ecosystem > Software Catalog** → search for "OpenShift Data Foundation" → Install
+  - **CLI**: Create a Subscription that references this catalog by name (`source: odf-catalog`):
+
+  ```yaml
+  apiVersion: operators.coreos.com/v1alpha1
+  kind: Subscription
+  metadata:
+    name: odf-operator
+    namespace: openshift-storage
+  spec:
+    channel: stable-{{ ocp_version }}
+    name: odf-operator
+    source: odf-catalog
+    sourceNamespace: openshift-marketplace
+    installPlanApproval: Automatic
+  ```
 
 ---
 

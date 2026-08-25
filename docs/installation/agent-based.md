@@ -92,6 +92,27 @@ For a compact cluster where control plane nodes are schedulable and also run wor
 
 Do **not** add worker hosts to `agent-config.yaml`. List only the three control plane nodes with `role: master`.
 
+### VMware vSphere VMs as Bare Metal Hosts
+
+When running the agent-based installer with `platform: baremetal` on VMware vSphere virtual machines, you **must** enable `disk.EnableUUID` on every VM before booting the ISO. Without this setting, RHCOS cannot reliably identify disks by their WWN/serial, and the `rootDeviceHints` in `agent-config.yaml` will fail to match.
+
+Set it via govc, PowerCLI, or the vSphere UI:
+
+```bash
+govc vm.change -vm /Datacenter/vm/ocp-master-0 -e disk.enableUUID=TRUE
+govc vm.change -vm /Datacenter/vm/ocp-master-1 -e disk.enableUUID=TRUE
+govc vm.change -vm /Datacenter/vm/ocp-master-2 -e disk.enableUUID=TRUE
+```
+
+Or in PowerCLI:
+
+```powershell
+Get-VM ocp-master-* | New-AdvancedSetting -Name disk.EnableUUID -Value TRUE -Confirm:$false
+```
+
+!!! warning
+    The VM must be **powered off** when changing this setting. Set it before booting the agent ISO. If the VM was already booted without `disk.EnableUUID`, power it off, enable the setting, and re-boot from the ISO.
+
 ## agent-config.yaml
 
 The `agent-config.yaml` defines host-level configurations. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN.
