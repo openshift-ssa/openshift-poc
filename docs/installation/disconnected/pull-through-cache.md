@@ -104,6 +104,32 @@ podman login {{ artifactory_host }} --authfile ~/merged-pull-secret.json
 
 This produces `~/merged-pull-secret.json` containing credentials for all registries. You will use this file in `install-config.yaml`.
 
+!!! warning "Anonymous pull-through caches still need a pull-secret entry"
+    Even if Artifactory/Nexus allows **anonymous** image pulls (no credentials required), you **must** include a blank `auth` entry for the registry hostname in the pull secret. Without it, CRI-O will not attempt to pull from the host at all.
+
+    If your cache does not require authentication, manually add a blank entry:
+
+    ```bash
+    oc registry login --registry {{ artifactory_host }} \
+      --auth-basic=":"  --to ~/merged-pull-secret.json
+    ```
+
+    Or manually merge the entry into your pull secret JSON:
+
+    ```json
+    {
+      "auths": {
+        "{{ artifactory_host }}": {"auth": ""},
+        "cloud.openshift.com": {"auth": "<redhat-token>"},
+        "quay.io": {"auth": "<redhat-token>"},
+        "registry.redhat.io": {"auth": "<redhat-token>"},
+        "registry.connect.redhat.com": {"auth": "<redhat-token>"}
+      }
+    }
+    ```
+
+    The Red Hat credentials are still required so that Artifactory can authenticate to upstream registries on your behalf.
+
 ---
 
 ## Pre-Warm the Cache (Recommended)

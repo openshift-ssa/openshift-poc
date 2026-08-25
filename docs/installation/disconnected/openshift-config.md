@@ -86,6 +86,9 @@ Use the merged pull secret that contains credentials for both Red Hat registries
 pullSecret: '< contents of ~/merged-pull-secret.json >'
 ```
 
+!!! warning "Anonymous registries require a blank auth entry"
+    If your pull-through cache allows anonymous access, the pull secret must still contain an entry for the registry with an empty `auth` value (e.g., `"{{ artifactory_host }}": {"auth": ""}`). CRI-O will not pull from any registry that has no entry in the pull secret, even if the registry requires no credentials. See [Pull-Through Cache — Create a Merged Pull Secret](pull-through-cache.md#create-a-merged-pull-secret) for details.
+
 ### Complete Example
 
 A full `install-config.yaml` for a disconnected environment (pull-through cache example):
