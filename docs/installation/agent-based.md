@@ -96,12 +96,15 @@ Do **not** add worker hosts to `agent-config.yaml`. List only the three control 
 
 The `agent-config.yaml` defines host-level configurations. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN.
 
+!!! note "rootDeviceHints and interface names"
+    If you do not know what the `rootDeviceHint` or your NIC's interface names are, do not guess. They will follow RHEL naming standards. Boot an example machine with a RHEL ISO and it will tell you how they show up. https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index#root-device-hints_preparing-to-install-with-agent-based-installer
+
 ```yaml
 apiVersion: v1beta1
 kind: AgentConfig
 metadata:
   name: poc
-rendezvousIP: 10.0.0.7
+rendezvousIP: 10.0.0.7        # This should be an IP of one of your nodes, preferably the first master node below. 
 additionalNtpSources:
   - {{ ntp_server_1 }}
   - {{ ntp_server_2 }}
@@ -186,7 +189,7 @@ If your environment uses active-backup bonding instead of LACP:
             address:
               - ip: 10.0.0.7
                 prefix-length: 28
-            dhcp: false
+            dhcp: falsehttps://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index#root-device-hints_preparing-to-install-with-agent-based-installer
           link-aggregation:
             mode: active-backup
             port:
