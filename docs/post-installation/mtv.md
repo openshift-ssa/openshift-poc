@@ -61,7 +61,7 @@ metadata:
   name: mtv-operator
   namespace: openshift-mtv
 spec:
-  channel: stable
+  channel: release-v2.12
   installPlanApproval: Automatic
   name: mtv-operator
   source: redhat-operators

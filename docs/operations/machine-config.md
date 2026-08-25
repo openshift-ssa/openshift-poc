@@ -22,7 +22,7 @@
   spec:
     config:
       ignition:
-        version: 3.4.0
+        version: 3.5.0
       storage:
         files:
         - path: /etc/file.conf
@@ -57,7 +57,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.4.0
+      version: 3.5.0
     storage:
       files:
       - path: /etc/myfile.conf
@@ -90,7 +90,7 @@ Butane transpiles human-readable configs into MachineConfig resources, avoiding 
 
   ```yaml
   variant: openshift
-  version: 4.21.0
+  version: 4.22.0
   metadata:
     name: 99-worker-example
     labels:
@@ -123,7 +123,7 @@ Instead of `inline`, reference a local file:
 
 ```yaml
 variant: openshift
-version: 4.21.0
+version: 4.22.0
 metadata:
   name: 99-worker-example
   labels:

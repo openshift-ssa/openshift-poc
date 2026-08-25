@@ -81,8 +81,8 @@ Strimzi now requires KRaft (no ZooKeeper). Create a dual-role node pool and a Ka
       strimzi.io/kraft: enabled
   spec:
     kafka:
-      version: 3.9.0
-      metadataVersion: 3.9-IV0
+      version: 4.2.0
+      metadataVersion: 4.2-IV0
       listeners:
         - name: plain
           port: 9092
@@ -155,7 +155,7 @@ oc apply -f kafka-topic.yaml
 
   ```bash
   oc run kafka-producer -ti \
-    --image=quay.io/strimzi/kafka:latest-kafka-3.9.0 \
+    --image=quay.io/strimzi/kafka:latest-kafka-4.2.0 \
     --rm=true --restart=Never \
     -- bin/kafka-console-producer.sh \
     --bootstrap-server my-cluster-kafka-bootstrap:9092 \
@@ -166,7 +166,7 @@ oc apply -f kafka-topic.yaml
 
   ```bash
   oc run kafka-consumer -ti \
-    --image=quay.io/strimzi/kafka:latest-kafka-3.9.0 \
+    --image=quay.io/strimzi/kafka:latest-kafka-4.2.0 \
     --rm=true --restart=Never \
     -- bin/kafka-console-consumer.sh \
     --bootstrap-server my-cluster-kafka-bootstrap:9092 \

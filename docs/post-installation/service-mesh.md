@@ -1,6 +1,6 @@
 # OpenShift Service Mesh (Ambient Mode)
 
-[Red Hat OpenShift Service Mesh Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.3/html/installing/ossm-istio-ambient-mode)
+[Red Hat OpenShift Service Mesh Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.4/html/installing/ossm-istio-ambient-mode)
 
 !!! note "Out of POC baseline"
     Service Mesh is **not** part of the default POC checklist. Install it only if mesh (mTLS, traffic splitting) is explicitly in scope for this engagement.

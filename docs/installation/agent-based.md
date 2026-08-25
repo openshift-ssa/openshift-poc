@@ -97,7 +97,7 @@ Do **not** add worker hosts to `agent-config.yaml`. List only the three control 
 The `agent-config.yaml` defines host-level configurations. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN.
 
 !!! note "rootDeviceHints and interface names"
-    If you do not know what the `rootDeviceHint` or your NIC's interface names are, do not guess. They will follow RHEL naming standards. Boot an example machine with a RHEL ISO and it will tell you how they show up. https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index#root-device-hints_preparing-to-install-with-agent-based-installer
+    If you do not know what the `rootDeviceHint` or your NIC's interface names are, do not guess. They will follow RHEL naming standards. Boot an example machine with a RHEL ISO and it will tell you how they show up. [Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index#root-device-hints_preparing-to-install-with-agent-based-installer)
 
 ```yaml
 apiVersion: v1beta1
@@ -167,7 +167,9 @@ Repeat the host entry for each control plane and worker node, updating hostname,
     Use the customer's NTP servers. `pool.ntp.org` only works if nodes have outbound internet, which most on-prem POCs do not. 
 
 !!! note
-    Notice the inconsistent labels and spellings in the OpenShift configs: `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza. `additionalNtpSources` is used in agent-config, but `additionalNTPServers` in install-config.
+    Notice the inconsistent labels and spellings in the OpenShift configs: 
+    - `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza. 
+    - `additionalNtpSources` is used in agent-config, but `additionalNTPServers` in install-config.
 
 ### Active-Backup Bond (No VLAN)
 

@@ -66,14 +66,14 @@ OpenShift version references are managed as sitewide variables in `mkdocs.yaml` 
 
 ```yaml
 extra:
-  ocp_version: "4.21"
-  ocp_release: "4.21.0"
+  ocp_version: "4.22"
+  ocp_release: "4.22.11"
 ```
 
 | Variable      | Example Value | Usage                                              |
 | ------------- | ------------- | -------------------------------------------------- |
-| `ocp_version` | `4.21`        | Channel names, operator index tags, CLI download URLs |
-| `ocp_release` | `4.21.0`      | Full release image tags                            |
+| `ocp_version` | `4.22`        | Channel names, operator index tags, CLI download URLs |
+| `ocp_release` | `4.22.11`     | Full release image tags                            |
 
 Use these in any markdown page with `{{ ocp_version }}` or `{{ ocp_release }}`. The [mkdocs-macros-plugin](https://mkdocs-macros-plugin.readthedocs.io/) substitutes them at build time. To update the version across all pages, change the values in `mkdocs.yaml`.
 

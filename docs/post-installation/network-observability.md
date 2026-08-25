@@ -33,7 +33,7 @@ Loki is recommended. Without Loki you still get dashboards, topology, and export
 - [Storage](storage/index.md) configured (CSI driver installed)
 - A StorageClass for LokiStack internal PVCs (block storage, `ReadWriteOnce`)
 - S3-compatible object storage for flow data (ODF NooBaa, NetApp StorageGRID, AWS S3, etc.)
-- Loki Operator 6.0 or later (`stable-6.5` in this guide)
+- Loki Operator 6.0 or later (`stable-6.6` in this guide)
 
 !!! warning "LokiStack Requires Two Types of Storage"
     - **Block storage** (via StorageClass): WAL, index cache, and compactor working space
@@ -66,7 +66,7 @@ The `PHASE` should show `Succeeded`.
 
 1. Go to Ecosystem -> Software Catalog -> filter for "Loki Operator" -> click the "Loki Operator" tile (provided by Red Hat)
 2. Click Install
-3. Select `stable-6.5` as the Update channel
+3. Select `stable-6.6` as the Update channel
 4. Ensure the namespace is `openshift-operators-redhat` (this should be pre-selected)
 5. Select "Enable Operator-recommended cluster monitoring on this namespace"
 6. Click Install
@@ -108,7 +108,7 @@ The `PHASE` should show `Succeeded`.
      name: loki-operator
      namespace: openshift-operators-redhat
    spec:
-     channel: stable-6.5
+     channel: stable-6.6
      installPlanApproval: Automatic
      name: loki-operator
      source: redhat-operators

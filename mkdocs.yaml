@@ -40,8 +40,8 @@ plugins:
       on_undefined: keep
 
 extra:
-  ocp_version: "4.21"
-  ocp_release: "4.21.0"
+  ocp_version: "4.22"
+  ocp_release: "4.22.11"
 
 markdown_extensions:
   - admonition

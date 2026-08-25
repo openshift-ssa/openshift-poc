@@ -34,7 +34,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.4.0
+      version: 3.5.0
     storage:
       files:
         - path: /usr/local/bin/gen-initiatorname.sh
@@ -73,7 +73,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.4.0
+      version: 3.5.0
     systemd:
       units:
         - name: iscsid.service
@@ -96,7 +96,7 @@ metadata:
 spec:
   config:
     ignition:
-      version: 3.4.0
+      version: 3.5.0
     storage:
       files:
         - path: /etc/multipath.conf

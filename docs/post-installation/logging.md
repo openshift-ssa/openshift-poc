@@ -11,7 +11,7 @@ OpenShift Logging provides centralized log collection, storage, and querying for
 | Cluster Observability Operator     | `openshift-cluster-observability-operator` | Adds Logs tab to the web console (optional)                 |
 
 !!! info
-    The Loki Operator and the Red Hat OpenShift Logging Operator must use the same major and minor version (e.g., both on `stable-6.5`).
+    The Loki Operator and the Red Hat OpenShift Logging Operator must use the same major and minor version (e.g., both on `stable-6.6`).
 
     If you also install [Network Observability](network-observability.md), create a **separate** LokiStack with `tenants.mode: openshift-network`. Do not reuse the logging LokiStack. The Loki Operator can be shared.
 
@@ -50,7 +50,7 @@ The Loki Operator must be installed first, before the Logging Operator.
 
 1. Go to Ecosystem -> Software Catalog -> filter for "Loki Operator" -> click the "Loki Operator" tile (provided by Red Hat)
 2. Click Install
-3. Select `stable-6.5` as the Update channel
+3. Select `stable-6.6` as the Update channel
 4. Ensure the namespace is `openshift-operators-redhat` (this should be pre-selected)
 5. Select "Enable Operator-recommended cluster monitoring on this namespace"
 6. Click Install
@@ -91,7 +91,7 @@ The Loki Operator must be installed first, before the Logging Operator.
      name: loki-operator
      namespace: openshift-operators-redhat
    spec:
-     channel: stable-6.5
+     channel: stable-6.6
      installPlanApproval: Automatic
      name: loki-operator
      source: redhat-operators
@@ -253,7 +253,7 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
 
 1. Go to Ecosystem -> Software Catalog -> filter for "Red Hat OpenShift Logging" -> click the tile
 2. Click Install
-3. Select `stable-6.5` as the Update channel
+3. Select `stable-6.6` as the Update channel
 4. Ensure the namespace is `openshift-logging`
 5. Select "Enable Operator-recommended cluster monitoring on this namespace"
 6. Click Install
@@ -278,7 +278,7 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
       name: cluster-logging
       namespace: openshift-logging
     spec:
-      channel: stable-6.5
+      channel: stable-6.6
       installPlanApproval: Automatic
       name: cluster-logging
       source: redhat-operators

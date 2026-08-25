@@ -55,7 +55,7 @@ hcp version
 Alternatively, download from the [OpenShift mirror](https://mirror.openshift.com/pub/openshift-v4/clients/hcp/).
 
 !!! note
-    Do not use `oc extract configmap/hcp-cli-download`. That ConfigMap is not a reliable source for the 4.21 CLI.
+    Do not use `oc extract configmap/hcp-cli-download`. That ConfigMap is not a reliable source for the 4.22 CLI.
 
 ## Create a Hosted Cluster (KubeVirt workers)
 
