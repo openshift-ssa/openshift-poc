@@ -21,8 +21,8 @@ The Migration Toolkit for Virtualization (MTV) enables migration of virtual mach
 To obtain the VDDK:
 
 1. Log in to the [Broadcom Support Portal](https://support.broadcom.com)
-2. Open a support ticket requesting access to the **VMware Virtual Disk Development Kit (VDDK)** for your licensed vSphere version
-3. Once access is granted, download the VDDK archive from the [Broadcom Developer Portal](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest)
+2. Open a support ticket requesting the **VMware Virtual Disk Development Kit (VDDK)** for your licensed vSphere version
+3. Broadcom support will provide the VDDK archive directly — it is no longer available for self-service download from the developer portal
 4. Match the VDDK version to your source vSphere version (e.g., VDDK 8.0.x for vSphere 8.0)
 
 Without the VDDK, migrations will fall back to a slower transfer method and migrations from VMware vSAN-backed VMs will not work at all.
@@ -164,6 +164,91 @@ A source provider is the hypervisor environment you are migrating VMs from. A de
 
   The `READY` column should show `True`.
 
+## vSphere Provider Inventory — Why Only a Subset of VMs Appears
+
+The MTV vSphere provider connects to **vCenter**, not to a single cluster. The list of virtual machines it shows is whatever the service account is allowed to enumerate through vCenter's VM folder tree. That is not the same as "VMs running on this cluster," and it is not the same as what the vSphere Client shows under **Hosts and Clusters**.
+
+Typical observed behavior:
+
+| Permission scope                                      | VMs visible in MTV                                                    |
+| ----------------------------------------------------- | --------------------------------------------------------------------- |
+| Cluster-level Admin                                   | A small subset (e.g. 8), spread across the ESXi hosts in that cluster |
+| Datacenter-level Admin (propagate)                    | All VMs in that datacenter, including VMs on other clusters           |
+| Cluster + specific VM folders + datastores + networks | Only the intended cluster's VMs, without exposing other clusters      |
+
+This behavior is expected.
+
+### How MTV Discovers VMs
+
+MTV (Forklift) logs into vCenter with the provider credentials and walks inventory via the vSphere SOAP API (`PropertyCollector`). It starts at the vCenter root folder and follows two different trees under the datacenter:
+
+| vCenter tree                      | What MTV uses it for           |
+| --------------------------------- | ------------------------------ |
+| Hosts and Clusters (`hostFolder`) | Clusters, ESXi hosts           |
+| VMs and Templates (`vmFolder`)    | Virtual machines               |
+| Storage / Networking folders      | Datastores, networks, switches |
+
+Virtual machines are **not** children of the cluster in vCenter's inventory model. They run on hosts in the cluster, but their inventory location is almost always a VM folder at the datacenter level (for example `Discovered virtual machine` or an application folder).
+
+MTV lists a VM only if it can walk down to that VM through **VMs and Templates** (or a vApp). It does not ask each host "which VMs are on you?"
+
+Therefore:
+
+- **Cluster Admin** is enough to see hosts and a few VMs whose inventory parent is actually under the cluster (resource pool, vApp, or a reachable folder). It is **not** enough to list VMs that live in datacenter VM folders, even if those VMs are running on that cluster's hosts.
+- **Datacenter Admin with propagate** unlocks all four trees (VM folders, clusters, datastores, networks) — which is why MTV then shows VMs on other clusters too.
+
+MTV also hides templates and incomplete "ghost" VMs (no UUID and no host). That usually accounts for a few objects, not most of the inventory.
+
+### Why the vSphere Client and MTV Disagree
+
+The vSphere HTML5 Client and MTV do not use the same view:
+
+| Tool                                 | Path used                                                                    | Result with cluster-level Admin                |
+| ------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------- |
+| vSphere Client (Hosts and Clusters)  | VMs shown as related to hosts/cluster — VMs inherit rights from cluster/host | All ~127 VMs can appear                        |
+| MTV provider inventory               | Walk of VMs and Templates folders                                            | Only VMs in folders the account can enumerate  |
+
+Seeing every VM in the vSphere Client with a service account does **not** mean MTV can inventory them. Confirm by logging in as the same user stored in the MTV provider secret and switching to **VMs and Templates**, not Hosts and Clusters.
+
+### Recommended Permission Layout
+
+Do not grant Admin on the whole datacenter if other clusters must stay hidden. Use a dedicated MTV role with the [documented VMware privileges](https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/latest/html/installing_and_using_the_migration_toolkit_for_virtualization/prerequisites#vmware-privileges_mtv) (interaction, provisioning, snapshot, datastore browse/low-level file, session validate, crypto if disks are encrypted).
+
+| vCenter object                                | Permission          | Propagate                                                                               |
+| --------------------------------------------- | ------------------- | --------------------------------------------------------------------------------------- |
+| vCenter root                                  | Read-only           | No                                                                                      |
+| Datacenter                                    | Read-only           | No — lets MTV traverse without inheriting every cluster, folder, datastore, and network |
+| Intended cluster                              | MTV role (or Admin) | Yes — covers hosts and compute                                                          |
+| VM folder(s) containing the target VMs        | MTV role (or Admin) | Yes — **this grant is what makes VMs appear in MTV**                                    |
+| Datastores used by those VMs                  | MTV role (or Admin) | Yes                                                                                     |
+| Networks / distributed switches / port groups | MTV role (or Admin) | Yes                                                                                     |
+
+If the VMs are spread across many folders, either grant on each folder or move in-scope VMs into one dedicated folder and grant only there.
+
+!!! warning
+    Do not grant rights only on the VM objects. MTV still needs parent folders, datastores, and networks. Red Hat requires rights on the objects a VM **uses**, not only on the VM itself.
+
+After changing permissions, wait for MTV to refresh provider inventory (or reconnect/reconcile the provider) and confirm the VM count.
+
+### How to Verify
+
+1. Log into the vSphere Client as the exact account in the MTV provider secret
+2. Open **VMs and Templates** (not Hosts and Clusters)
+3. Compare a VM that MTV shows vs. one it does not — the missing VM will typically sit in a datacenter VM folder that has no grant for this account
+
+Optionally check MTV inventory logs for skipped or permission-related objects:
+
+```bash
+oc logs -n openshift-mtv deploy/forklift-controller -c inventory \
+  | grep -E 'ghost VM|Skipping template|NoPermission|permission'
+```
+
+On newer MTV versions, also review the Provider resource for reported missing vSphere privileges:
+
+```bash
+oc get provider vsphere-source -n openshift-mtv -o jsonpath='{.status.conditions}' | jq
+```
+
 ## Set Up the VMware Virtual Disk Development Kit (VDDK)
 
 It is strongly recommended that MTV be used with the VMware Virtual Disk Development Kit (VDDK) SDK when transferring virtual disks from VMware vSphere. Using MTV without VDDK is not recommended and could result in significantly lower migration speeds. You must use a VDDK image if the source VMs are backed by VMware vSAN.
@@ -173,16 +258,16 @@ Download the VDDK archive from VMware, then either upload it through the MTV Web
 !!! warning "VMware License"
     Storing the VDDK image in a public registry might violate the VMware license terms.
 
-### Download VDDK from Broadcom
+### Obtain VDDK from Broadcom
 
 Match the VDDK version to your source vSphere (vCenter/ESXi) version. Broadcom aligns VDDK version numbers with vSphere (for example, use VDDK **8.0.x** with vSphere **8.0**). Prefer the VDDK release that corresponds to your environment's major.minor version so disk-transfer features and compatibility stay aligned.
 
 !!! note
-    You must have an active Broadcom support ticket granting VDDK access before you can download. See [Obtaining the VDDK](#obtaining-the-vddk) above.
+    The VDDK is no longer available for self-service download from the Broadcom developer portal. You must open a support ticket and Broadcom will provide the archive directly. See [Obtaining the VDDK](#obtaining-the-vddk) above.
 
-1. Open the [Broadcom Developer Portal VDDK page](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/latest) for the major version that matches your vSphere release (for example, [VDDK 8](https://developer.broadcom.com/sdks/vmware-virtual-disk-development-kit-vddk/8.0) for vSphere 8)
-2. Select the VDDK version closest to your vSphere version and click Download
-3. Save `VMware-vix-disklib-<version>.x86_64.tar.gz` locally (for example, into `/tmp/vddk`)
+1. Open a support ticket at the [Broadcom Support Portal](https://support.broadcom.com) requesting VDDK for your vSphere version
+2. Broadcom support will provide the `VMware-vix-disklib-<version>.x86_64.tar.gz` archive
+3. Save the archive locally (for example, into `/tmp/vddk`)
 
 ### Upload the VDDK Image via WebUI
 
