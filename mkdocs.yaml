@@ -142,6 +142,7 @@ nav:
       - Virtual Machine Workloads:
           - Deploying Virtual Machines: workloads/workload-virtual-machines.md
           - RHEL VM with Apache httpd: workloads/rhel-httpd-vm.md
+          - Virtual Appliances (OVA): workloads/ova-virtual-appliance.md
       - Operational Validation:
           - VM Failover Test: operations/vm-failover.md
           - Container Failover Test: operations/container-failover.md
