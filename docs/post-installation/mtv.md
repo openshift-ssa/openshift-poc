@@ -25,7 +25,7 @@ To obtain the VDDK:
 3. Broadcom support will provide the VDDK archive directly — it is no longer available for self-service download from the developer portal
 4. Match the VDDK version to your source vSphere version (e.g., VDDK 8.0.x for vSphere 8.0)
 
-Without the VDDK, migrations will fall back to a slower transfer method and migrations from VMware vSAN-backed VMs will not work at all.
+Without the VDDK, migrations fall back to a slower transfer method (`virt-v2v`). The VDDK is strongly recommended for all VMware migrations.
 
 ## Install the Operator via WebUI
 
@@ -251,7 +251,7 @@ oc get provider vsphere-source -n openshift-mtv -o jsonpath='{.status.conditions
 
 ## Set Up the VMware Virtual Disk Development Kit (VDDK)
 
-It is strongly recommended that MTV be used with the VMware Virtual Disk Development Kit (VDDK) SDK when transferring virtual disks from VMware vSphere. Using MTV without VDDK is not recommended and could result in significantly lower migration speeds. You must use a VDDK image if the source VMs are backed by VMware vSAN.
+It is strongly recommended that MTV be used with the VMware Virtual Disk Development Kit (VDDK) SDK when transferring virtual disks from VMware vSphere. Without the VDDK, MTV falls back to the slower `virt-v2v` transfer path, which can result in significantly longer migration times.
 
 Download the VDDK archive from VMware, then either upload it through the MTV WebUI (MTV builds the init image for you) or build and push the container image yourself with `podman`.
 
@@ -455,7 +455,7 @@ Once providers are configured, create a migration plan using the WebUI wizard:
 !!! tip "Start with Cold Migrations"
     For POC environments, start with cold migrations. They are simpler to troubleshoot and do not require VMware Changed Block Tracking (CBT).
 
-    Cold migration of **non-vSAN** disks can run without VDDK (slower). **vSAN-backed VMs still require a VDDK image** — without it those migrations fail. See [Obtaining the VDDK](#obtaining-the-vddk).
+    Migrations can run without VDDK but will use the slower `virt-v2v` fallback. VDDK is strongly recommended for acceptable transfer speeds. See [Obtaining the VDDK](#obtaining-the-vddk).
 
 ## Run the Migration
 
