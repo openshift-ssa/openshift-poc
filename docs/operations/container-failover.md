@@ -169,13 +169,13 @@ This guide walks through testing container workload failover by deploying a samp
 
 ## Key Differences from VM Failover
 
-| Aspect             | Container Pods                                        | Virtual Machines                                  |
-| ------------------ | ----------------------------------------------------- | ------------------------------------------------- |
-| Restart behavior   | New pod created by Deployment controller              | New VMI created by virt-controller                |
-| Downtime           | Zero (other replicas keep serving)                    | ~120s (single instance restarts)                  |
-| IP persistence     | New pod gets a new IP (Service abstracts this)        | Same IP via CUDN persistent IPAM                  |
-| Storage            | StatefulSet PVCs reattach; Deployment PVCs are fresh  | RWX disks reattach to new node                    |
-| Scaling            | Multiple replicas provide built-in HA                 | Single instance, relies on failover               |
+| Aspect           | Container Pods                                       | Virtual Machines                    |
+| ---------------- | ---------------------------------------------------- | ----------------------------------- |
+| Restart behavior | New pod created by Deployment controller             | New VMI created by virt-controller  |
+| Downtime         | Zero (other replicas keep serving)                   | ~120s (single instance restarts)    |
+| IP persistence   | New pod gets a new IP (Service abstracts this)       | Same IP via CUDN persistent IPAM    |
+| Storage          | StatefulSet PVCs reattach; Deployment PVCs are fresh | RWX disks reattach to new node      |
+| Scaling          | Multiple replicas provide built-in HA                | Single instance, relies on failover |
 
 !!! info "Why Containers Recover Faster"
     With multiple replicas behind a Service, container workloads experience **zero downtime** from the client's perspective during a node failure. The Service immediately stops routing to the unavailable pod, and the remaining replicas handle all traffic. The Deployment controller then creates a replacement pod on a healthy node to restore full capacity — but the application was never actually "down."

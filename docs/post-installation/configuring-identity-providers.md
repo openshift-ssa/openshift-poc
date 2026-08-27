@@ -9,23 +9,23 @@ By default, only the `kubeadmin` user exists on the cluster. An identity provide
 
 ## Supported Identity Providers
 
-| Provider     | Type       | Use Case                                           |
-| ------------ | ---------- | -------------------------------------------------- |
-| LDAP         | `LDAP`     | Active Directory, OpenLDAP, FreeIPA                |
-| OpenID Connect | `OpenID` | Keycloak, Azure AD, Okta, Google                   |
-| HTPasswd     | `HTPasswd` | Simple file-based auth (good for POC admin users)  |
-| GitHub       | `GitHub`   | GitHub or GitHub Enterprise                        |
-| GitLab       | `GitLab`   | GitLab                                             |
+| Provider       | Type       | Use Case                                          |
+| -------------- | ---------- | ------------------------------------------------- |
+| LDAP           | `LDAP`     | Active Directory, OpenLDAP, FreeIPA               |
+| OpenID Connect | `OpenID`   | Keycloak, Azure AD, Okta, Google                  |
+| HTPasswd       | `HTPasswd` | Simple file-based auth (good for POC admin users) |
+| GitHub         | `GitHub`   | GitHub or GitHub Enterprise                       |
+| GitLab         | `GitLab`   | GitLab                                            |
 
 ## Mapping Methods
 
 The `mappingMethod` controls how identities from the provider are mapped to OpenShift users:
 
-| Method   | Behavior                                                                                     |
-| -------- | -------------------------------------------------------------------------------------------- |
+| Method   | Behavior                                                                                      |
+| -------- | --------------------------------------------------------------------------------------------- |
 | `claim`  | Default. Provisions a new user with the identity's preferred username. Fails if already taken |
-| `lookup` | Only maps to pre-existing users. Requires manual user provisioning                           |
-| `add`    | Maps to existing user if username matches, or creates new. Use with multiple providers       |
+| `lookup` | Only maps to pre-existing users. Requires manual user provisioning                            |
+| `add`    | Maps to existing user if username matches, or creates new. Use with multiple providers        |
 
 ## Configure LDAP Identity Provider
 
@@ -352,12 +352,12 @@ OpenID Connect (OIDC) integrates with providers like Keycloak, Microsoft Entra I
   ```
 
 !!! info "Claims Mapping"
-    | Field                | Purpose                                          | Common Values                    |
-    | -------------------- | ------------------------------------------------ | -------------------------------- |
-    | `preferredUsername`  | Username in OpenShift                            | `preferred_username`, `email`, `upn` |
-    | `name`              | Display name                                     | `name`, `given_name`             |
-    | `email`             | Email address                                    | `email`                          |
-    | `groups`            | Group memberships (maps to OpenShift Groups)     | `groups`, `roles`                |
+    | Field               | Purpose                                      | Common Values                        |
+    | ------------------- | -------------------------------------------- | ------------------------------------ |
+    | `preferredUsername` | Username in OpenShift                        | `preferred_username`, `email`, `upn` |
+    | `name`              | Display name                                 | `name`, `given_name`                 |
+    | `email`             | Email address                                | `email`                              |
+    | `groups`            | Group memberships (maps to OpenShift Groups) | `groups`, `roles`                    |
 
     The `groups` claim allows the OIDC provider to pass group memberships directly in the token. OpenShift will automatically create Groups and assign users to them based on this claim.
 

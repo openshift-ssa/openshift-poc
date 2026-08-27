@@ -125,10 +125,10 @@ hcp create cluster agent \
 
 Create DNS records for the hosted cluster:
 
-| Record | Value |
-|--------|-------|
-| `api.hosted-cluster-kv.ocp.basedomain.com` | Load balancer or IP for the API server service |
-| `*.apps.hosted-cluster-kv.ocp.basedomain.com` | Load balancer or IP for the ingress service |
+| Record                                        | Value                                          |
+| --------------------------------------------- | ---------------------------------------------- |
+| `api.hosted-cluster-kv.ocp.basedomain.com`    | Load balancer or IP for the API server service |
+| `*.apps.hosted-cluster-kv.ocp.basedomain.com` | Load balancer or IP for the ingress service    |
 
 Retrieve the service addresses:
 

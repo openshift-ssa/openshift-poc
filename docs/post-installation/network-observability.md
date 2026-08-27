@@ -4,13 +4,13 @@
 
 The Network Observability Operator captures cluster network flows with an eBPF agent on each node, enriches them with Kubernetes metadata, and shows topology, metrics, and traffic tables in the OpenShift web console under **Observe -> Network Traffic**.
 
-| Component                          | Namespace                        | Purpose                                                                 |
-| ---------------------------------- | -------------------------------- | ----------------------------------------------------------------------- |
-| Loki Operator                      | `openshift-operators-redhat`     | Manages LokiStack (cluster-wide; reuse if already installed for logging) |
-| LokiStack                          | `netobserv-loki`                 | Stores flow logs with the `openshift-network` tenant                    |
-| Network Observability Operator     | `openshift-netobserv-operator`   | Manages the `FlowCollector` CR                                          |
-| Flow pipeline and console plugin   | `netobserv`                      | Receives, enriches, and displays flows                                  |
-| eBPF agents                        | `netobserv-privileged`           | DaemonSet that samples packets on every node                            |
+| Component                        | Namespace                      | Purpose                                                                  |
+| -------------------------------- | ------------------------------ | ------------------------------------------------------------------------ |
+| Loki Operator                    | `openshift-operators-redhat`   | Manages LokiStack (cluster-wide; reuse if already installed for logging) |
+| LokiStack                        | `netobserv-loki`               | Stores flow logs with the `openshift-network` tenant                     |
+| Network Observability Operator   | `openshift-netobserv-operator` | Manages the `FlowCollector` CR                                           |
+| Flow pipeline and console plugin | `netobserv`                    | Receives, enriches, and displays flows                                   |
+| eBPF agents                      | `netobserv-privileged`         | DaemonSet that samples packets on every node                             |
 
 !!! warning "Use a dedicated LokiStack"
     Do not reuse the [Logging](logging.md) LokiStack. Network Observability requires its own LokiStack with `tenants.mode: openshift-network`. The Loki Operator itself can be shared.
@@ -43,11 +43,11 @@ Loki is recommended. Without Loki you still get dashboards, topology, and export
 
 ## Deployment Sizing
 
-| Size               | Use case              | Notes                                      |
-| ------------------ | --------------------- | ------------------------------------------ |
-| `1x.demo`        | POC / compact cluster | No HA; use on 3-node or small labs         |
+| Size             | Use case              | Notes                                        |
+| ---------------- | --------------------- | -------------------------------------------- |
+| `1x.demo`        | POC / compact cluster | No HA; use on 3-node or small labs           |
 | `1x.extra-small` | Small cluster         | Typical starting size for a POC with workers |
-| `1x.small`       | Medium cluster        | Higher ingest and query load               |
+| `1x.small`       | Medium cluster        | Higher ingest and query load                 |
 
 !!! tip
     For a POC, start with `1x.demo` on compact or single-node clusters, or `1x.extra-small` otherwise. Leave eBPF sampling at `50` (1 in 50 packets) unless you need denser data.
@@ -432,11 +432,11 @@ spec:
         - FlowRTT
 ```
 
-| Feature        | What it adds                                      | Privileged required |
-| -------------- | ------------------------------------------------- | ------------------- |
-| `PacketDrop` | Dropped-packet counters on flows                  | Yes                 |
-| `DNSTracking`| DNS latency and response codes                    | No                  |
-| `FlowRTT`    | TCP smoothed RTT                                  | No                  |
+| Feature       | What it adds                     | Privileged required |
+| ------------- | -------------------------------- | ------------------- |
+| `PacketDrop`  | Dropped-packet counters on flows | Yes                 |
+| `DNSTracking` | DNS latency and response codes   | No                  |
+| `FlowRTT`     | TCP smoothed RTT                 | No                  |
 
 ### Secondary networks and virtual machines
 
@@ -463,11 +463,11 @@ See [Networking](networking.md) and [OpenShift Virtualization](virtualization.md
 
 Cluster administrators can view all flows. Grant others access with:
 
-| Role                          | Scope                                      |
-| ----------------------------- | ------------------------------------------ |
-| `netobserv-loki-reader`     | Cluster-wide flow logs in Loki             |
-| `cluster-monitoring-view`   | Cluster-wide Prometheus metrics            |
-| `netobserv-metrics-reader`  | Metrics; bind as a cluster role or per namespace |
+| Role                       | Scope                                            |
+| -------------------------- | ------------------------------------------------ |
+| `netobserv-loki-reader`    | Cluster-wide flow logs in Loki                   |
+| `cluster-monitoring-view`  | Cluster-wide Prometheus metrics                  |
+| `netobserv-metrics-reader` | Metrics; bind as a cluster role or per namespace |
 
 Cluster-wide access for a non-admin user:
 

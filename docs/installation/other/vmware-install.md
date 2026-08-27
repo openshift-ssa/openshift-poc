@@ -131,17 +131,17 @@ Folder.Delete
 
 ### Propagation Settings
 
-| vSphere Object          | When Required                       | Propagate to Children |
-| ----------------------- | ----------------------------------- | --------------------- |
-| vSphere vCenter         | Always                              | No                    |
-| vCenter Datacenter      | Existing folder                     | No (ReadOnly)         |
-| vCenter Datacenter      | Installation program creates folder | Yes                   |
-| vCenter Cluster         | Always                              | Yes                   |
-| vSphere Datastore       | Always                              | No                    |
-| vSphere Switch          | Always                              | No (ReadOnly)         |
-| vSphere Port Group      | Always                              | No                    |
-| vCenter VM Folder       | Existing folder                     | Yes                   |
-| vCenter Resource Pool   | Existing resource pool              | Yes                   |
+| vSphere Object        | When Required                       | Propagate to Children |
+| --------------------- | ----------------------------------- | --------------------- |
+| vSphere vCenter       | Always                              | No                    |
+| vCenter Datacenter    | Existing folder                     | No (ReadOnly)         |
+| vCenter Datacenter    | Installation program creates folder | Yes                   |
+| vCenter Cluster       | Always                              | Yes                   |
+| vSphere Datastore     | Always                              | No                    |
+| vSphere Switch        | Always                              | No (ReadOnly)         |
+| vSphere Port Group    | Always                              | No                    |
+| vCenter VM Folder     | Existing folder                     | Yes                   |
+| vCenter Resource Pool | Existing resource pool              | Yes                   |
 
 !!! tip
     Create a dedicated vCenter service account for OpenShift rather than using an admin account. This makes auditing and credential rotation easier.

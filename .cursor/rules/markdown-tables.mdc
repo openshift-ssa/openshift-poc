@@ -1,0 +1,32 @@
+---
+description: Format markdown tables with aligned columns for human readability
+globs: "**/*.md"
+alwaysApply: false
+---
+
+# Markdown Table Formatting
+
+Always format markdown tables with aligned columns using consistent padding so they are readable in plain text, not just when rendered.
+
+```markdown
+| Field         | Example           |
+| ------------- | ----------------- |
+| IP Address    | 10.0.0.7          |
+| Subnet Mask   | 255.255.255.240   |
+| Gateway       | 10.0.0.1          |
+```
+
+Not:
+
+```markdown
+| Field | Example |
+|---|---|
+| IP Address | 10.0.0.7 |
+| Subnet Mask | 255.255.255.240 |
+| Gateway | 10.0.0.1 |
+```
+
+Rules:
+- Pad every column so all `|` separators align vertically
+- Use dashes in the separator row that match the column width (e.g. `| ------------- |`)
+- Keep one space of padding on each side of every cell's content

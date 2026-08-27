@@ -13,11 +13,11 @@ This guide covers how to configure the OpenShift installer and post-install oper
 
 The standard installation process follows the [Agent-Based Installer](../agent-based.md) guide. For a disconnected environment, you add three fields to `install-config.yaml`:
 
-| Field | Purpose |
-| ----- | ------- |
-| `imageDigestSources` | Routes image pulls to your internal registry |
-| `additionalTrustBundle` | Adds your registry's CA certificate to cluster trust |
-| `pullSecret` | Contains credentials for both Red Hat and your internal registry |
+| Field                   | Purpose                                                          |
+| ----------------------- | ---------------------------------------------------------------- |
+| `imageDigestSources`    | Routes image pulls to your internal registry                     |
+| `additionalTrustBundle` | Adds your registry's CA certificate to cluster trust             |
+| `pullSecret`            | Contains credentials for both Red Hat and your internal registry |
 
 ### imageDigestSources
 
@@ -479,13 +479,13 @@ oc get pods -A -o jsonpath='{range .items[*]}{.spec.containers[*].image}{"\n"}{e
 
 ## Troubleshooting
 
-| Symptom | Likely Cause | Fix |
-| ------- | ------------ | --- |
-| `ImagePullBackOff` on any pod | Pull secret missing registry creds | Update global pull secret |
-| `x509: certificate signed by unknown authority` | CA not in `additionalTrustBundle` | Add registry CA certificate |
-| CatalogSource pod not starting | Catalog image path incorrect | Verify remote repo name in image path |
-| Operator shows available but install hangs | Bundle images routing to wrong repo | Add missing source to `ImageDigestMirrorSet` |
-| MachineConfigPool degraded | `imageDigestSources` mismatch | Verify paths match registry layout |
-| Upgrade shows no available versions | Update graph unreachable | Use `--to-image` with explicit release image |
+| Symptom                                         | Likely Cause                        | Fix                                          |
+| ----------------------------------------------- | ----------------------------------- | -------------------------------------------- |
+| `ImagePullBackOff` on any pod                   | Pull secret missing registry creds  | Update global pull secret                    |
+| `x509: certificate signed by unknown authority` | CA not in `additionalTrustBundle`   | Add registry CA certificate                  |
+| CatalogSource pod not starting                  | Catalog image path incorrect        | Verify remote repo name in image path        |
+| Operator shows available but install hangs      | Bundle images routing to wrong repo | Add missing source to `ImageDigestMirrorSet` |
+| MachineConfigPool degraded                      | `imageDigestSources` mismatch       | Verify paths match registry layout           |
+| Upgrade shows no available versions             | Update graph unreachable            | Use `--to-image` with explicit release image |
 
 For common installation issues, see [Troubleshooting](../troubleshooting.md).

@@ -194,13 +194,13 @@ Remove the pause request entry to resume remediation.
 
 ### Key Configuration Fields
 
-| Field                    | Description                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------ |
+| Field                    | Description                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------- |
 | `minHealthy`             | Minimum percentage/number of healthy nodes required before remediation triggers |
-| `maxUnhealthy`           | Alternative to minHealthy — max unhealthy nodes allowed                        |
-| `stormCooldownDuration`  | Cooldown period after a storm of remediations (default 60s)                    |
-| `pauseRequests`          | List of strings to pause remediation during maintenance                        |
-| `escalatingRemediations` | Ordered list of remediation strategies with timeouts                           |
+| `maxUnhealthy`           | Alternative to minHealthy — max unhealthy nodes allowed                         |
+| `stormCooldownDuration`  | Cooldown period after a storm of remediations (default 60s)                     |
+| `pauseRequests`          | List of strings to pause remediation during maintenance                         |
+| `escalatingRemediations` | Ordered list of remediation strategies with timeouts                            |
 
 ### Verify
 
@@ -355,11 +355,11 @@ spec:
 
 ### Descheduler Profiles
 
-| Profile                     | Description                                                                                          |
-| --------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `KubeVirtRelieveAndMigrate` | Load-aware rebalancing for both virtual machines and container workloads using CPU/memory and PSI    |
-| `TopologyAndDuplicates`     | Balances topology domain constraints and spreads duplicates                                          |
-| `LongLifecycle`             | Evicts long-running and overutilized pods; do not combine with `KubeVirtRelieveAndMigrate`           |
+| Profile                     | Description                                                                                       |
+| --------------------------- | ------------------------------------------------------------------------------------------------- |
+| `KubeVirtRelieveAndMigrate` | Load-aware rebalancing for both virtual machines and container workloads using CPU/memory and PSI |
+| `TopologyAndDuplicates`     | Balances topology domain constraints and spreads duplicates                                       |
+| `LongLifecycle`             | Evicts long-running and overutilized pods; do not combine with `KubeVirtRelieveAndMigrate`        |
 
 `KubeVirtRelieveAndMigrate` is the recommended profile for mixed clusters. It manages both workload types:
 
@@ -382,17 +382,17 @@ The following describes the complete sequence when a node running a virtual mach
 
 ### Timeline
 
-| Time    | Event                                                                                         |
-| ------- | --------------------------------------------------------------------------------------------- |
-| T+0s    | Node fails — stops responding to the API server                                               |
-| T+~50s  | API server marks node condition `Ready=Unknown` after missing heartbeats                      |
-| T+~80s  | NHC detects the unhealthy condition has exceeded the 30s `duration` threshold                 |
-| T+~80s  | NHC creates a `SelfNodeRemediation` CR for the unhealthy node                                |
-| T+~85s  | SNR marks the node as unschedulable and applies the `OutOfServiceTaint`                       |
+| Time    | Event                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------ |
+| T+0s    | Node fails — stops responding to the API server                                                  |
+| T+~50s  | API server marks node condition `Ready=Unknown` after missing heartbeats                         |
+| T+~80s  | NHC detects the unhealthy condition has exceeded the 30s `duration` threshold                    |
+| T+~80s  | NHC creates a `SelfNodeRemediation` CR for the unhealthy node                                    |
+| T+~85s  | SNR marks the node as unschedulable and applies the `OutOfServiceTaint`                          |
 | T+~90s  | The `OutOfServiceTaint` allows Kubernetes to force-delete pods and VolumeAttachments on the node |
-| T+~95s  | The VM pod is deleted and the `VirtualMachineInstance` is rescheduled by the virt-controller  |
-| T+~100s | The VM pod starts on a healthy node, attaches RWX storage                                    |
-| T+~120s | The VM is fully running on the new node                                                      |
+| T+~95s  | The VM pod is deleted and the `VirtualMachineInstance` is rescheduled by the virt-controller     |
+| T+~100s | The VM pod starts on a healthy node, attaches RWX storage                                        |
+| T+~120s | The VM is fully running on the new node                                                          |
 
 ### What Happens Under the Hood
 
@@ -422,12 +422,12 @@ Reducing the failover time below 120 seconds (e.g., to 30 seconds) is theoretica
 
 ### Tunable Parameters
 
-| Parameter                          | Default   | Aggressive | Where                              |
-| ---------------------------------- | --------- | ---------- | ---------------------------------- |
-| `node-monitor-grace-period`        | 40s       | 10s        | kube-controller-manager            |
-| NHC `unhealthyConditions.duration` | 30s       | 5s         | NodeHealthCheck CR                 |
-| SNR `safeTimeToAssumeNodeRebootedSeconds` | 180s | 30s  | SelfNodeRemediationConfig CR       |
-| kubelet `nodeStatusUpdateFrequency` | 10s      | 5s         | KubeletConfig CR                   |
+| Parameter                                 | Default | Aggressive | Where                        |
+| ----------------------------------------- | ------- | ---------- | ---------------------------- |
+| `node-monitor-grace-period`               | 40s     | 10s        | kube-controller-manager      |
+| NHC `unhealthyConditions.duration`        | 30s     | 5s         | NodeHealthCheck CR           |
+| SNR `safeTimeToAssumeNodeRebootedSeconds` | 180s    | 30s        | SelfNodeRemediationConfig CR |
+| kubelet `nodeStatusUpdateFrequency`       | 10s     | 5s         | KubeletConfig CR             |
 
 ### Complications
 

@@ -35,12 +35,12 @@ Create remote (proxy) repositories in your artifact manager for each upstream re
 
 Create **Remote Container Repositories** for each upstream:
 
-| Repository Key | URL | Notes |
-| -------------- | --- | ----- |
-| `quay-remote` | `https://quay.io` | OpenShift release images |
-| `redhat-registry-remote` | `https://registry.redhat.io` | Core Red Hat images |
-| `redhat-access-remote` | `https://registry.access.redhat.com` | Legacy Red Hat images (UBI, etc.) |
-| `redhat-connect-remote` | `https://registry.connect.redhat.com` | Certified partner operators |
+| Repository Key           | URL                                   | Notes                             |
+| ------------------------ | ------------------------------------- | --------------------------------- |
+| `quay-remote`            | `https://quay.io`                     | OpenShift release images          |
+| `redhat-registry-remote` | `https://registry.redhat.io`          | Core Red Hat images               |
+| `redhat-access-remote`   | `https://registry.access.redhat.com`  | Legacy Red Hat images (UBI, etc.) |
+| `redhat-connect-remote`  | `https://registry.connect.redhat.com` | Certified partner operators       |
 
 For each remote repository:
 

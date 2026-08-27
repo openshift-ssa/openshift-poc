@@ -40,12 +40,12 @@ oc-mirror version
 
 You need a container registry on the disconnected network. Options include:
 
-| Registry | Notes |
-| -------- | ----- |
+| Registry                                                                                                                                                                                                                                                        | Notes                                          |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
 | [Mirror registry for Red Hat OpenShift](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2#mirror-registry-for-red-hat-openshift) | Purpose-built, minimal setup, runs with Podman |
-| [Red Hat Quay](https://docs.redhat.com/en/documentation/red_hat_quay) | Full-featured, enterprise-grade |
-| JFrog Artifactory | If already available in-house |
-| Harbor | Open-source alternative |
+| [Red Hat Quay](https://docs.redhat.com/en/documentation/red_hat_quay)                                                                                                                                                                                           | Full-featured, enterprise-grade                |
+| JFrog Artifactory                                                                                                                                                                                                                                               | If already available in-house                  |
+| Harbor                                                                                                                                                                                                                                                          | Open-source alternative                        |
 
 To install the mirror registry for Red Hat OpenShift:
 
@@ -168,11 +168,11 @@ mirror:
 
 oc-mirror v2 writes cluster resources to `oc-mirror-workspace/working-dir/cluster-resources/`:
 
-| File | Purpose |
-| ---- | ------- |
-| `idms-oc-mirror.yaml` | `ImageDigestMirrorSet` — tells the cluster where to find mirrored images |
-| CatalogSource YAML | Points OLM to the mirrored operator catalog |
-| UpdateService YAML | Cincinnati graph for disconnected upgrades (`platform.graph: true` in this example) |
+| File                  | Purpose                                                                             |
+| --------------------- | ----------------------------------------------------------------------------------- |
+| `idms-oc-mirror.yaml` | `ImageDigestMirrorSet` — tells the cluster where to find mirrored images            |
+| CatalogSource YAML    | Points OLM to the mirrored operator catalog                                         |
+| UpdateService YAML    | Cincinnati graph for disconnected upgrades (`platform.graph: true` in this example) |
 
 ```bash
 ls oc-mirror-workspace/working-dir/cluster-resources/

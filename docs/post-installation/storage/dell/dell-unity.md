@@ -348,14 +348,14 @@ oc delete pvc unity-test -n unity
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| Node pods CrashLoop with initiator errors | MachineConfig not finished before driver deployed | Wait for `oc get mcp worker` to show `UPDATED=True`, then delete the node pods to restart them |
-| PVC stuck in Pending | Wrong `arrayId` or `storagepool` in StorageClass | Check controller pod logs: `oc logs -n unity -l app=unity-controller --tail=50` |
-| PVC stuck in Pending with topology mismatch | `arrayId` in StorageClass is uppercase but the driver labels nodes with lowercase | Change `arrayId` in the StorageClass to lowercase to match the node topology labels (e.g. `apm00xxxxxxxxx` not `APM00XXXXXXXXX`) |
-| `configVersion` rejected | Operator/driver version mismatch | Check `oc get csm unity -n unity -o yaml` for the expected version |
-| iSCSI login failures | Array iSCSI interfaces not on the same VLAN as nodes | Verify SPA/SPB iSCSI IPs are reachable from worker nodes |
-| PVC stuck in Pending, attach failures, or missing `csi-unity.dellemc.com` topology labels after a network outage | Stale Unisphere API sessions or iSCSI logins in the driver pods | Restore connectivity, then restart all Unity driver pods (see below) |
+| Symptom                                                                                                          | Cause                                                                             | Fix                                                                                                                              |
+| ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Node pods CrashLoop with initiator errors                                                                        | MachineConfig not finished before driver deployed                                 | Wait for `oc get mcp worker` to show `UPDATED=True`, then delete the node pods to restart them                                   |
+| PVC stuck in Pending                                                                                             | Wrong `arrayId` or `storagepool` in StorageClass                                  | Check controller pod logs: `oc logs -n unity -l app=unity-controller --tail=50`                                                  |
+| PVC stuck in Pending with topology mismatch                                                                      | `arrayId` in StorageClass is uppercase but the driver labels nodes with lowercase | Change `arrayId` in the StorageClass to lowercase to match the node topology labels (e.g. `apm00xxxxxxxxx` not `APM00XXXXXXXXX`) |
+| `configVersion` rejected                                                                                         | Operator/driver version mismatch                                                  | Check `oc get csm unity -n unity -o yaml` for the expected version                                                               |
+| iSCSI login failures                                                                                             | Array iSCSI interfaces not on the same VLAN as nodes                              | Verify SPA/SPB iSCSI IPs are reachable from worker nodes                                                                         |
+| PVC stuck in Pending, attach failures, or missing `csi-unity.dellemc.com` topology labels after a network outage | Stale Unisphere API sessions or iSCSI logins in the driver pods                   | Restore connectivity, then restart all Unity driver pods (see below)                                                             |
 
 ### Network interruption — restart driver pods
 

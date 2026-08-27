@@ -29,7 +29,7 @@ From a Linux configuration perspective:
 | OVS Bridge                          | Linux      | NNCP       |
 | OVN Bridge Mapping                  | OVN-K      | NNCP       |
 | Localnet                            | OVN-K      | NNCP       |
-| Cluster User Defined Network (CUDN) | OVN-K      | —         |
+| Cluster User Defined Network (CUDN) | OVN-K      | —          |
 | Network Attachment Definition       | OVN-K      | CUDN       |
 | Virtual Ethernet Pair               | Kubernetes | CNI        |
 

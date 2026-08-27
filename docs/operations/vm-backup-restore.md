@@ -206,14 +206,14 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Summary
 
-| Step                  | What Happened                                              |
-| --------------------- | ---------------------------------------------------------- |
-| Create VM             | RHEL 9 VM with a data disk, test data written              |
-| Backup                | OADP captured the VM definition, disks, and PVC data       |
-| Destructive change    | Modified data and added files to prove the change          |
-| Delete VM             | Simulated a disaster by removing the VM entirely           |
-| Restore               | OADP recreated the VM and restored disk contents           |
-| Verify                | Original data is back, modifications are gone              |
+| Step               | What Happened                                        |
+| ------------------ | ---------------------------------------------------- |
+| Create VM          | RHEL 9 VM with a data disk, test data written        |
+| Backup             | OADP captured the VM definition, disks, and PVC data |
+| Destructive change | Modified data and added files to prove the change    |
+| Delete VM          | Simulated a disaster by removing the VM entirely     |
+| Restore            | OADP recreated the VM and restored disk contents     |
+| Verify             | Original data is back, modifications are gone        |
 
 ## Cleanup
 

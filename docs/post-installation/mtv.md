@@ -203,10 +203,10 @@ MTV also hides templates and incomplete "ghost" VMs (no UUID and no host). That 
 
 The vSphere HTML5 Client and MTV do not use the same view:
 
-| Tool                                 | Path used                                                                    | Result with cluster-level Admin                |
-| ------------------------------------ | ---------------------------------------------------------------------------- | ---------------------------------------------- |
-| vSphere Client (Hosts and Clusters)  | VMs shown as related to hosts/cluster — VMs inherit rights from cluster/host | All ~127 VMs can appear                        |
-| MTV provider inventory               | Walk of VMs and Templates folders                                            | Only VMs in folders the account can enumerate  |
+| Tool                                | Path used                                                                    | Result with cluster-level Admin               |
+| ----------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------- |
+| vSphere Client (Hosts and Clusters) | VMs shown as related to hosts/cluster — VMs inherit rights from cluster/host | All ~127 VMs can appear                       |
+| MTV provider inventory              | Walk of VMs and Templates folders                                            | Only VMs in folders the account can enumerate |
 
 Seeing every VM in the vSphere Client with a service account does **not** mean MTV can inventory them. Confirm by logging in as the same user stored in the MTV provider secret and switching to **VMs and Templates**, not Hosts and Clusters.
 
@@ -447,9 +447,9 @@ Once providers are configured, create a migration plan using the WebUI wizard:
 
 ### Migration Types
 
-| Type | Description                                                                  |
-| ---- | ---------------------------------------------------------------------------- |
-| Cold | VM is powered off before migration. Simplest and most reliable.              |
+| Type | Description                                                                    |
+| ---- | ------------------------------------------------------------------------------ |
+| Cold | VM is powered off before migration. Simplest and most reliable.                |
 | Warm | Pre-copies data while VM is running, then does a final cutover (less downtime) |
 
 !!! tip "Start with Cold Migrations"

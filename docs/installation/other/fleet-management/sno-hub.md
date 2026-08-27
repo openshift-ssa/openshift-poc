@@ -11,14 +11,14 @@ A Single Node OpenShift (SNO) cluster runs the control plane and workloads on a 
 
 Follow the [Assisted Installer](../../assisted-installer.md) guide with the following differences for SNO:
 
-| Setting                        | Full Cluster (6-node)           | SNO Hub                        |
-| ------------------------------ | ------------------------------- | ------------------------------ |
-| Number of control plane nodes  | 3                               | **1 (Single Node OpenShift)**  |
-| Number of workers              | 3                               | 0                              |
-| Hosts to boot                  | All 6                           | 1                              |
-| API VIP / Ingress VIP          | Separate VIP addresses          | Not required (uses host IP)    |
-| Networking -> VIPs             | Fill in both                    | host IP                        |
-| Installation time              | 30-45 minutes                   | 20-30 minutes                  |
+| Setting                       | Full Cluster (6-node)  | SNO Hub                       |
+| ----------------------------- | ---------------------- | ----------------------------- |
+| Number of control plane nodes | 3                      | **1 (Single Node OpenShift)** |
+| Number of workers             | 3                      | 0                             |
+| Hosts to boot                 | All 6                  | 1                             |
+| API VIP / Ingress VIP         | Separate VIP addresses | Not required (uses host IP)   |
+| Networking -> VIPs            | Fill in both           | host IP                       |
+| Installation time             | 30-45 minutes          | 20-30 minutes                 |
 
 !!! note
     Since SNO has a single node, the API and Ingress traffic goes directly to that node's IP. You do not need to configure VIPs in the Networking step — the installer will skip that section for SNO.

@@ -33,12 +33,12 @@ OpenShift uses an overlay network (OVN-Kubernetes) which encapsulates pod traffi
 └─────────────────────────────────────────────┘
 ```
 
-| Layer | Typical MTU | Notes |
-| ----- | ----------- | ----- |
-| Physical NIC | 1500 or 9000 | Set at the switch/NIC level |
-| Cluster network (pods) | 1400 or 8900 | Physical MTU minus overlay overhead |
-| Geneve overhead | 50 bytes | OVN-Kubernetes default encapsulation |
-| Service network | Inherits pod MTU | ClusterIP traffic stays in overlay |
+| Layer                  | Typical MTU      | Notes                                |
+| ---------------------- | ---------------- | ------------------------------------ |
+| Physical NIC           | 1500 or 9000     | Set at the switch/NIC level          |
+| Cluster network (pods) | 1400 or 8900     | Physical MTU minus overlay overhead  |
+| Geneve overhead        | 50 bytes         | OVN-Kubernetes default encapsulation |
+| Service network        | Inherits pod MTU | ClusterIP traffic stays in overlay   |
 
 If the physical MTU is 1500, the pod MTU must be 1400 (1500 − 100 for Geneve + outer headers). If any hop between the pod and the destination has a lower MTU and does not fragment or return ICMP "Fragmentation Needed," packets are silently dropped.
 

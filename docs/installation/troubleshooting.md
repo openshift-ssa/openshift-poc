@@ -26,11 +26,11 @@ If you need to troubleshoot boot issues, modify the boot parameters at the GRUB 
 
 ### Debug Parameters
 
-| Parameter                         | When to Use                                              |
-| --------------------------------- | -------------------------------------------------------- |
-| `rd.break`                        | Fix problems on root filesystem before systemd runs      |
-| `systemd.unit=emergency.target`   | General system troubleshooting (corrupt fstab, services) |
-| `init=/bin/bash`                  | Last resort when other methods fail                      |
+| Parameter                       | When to Use                                              |
+| ------------------------------- | -------------------------------------------------------- |
+| `rd.break`                      | Fix problems on root filesystem before systemd runs      |
+| `systemd.unit=emergency.target` | General system troubleshooting (corrupt fstab, services) |
+| `init=/bin/bash`                | Last resort when other methods fail                      |
 
 ## Known Issues
 

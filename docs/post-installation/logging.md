@@ -4,8 +4,8 @@
 
 OpenShift Logging provides centralized log collection, storage, and querying for application, infrastructure, and audit logs. The stack consists of three operators:
 
-| Operator                           | Namespace                                    | Purpose                                                     |
-| ---------------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
+| Operator                           | Namespace                                  | Purpose                                                     |
+| ---------------------------------- | ------------------------------------------ | ----------------------------------------------------------- |
 | Loki Operator                      | `openshift-operators-redhat`               | Manages the LokiStack log store (receives, indexes, stores) |
 | Red Hat OpenShift Logging Operator | `openshift-logging`                        | Manages log collection and forwarding (Vector collector)    |
 | Cluster Observability Operator     | `openshift-cluster-observability-operator` | Adds Logs tab to the web console (optional)                 |
@@ -32,8 +32,8 @@ OpenShift Logging provides centralized log collection, storage, and querying for
 
 Choose an initial size based on your cluster. You can resize after deployment based on observed log volume.
 
-| Size               | Data Transfer | Queries/sec | Total CPU | Total Memory | Total Disk |
-| ------------------ | ------------- | ----------- | --------- | ------------ | ---------- |
+| Size             | Data Transfer | Queries/sec | Total CPU | Total Memory | Total Disk |
+| ---------------- | ------------- | ----------- | --------- | ------------ | ---------- |
 | `1x.demo`        | Demo only     | Demo only   | Minimal   | Minimal      | 40 Gi      |
 | `1x.extra-small` | 100 GB/day    | 1-25 QPS    | 14 vCPUs  | 31 Gi        | 430 Gi     |
 | `1x.small`       | 500 GB/day    | 25-50 QPS   | 34 vCPUs  | 67 Gi        | 430 Gi     |
@@ -322,8 +322,8 @@ The log collector requires a service account with specific cluster roles to read
 
     Cluster Roles
 
-    | Role                              | Purpose                              |
-    | --------------------------------- | ------------------------------------ |
+    | Role                            | Purpose                              |
+    | ------------------------------- | ------------------------------------ |
     | `logging-collector-logs-writer` | Allows writing logs to the LokiStack |
     | `collect-application-logs`      | Allows reading application logs      |
     | `collect-infrastructure-logs`   | Allows reading infrastructure logs   |
@@ -490,8 +490,8 @@ The Cluster Observability Operator (COO) adds a **Logs** tab under **Observe** i
 
 By default, the Logging Operator does not grant all users access to logs. Grant access using the following cluster roles:
 
-| Cluster Role                            | Access Granted           |
-| --------------------------------------- | ------------------------ |
+| Cluster Role                          | Access Granted           |
+| ------------------------------------- | ------------------------ |
 | `cluster-logging-application-view`    | Read application logs    |
 | `cluster-logging-infrastructure-view` | Read infrastructure logs |
 | `cluster-logging-audit-view`          | Read audit logs          |

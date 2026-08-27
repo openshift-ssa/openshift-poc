@@ -4,11 +4,11 @@ OpenShift requires specific network configurations and firewall rules between no
 
 ## Network Requirements
 
-| Network         | Purpose                        | CIDR Example  |
-| --------------- | ------------------------------ | ------------- |
-| Machine Network | Node-to-node communication     | 10.0.0.0/28   |
-| Pod Network     | Pod-to-pod communication       | 10.128.0.0/14 |
-| Service Network | Kubernetes service IPs         | 172.30.0.0/16 |
+| Network         | Purpose                    | CIDR Example  |
+| --------------- | -------------------------- | ------------- |
+| Machine Network | Node-to-node communication | 10.0.0.0/28   |
+| Pod Network     | Pod-to-pod communication   | 10.128.0.0/14 |
+| Service Network | Kubernetes service IPs     | 172.30.0.0/16 |
 
 !!! warning "Machine Network Isolation"
     In a production environment, it is best to run the machine network in an isolated network in a separate vlan than your workloads. If you are planning to run OpenShift Virtualization, those VMs should run on a different vlan than the machine network. 
@@ -32,18 +32,18 @@ Since there is no DHCP, every node requires a pre-assigned static IP. Gather the
 
 Do not reuse node addresses for VIPs or DNS. In the `10.0.0.0/28` examples used throughout this site:
 
-| Role | Example |
-| ---- | ------- |
-| Gateway | `10.0.0.1` |
-| DNS | `10.0.0.2` |
-| API VIP | `10.0.0.3` |
-| Ingress VIP | `10.0.0.4` |
-| Installation host | `10.0.0.5` |
-| Hub (SNO, if used) | `10.0.0.6` |
-| Control plane 1 (rendezvous) | `10.0.0.7` |
-| Control plane 2–3 | `10.0.0.8`–`10.0.0.9` |
-| Workers 1–3 | `10.0.0.10`–`10.0.0.12` |
-| Additional worker | `10.0.0.13` |
+| Role                         | Example                 |
+| ---------------------------- | ----------------------- |
+| Gateway                      | `10.0.0.1`              |
+| DNS                          | `10.0.0.2`              |
+| API VIP                      | `10.0.0.3`              |
+| Ingress VIP                  | `10.0.0.4`              |
+| Installation host            | `10.0.0.5`              |
+| Hub (SNO, if used)           | `10.0.0.6`              |
+| Control plane 1 (rendezvous) | `10.0.0.7`              |
+| Control plane 2–3            | `10.0.0.8`–`10.0.0.9`   |
+| Workers 1–3                  | `10.0.0.10`–`10.0.0.12` |
+| Additional worker            | `10.0.0.13`             |
 
 !!! tip
     Document all static IP assignments in a spreadsheet or table before starting installation. The Assisted Installer will require this information for each host.
@@ -103,14 +103,14 @@ The post-installation [Networking](../post-installation/networking.md) page has 
 
 The table above is **node-to-node**. Also open these paths from clients, the install host, and infrastructure services:
 
-| Port | Protocol | Source | Destination | Purpose |
-| ---- | -------- | ------ | ----------- | ------- |
-| 6443 | TCP | Operators, `oc`, CI | API VIP | Kubernetes API |
-| 80, 443 | TCP | Users and apps | Ingress VIP | OpenShift console and application Routes |
-| 53 | TCP/UDP | All nodes, install host | DNS servers | Name resolution |
-| 123 | UDP | All nodes | NTP servers | Time sync |
-| 443, 623 | TCP/UDP | Install host | BMC / iLO / iDRAC | Virtual media and power control |
-| 8080 | TCP | BMC / nodes | Install host | Agent-based ISO HTTP serve (if used) |
+| Port     | Protocol | Source                  | Destination       | Purpose                                  |
+| -------- | -------- | ----------------------- | ----------------- | ---------------------------------------- |
+| 6443     | TCP      | Operators, `oc`, CI     | API VIP           | Kubernetes API                           |
+| 80, 443  | TCP      | Users and apps          | Ingress VIP       | OpenShift console and application Routes |
+| 53       | TCP/UDP  | All nodes, install host | DNS servers       | Name resolution                          |
+| 123      | UDP      | All nodes               | NTP servers       | Time sync                                |
+| 443, 623 | TCP/UDP  | Install host            | BMC / iLO / iDRAC | Virtual media and power control          |
+| 8080     | TCP      | BMC / nodes             | Install host      | Agent-based ISO HTTP serve (if used)     |
 
 ## Outbound Access
 
@@ -140,12 +140,12 @@ The following external endpoints must be reachable from all cluster nodes (unles
 
 **Installation and Release Artifacts**
 
-| Destination                              | Port | Purpose                             |
-| ---------------------------------------- | ---- | ----------------------------------- |
-| mirror.openshift.com                     | 443  | Mirrored install content and images |
-| quayio-production-s3.s3.amazonaws.com    | 443  | Quay image content in AWS           |
-| rhcos.mirror.openshift.com               | 443  | RHCOS images                        |
-| storage.googleapis.com                   | 443  | Release image signatures            |
+| Destination                           | Port | Purpose                             |
+| ------------------------------------- | ---- | ----------------------------------- |
+| mirror.openshift.com                  | 443  | Mirrored install content and images |
+| quayio-production-s3.s3.amazonaws.com | 443  | Quay image content in AWS           |
+| rhcos.mirror.openshift.com            | 443  | RHCOS images                        |
+| storage.googleapis.com                | 443  | Release image signatures            |
 
 **Telemetry (if not disabled)**
 
@@ -191,9 +191,9 @@ Example `noProxy` value:
 .basedomain.com,10.0.0.0/28,10.128.0.0/14,172.30.0.0/16,localhost,127.0.0.1,.cluster.local,.svc
 ```
 
-| Entry               | Reason                                 |
-| ------------------- | -------------------------------------- |
-| `.basedomain.com` | Internal domain — do not proxy        |
+| Entry             | Reason                                 |
+| ----------------- | -------------------------------------- |
+| `.basedomain.com` | Internal domain — do not proxy         |
 | `10.0.0.0/28`     | Machine network (node-to-node traffic) |
 | `10.128.0.0/14`   | Cluster network (pod-to-pod traffic)   |
 | `172.30.0.0/16`   | Service network (ClusterIP services)   |

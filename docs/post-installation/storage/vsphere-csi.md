@@ -34,15 +34,15 @@ When using the Assisted Installer with vSphere platform integration, the cluster
 2. Under **Status**, click **vSphere connection** to open the configuration wizard
 3. Fill in the following fields:
 
-    | Field | Value |
-    | --- | --- |
-    | vCenter | vCenter server FQDN or IP (e.g., `vcenter.example.com`) |
-    | Username | vCenter service account username |
-    | Password | vCenter service account password |
-    | Datacenter | vSphere datacenter name (e.g., `SDDC-Datacenter`) |
-    | Default data store | Full datastore path (e.g., `/SDDC-Datacenter/datastore/vsanDatastore`) |
+    | Field                  | Value                                                                   |
+    | ---------------------- | ----------------------------------------------------------------------- |
+    | vCenter                | vCenter server FQDN or IP (e.g., `vcenter.example.com`)                 |
+    | Username               | vCenter service account username                                        |
+    | Password               | vCenter service account password                                        |
+    | Datacenter             | vSphere datacenter name (e.g., `SDDC-Datacenter`)                       |
+    | Default data store     | Full datastore path (e.g., `/SDDC-Datacenter/datastore/vsanDatastore`)  |
     | Virtual Machine Folder | Folder containing cluster VMs (e.g., `/SDDC-Datacenter/vm/ocp-cluster`) |
-    | vCenter cluster | vSphere cluster where OpenShift is installed |
+    | vCenter cluster        | vSphere cluster where OpenShift is installed                            |
 
 4. Click **Save Configuration**
 
@@ -403,13 +403,13 @@ oc delete pvc test-vsphere-pvc
 
 ## Supported Features
 
-| Feature | Supported | Notes |
-| --- | --- | --- |
-| Dynamic provisioning | Yes | |
-| Volume expansion | Yes | vSphere 8.0 Update 1+ for online expansion |
-| Volume snapshots | Yes | vSphere 8.0 Update 1+ required |
-| ReadWriteOnce (RWO) | Yes | |
-| ReadWriteMany (RWX) | Yes | Requires vSAN file service |
-| Disk encryption | Yes | RWX encrypted PVs not supported |
-| Topology-aware provisioning | Yes | |
-| CSI migration (in-tree) | Yes | Automatic |
+| Feature                     | Supported | Notes                                      |
+| --------------------------- | --------- | ------------------------------------------ |
+| Dynamic provisioning        | Yes       |                                            |
+| Volume expansion            | Yes       | vSphere 8.0 Update 1+ for online expansion |
+| Volume snapshots            | Yes       | vSphere 8.0 Update 1+ required             |
+| ReadWriteOnce (RWO)         | Yes       |                                            |
+| ReadWriteMany (RWX)         | Yes       | Requires vSAN file service                 |
+| Disk encryption             | Yes       | RWX encrypted PVs not supported            |
+| Topology-aware provisioning | Yes       |                                            |
+| CSI migration (in-tree)     | Yes       | Automatic                                  |

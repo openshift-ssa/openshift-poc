@@ -149,15 +149,15 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
 ## Expected Timeline
 
-| Time    | Event                                                    |
-| ------- | -------------------------------------------------------- |
-| T+0s    | Node reboots — stops responding                          |
-| T+~50s  | API server marks node `Ready=Unknown`                    |
-| T+~80s  | NHC threshold (30s) breached, remediation CR created     |
-| T+~85s  | SNR applies `out-of-service` taint                       |
-| T+~90s  | Pods force-deleted, volumes detached                     |
-| T+~100s | New VMI scheduled on healthy node, storage attached      |
-| T+~120s | VM fully running on new node                             |
+| Time    | Event                                                |
+| ------- | ---------------------------------------------------- |
+| T+0s    | Node reboots — stops responding                      |
+| T+~50s  | API server marks node `Ready=Unknown`                |
+| T+~80s  | NHC threshold (30s) breached, remediation CR created |
+| T+~85s  | SNR applies `out-of-service` taint                   |
+| T+~90s  | Pods force-deleted, volumes detached                 |
+| T+~100s | New VMI scheduled on healthy node, storage attached  |
+| T+~120s | VM fully running on new node                         |
 
 ## Cleanup
 

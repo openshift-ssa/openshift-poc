@@ -20,11 +20,11 @@ Browser ──> productpage (Python) ──> details (Ruby)
 
 The `reviews` service has three versions:
 
-| Version | Behavior |
-| --- | --- |
-| v1 | No star ratings |
-| v2 | Black star ratings (calls `ratings` service) |
-| v3 | Red star ratings (calls `ratings` service) |
+| Version | Behavior                                     |
+| ------- | -------------------------------------------- |
+| v1      | No star ratings                              |
+| v2      | Black star ratings (calls `ratings` service) |
+| v3      | Red star ratings (calls `ratings` service)   |
 
 This multi-version setup is what makes Bookinfo useful for traffic management demos.
 

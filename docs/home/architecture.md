@@ -39,26 +39,26 @@ graph TD
 
 ### Key Components
 
-| Component          | Runs On       | Purpose                                                  |
-| ------------------ | ------------- | -------------------------------------------------------- |
-| API Server         | Control Plane | REST API for all cluster operations                      |
-| etcd               | Control Plane | Distributed key-value store for cluster state            |
-| Scheduler          | Control Plane | Assigns pods to nodes based on resource availability     |
-| Controller Manager | Control Plane | Runs controllers that regulate cluster state             |
-| Kubelet            | All Nodes     | Agent that ensures containers are running on each node   |
-| OVN-Kubernetes     | All Nodes     | Software-defined networking for pod communication        |
-| CRI-O              | All Nodes     | Container runtime                                        |
-| Machine Config Operator | Control Plane | Manages node OS configuration via MachineConfig CRs |
+| Component               | Runs On       | Purpose                                                |
+| ----------------------- | ------------- | ------------------------------------------------------ |
+| API Server              | Control Plane | REST API for all cluster operations                    |
+| etcd                    | Control Plane | Distributed key-value store for cluster state          |
+| Scheduler               | Control Plane | Assigns pods to nodes based on resource availability   |
+| Controller Manager      | Control Plane | Runs controllers that regulate cluster state           |
+| Kubelet                 | All Nodes     | Agent that ensures containers are running on each node |
+| OVN-Kubernetes          | All Nodes     | Software-defined networking for pod communication      |
+| CRI-O                   | All Nodes     | Container runtime                                      |
+| Machine Config Operator | Control Plane | Manages node OS configuration via MachineConfig CRs    |
 
 ### Networking
 
 OpenShift uses three distinct networks:
 
-| Network         | Example CIDR  | Purpose                                        |
-| --------------- | ------------- | ---------------------------------------------- |
-| Machine Network | 10.0.0.0/28   | Physical node communication                    |
-| Pod Network     | 10.128.0.0/14 | Internal pod-to-pod communication (overlay)    |
-| Service Network | 172.30.0.0/16 | Kubernetes service ClusterIPs                  |
+| Network         | Example CIDR  | Purpose                                     |
+| --------------- | ------------- | ------------------------------------------- |
+| Machine Network | 10.0.0.0/28   | Physical node communication                 |
+| Pod Network     | 10.128.0.0/14 | Internal pod-to-pod communication (overlay) |
+| Service Network | 172.30.0.0/16 | Kubernetes service ClusterIPs               |
 
 External traffic enters the cluster through the Ingress VIP, which routes to the OpenShift Router (HAProxy) running on worker nodes. The API VIP provides access to the Kubernetes API on port 6443.
 
@@ -129,12 +129,12 @@ Spoke clusters are the production environments where workloads run:
 
 ### Benefits
 
-| Benefit                | Description                                                         |
-| ---------------------- | ------------------------------------------------------------------- |
-| Centralized control    | Single pane of glass for all cluster operations                     |
-| Consistent policy      | Enforce governance, security, and compliance across the fleet       |
-| Automated provisioning | Create new bare metal clusters on demand through ACM                |
-| Lifecycle management   | Upgrade and patch clusters centrally with controlled rollout        |
-| Observability          | Unified view of cluster health, metrics, and alerts                 |
-| GitOps at scale        | Push application and configuration changes across all clusters      |
+| Benefit                | Description                                                          |
+| ---------------------- | -------------------------------------------------------------------- |
+| Centralized control    | Single pane of glass for all cluster operations                      |
+| Consistent policy      | Enforce governance, security, and compliance across the fleet        |
+| Automated provisioning | Create new bare metal clusters on demand through ACM                 |
+| Lifecycle management   | Upgrade and patch clusters centrally with controlled rollout         |
+| Observability          | Unified view of cluster health, metrics, and alerts                  |
+| GitOps at scale        | Push application and configuration changes across all clusters       |
 | Resilient spokes       | Spoke clusters continue operating if hub connectivity is interrupted |

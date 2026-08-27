@@ -5,10 +5,10 @@ OpenShift requires specific DNS records for the API and ingress services. All re
 ## Required DNS Records
 
 | A Record                                     | Value                        |
-| -------------------------------------------- | ---------------------------- | 
-| api.{{ cluster_name }}.{{ base_domain }}     | API VIP or node IP (SNO)     | 
-| api-int.{{ cluster_name }}.{{ base_domain }} | API VIP or node IP (SNO)     | 
-| *.apps.{{ cluster_name }}.{{ base_domain }}  | Ingress VIP or node IP (SNO) | 
+| -------------------------------------------- | ---------------------------- |
+| api.{{ cluster_name }}.{{ base_domain }}     | API VIP or node IP (SNO)     |
+| api-int.{{ cluster_name }}.{{ base_domain }} | API VIP or node IP (SNO)     |
+| *.apps.{{ cluster_name }}.{{ base_domain }}  | Ingress VIP or node IP (SNO) |
 
 Validate the DNS using dig:
 

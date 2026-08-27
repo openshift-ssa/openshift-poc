@@ -22,12 +22,12 @@ Worker nodes must be configured for the storage protocols you plan to use **befo
 
 The required tools per driver:
 
-| Driver | Required Tools |
-| --- | --- |
-| `ontap-nas`, `ontap-nas-economy`, `ontap-nas-flexgroup` | NFS |
-| `ontap-san`, `ontap-san-economy` (iSCSI) | iSCSI, multipath |
-| `ontap-san` (NVMe/TCP) | NVMe (requires RHEL 9 or later) |
-| `ontap-san` with `sanType: fcp` | FC, multipath |
+| Driver                                                  | Required Tools                  |
+| ------------------------------------------------------- | ------------------------------- |
+| `ontap-nas`, `ontap-nas-economy`, `ontap-nas-flexgroup` | NFS                             |
+| `ontap-san`, `ontap-san-economy` (iSCSI)                | iSCSI, multipath                |
+| `ontap-san` (NVMe/TCP)                                  | NVMe (requires RHEL 9 or later) |
+| `ontap-san` with `sanType: fcp`                         | FC, multipath                   |
 
 !!! info "iSCSI Self-Healing"
     Trident 26.06 runs iSCSI self-healing every 5 minutes to identify and repair stale or missing iSCSI sessions and rescan for missing LUNs. This is enabled by default and requires no additional configuration.
@@ -168,14 +168,14 @@ All pools should show `UPDATED=True`, `UPDATING=False`, `DEGRADED=False`.
 
 Prepare the ONTAP SVM (Storage Virtual Machine) before installing Trident:
 
-| Requirement | Details |
-| --- | --- |
-| **SVM credentials** | A `vsadmin`-equivalent username and password |
-| **API protocols** | Enable `ontapi`, `ssh`, and `http` application methods on the SVM user (Trident communicates over HTTPS on port 443 — the `http` application type covers both REST and ZAPI over TLS) |
-| **Storage protocols** | Enable NFS, iSCSI, and/or NVMe on the SVM as needed |
-| **Aggregate assignment** | Assign at least one aggregate directly to the SVM (this does not remove it from other SVMs) |
-| **SVM root export** | The SVM root export policy must include the worker nodes. If you use `autoExportPolicy: true` in the backend config, Trident manages volume export policies automatically; however, the SVM root volume's export policy must still permit initial access from the worker nodes |
-| **SVM capacity limit** | Set an [SVM capacity limit](https://docs.netapp.com/us-en/ontap/volumes/manage-svm-capacity.html) to protect the array from being overrun with storage requests from Kubernetes |
+| Requirement              | Details                                                                                                                                                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **SVM credentials**      | A `vsadmin`-equivalent username and password                                                                                                                                                                                                                                   |
+| **API protocols**        | Enable `ontapi`, `ssh`, and `http` application methods on the SVM user (Trident communicates over HTTPS on port 443 — the `http` application type covers both REST and ZAPI over TLS)                                                                                          |
+| **Storage protocols**    | Enable NFS, iSCSI, and/or NVMe on the SVM as needed                                                                                                                                                                                                                            |
+| **Aggregate assignment** | Assign at least one aggregate directly to the SVM (this does not remove it from other SVMs)                                                                                                                                                                                    |
+| **SVM root export**      | The SVM root export policy must include the worker nodes. If you use `autoExportPolicy: true` in the backend config, Trident manages volume export policies automatically; however, the SVM root volume's export policy must still permit initial access from the worker nodes |
+| **SVM capacity limit**   | Set an [SVM capacity limit](https://docs.netapp.com/us-en/ontap/volumes/manage-svm-capacity.html) to protect the array from being overrun with storage requests from Kubernetes                                                                                                |
 
 !!! info "Trident Handles igroup and NQN Registration"
     You do **not** need to manually create an igroup for iSCSI or input NQNs for NVMe — Trident manages these dynamically.
@@ -184,10 +184,10 @@ Prepare the ONTAP SVM (Storage Virtual Machine) before installing Trident:
 
 Open the following ports from **all worker nodes**:
 
-| Destination | Ports | Purpose |
-| --- | --- | --- |
-| SVM Management LIF | 22, 443 | Trident management API access |
-| Data LIFs | Protocol-specific ports (2049 for NFS, 3260 for iSCSI, etc.) | Data path traffic |
+| Destination        | Ports                                                        | Purpose                       |
+| ------------------ | ------------------------------------------------------------ | ----------------------------- |
+| SVM Management LIF | 22, 443                                                      | Trident management API access |
+| Data LIFs          | Protocol-specific ports (2049 for NFS, 3260 for iSCSI, etc.) | Data path traffic             |
 
 #### DNS and Networking Best Practices
 

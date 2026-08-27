@@ -6,11 +6,11 @@ Many commercial and open-source products ship as **OVA (Open Virtual Appliance)*
 
 An `.ova` file is a TAR archive containing:
 
-| File | Purpose |
-|------|---------|
-| `*.ovf` | XML descriptor with VM hardware settings (CPU, memory, NICs, disks) |
-| `*.vmdk` / `*.vhd` | Virtual disk image(s) |
-| `*.mf` | Optional manifest with checksums |
+| File               | Purpose                                                             |
+| ------------------ | ------------------------------------------------------------------- |
+| `*.ovf`            | XML descriptor with VM hardware settings (CPU, memory, NICs, disks) |
+| `*.vmdk` / `*.vhd` | Virtual disk image(s)                                               |
+| `*.mf`             | Optional manifest with checksums                                    |
 
 OpenShift Virtualization uses KubeVirt and the Containerized Data Importer (CDI). CDI can import **raw** and **qcow2** images directly, so the workflow is:
 

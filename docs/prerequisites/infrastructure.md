@@ -13,10 +13,7 @@ All nodes are bare metal servers in an on-premise environment. Provision compute
 
 Consider these minimum values — the more the better. 
 
-!!! tip "Do I need an installation host?"
-    No, as long as the computer we are working from has full access to all the necessary tools or is able to get them without opening tickets (oc, openshift-install, kubectl, helm, kustomize, nmstatectl, git, podman, istioctl, etc). However, if the work is proceeding and the laptop or environment that is currently being used is not available (PTO, sick, etc), then everything comes to a halt. We highly recommend working from a centralized installation host to ensure not only access but also compatibility with the examples in this guide. 
-
-### Installation
+### Single Cluster Installation
 
 | Host Type     | Count | CPU | Memory | Install Disk | Secondary Disk |
 | ------------- | ----- | --- | ------ | ------------ | -------------- |
@@ -24,27 +21,35 @@ Consider these minimum values — the more the better.
 | Control Plane | 3     | 16  | 32 GB  | 120 GB       | ---            |
 | Worker        | 3     | 16  | 64 GB  | 120 GB       | 1 TB (opt)     |
 
-### Fleet Management (Hub + Spoke)
+### Fleet Management (Hub + Spoke) Installation
 
-| Host Type             | Count | CPU | Memory | Install Disk | Secondary Disk |
-| -------------         | ----- | --- | ------ | ------------ | -------------- |
-| Installation          | 1     | 4   | 16 GB  | 60 GB        | ---            |
-| Hub (SNO)             | 1     | 16  | 64 GB  | 120 GB       | 1 TB           |
-| Spoke Control Plane   | 3     | 16  | 32 GB  | 120 GB       | ---            |
-| Spoke Worker          | 3     | 16  | 64 GB  | 120 GB       | 1 TB (opt)     |
+| Host Type           | Count | CPU | Memory | Install Disk | Secondary Disk |
+| ------------------- | ----- | --- | ------ | ------------ | -------------- |
+| Installation        | 1     | 4   | 16 GB  | 60 GB        | ---            |
+| Hub (SNO)           | 1     | 16  | 64 GB  | 120 GB       | 1 TB (opt)     |
+| Spoke Control Plane | 3     | 16  | 32 GB  | 120 GB       | ---            |
+| Spoke Worker        | 3     | 16  | 64 GB  | 120 GB       | 1 TB (opt)     |
 
-!!! note "Machine Types"
-    The installation and hub machine can be either a virtual machine or bare metal host. They just need network access to the other hosts. 
+### Hardware Notes
+
+!!! tip "Do I need an installation host?"
+    No, as long as the computer we are working from has full access to all the necessary tools or is able to get them without opening tickets (oc, openshift-install, kubectl, helm, kustomize, nmstatectl, git, podman, istioctl, etc). However, if the work is proceeding and the laptop or environment that is currently being used is not available (PTO, sick, etc), then everything comes to a halt. We **highly recommend** working from a centralized installation host to ensure not only access but also compatibility with the examples in this guide. 
+
+!!! note "Machine Type"
+    The installation and hub machine can be either a virtual machine or bare metal host. They just need network access to the other hosts. The cluster machines should be bare metal. 
 
 !!! note "CPU Architecture" 
     For the POC, prefer the same vendor and generation CPU architectures across all machines. 
 
-!!! warning "etcd Disk Requirements"
-    For the install disk, run etcd on a block device that can write at least 50 IOPS of 8 KB sequentially, including fdatasync, in under 10 ms. Heavily loaded clusters should target 500 sequential IOPS of 8 KB in 2 ms. See [etcd Storage](storage.md#etcd-storage) for the full disk performance requirements.
+!!! warning "Install Disk"
+    The etcd instances needs to run on a block device that can write at least 50 IOPS of 8 KB sequentially, including fdatasync, in under 10 ms. Heavily loaded clusters should target 500 sequential IOPS of 8 KB in 2 ms. See [etcd Storage](storage.md#etcd-storage) for the full disk performance requirements.
+
+!!! note "Secondary Disk" 
+    The secondary disk in the worker nodes can be used for storage if you decide to use OpenShift Data Foundation as your storage solution in the cluster. If you are using an already existing storage provider, the secondary disk is optional in the cluster. 
 
 ## Network Interface Requirements
 
-Only a single NIC is required for OpenShift. To perform more advanced networking, 4 x 10 GbE is recommended for bond0/bond1.
+Only a single NIC is required for OpenShift. To perform more advanced networking, 4 x 10 GbE is recommended for bond0/bond1. Production setups are typically 3 bond pairs - mgmt (access), data (trunked), storage (access). 
 
 ## Machine Information
 
@@ -412,11 +417,11 @@ curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/ -u {{ bmc_username }}:{{ bmc_p
 
 The BMC address format varies by vendor:
 
-| Vendor     | Address Format                                                              |
-| ---------- | --------------------------------------------------------------------------- |
-| HPE iLO    | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1`                  |
-| Dell iDRAC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1`  |
-| Cisco CIMC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/{{ system_id }}`    |
+| Vendor     | Address Format                                                             |
+| ---------- | -------------------------------------------------------------------------- |
+| HPE iLO    | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1`                 |
+| Dell iDRAC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1` |
+| Cisco CIMC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/{{ system_id }}`   |
 
 Verify power state:
 

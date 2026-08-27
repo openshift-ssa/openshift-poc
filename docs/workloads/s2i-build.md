@@ -95,15 +95,15 @@ oc get imagestreams -n openshift | grep -E "NAME|python|nodejs|java|ruby|php|per
 
 Common builders include:
 
-| Builder | Language/Runtime |
-| --- | --- |
-| `python` | Python (Django, Flask) |
-| `nodejs` | Node.js (Express, Next.js) |
-| `java` | Java (Spring Boot, Quarkus) |
-| `ruby` | Ruby (Rails, Sinatra) |
-| `php` | PHP (Laravel, Symfony) |
-| `dotnet` | .NET (ASP.NET Core) |
-| `golang` | Go |
+| Builder  | Language/Runtime            |
+| -------- | --------------------------- |
+| `python` | Python (Django, Flask)      |
+| `nodejs` | Node.js (Express, Next.js)  |
+| `java`   | Java (Spring Boot, Quarkus) |
+| `ruby`   | Ruby (Rails, Sinatra)       |
+| `php`    | PHP (Laravel, Symfony)      |
+| `dotnet` | .NET (ASP.NET Core)         |
+| `golang` | Go                          |
 
 ## Trigger a Rebuild
 
