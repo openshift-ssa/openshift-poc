@@ -96,11 +96,9 @@ nav:
       - Networking: configure-the-cluster/networking.md
       - Storage:
           - configure-the-cluster/storage/index.md
-          - OpenShift Data Foundation: configure-the-cluster/storage/odf.md
-          - NetApp Trident: configure-the-cluster/storage/netapp-trident.md
-          - Dell Unity XT (iSCSI): configure-the-cluster/storage/dell/dell-unity.md
-          - VMware vSphere CSI: configure-the-cluster/storage/vsphere-csi.md
           - Multipathing: configure-the-cluster/storage/multipathing.md
+          - OpenShift Data Foundation: configure-the-cluster/storage/odf.md
+          - Vendors: configure-the-cluster/storage/vendors.md
       - Registry: configure-the-cluster/registry.md
       - Workload Availability: configure-the-cluster/workload-availability.md
       - OpenShift Virtualization: configure-the-cluster/virtualization.md

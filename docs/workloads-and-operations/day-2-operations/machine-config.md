@@ -10,7 +10,7 @@
   echo -n "mysecretvalue" | base64
   ```
 
-2. Place the encoded value after `base64,` in the MachineConfig:
+2. Place the encoded value after `base64,` in the MachineConfig (the base64 string `bXlzZWNyZXR2YWx1ZQ==` decodes to `mysecretvalue`):
 
   ```yaml
   apiVersion: machineconfiguration.openshift.io/v1

@@ -1,25 +1,30 @@
-# Dell Unity XT (iSCSI)
+# Dell
 
-[Dell CSI Driver for Unity XT](https://dell.github.io/csm-docs/docs/csidriver/installation/operator/unity/) | [CSM Operator](https://dell.github.io/csm-docs/docs/deployment/csmoperator/)
+[Dell Technologies Container Storage Modules Administrator Guide](https://www.dell.com/support/manuals/en-us/container-storage-modules/csm_installation)
+
+!!! note
+    Always refer to the official Dell CSM documentation for the latest installation and configuration guidance. The examples below are field notes from POC engagements and may not reflect the most current driver versions or recommended settings.
+
+## Unity XT (iSCSI)
 
 This guide installs the Dell CSI driver for Unity XT via the Container Storage Modules (CSM) Operator on OpenShift {{ ocp_version }}. It uses CSM Operator v1.12.x (CSM 1.17.x) with the Unity driver `configVersion: v2.15.0`.
 
-## Step 1 — Array-Side Prep (Unisphere)
+### Step 1 — Array-Side Prep (Unisphere)
 
 Before touching the cluster, configure the Unity XT array:
 
 1. Configure iSCSI interfaces on both SPs (SPA + SPB) on your storage VLAN
 2. Create a storage pool — note the pool name/ID
 3. Confirm the Unisphere management IP is reachable over IPv4 from the cluster nodes (the driver is IPv4-only)
-4. If running jumbo frames, MTU 9000 must match end-to-end (array ports, switches, node NICs)
+4. If running jumbo frames, MTU 9000 must match end-to-end — see [Storage Network](index.md#storage-network)
 
 Collect the **array serial** (`apm00...`) and **pool name** — both are required below.
 
-## Step 2 — Node Prep (MachineConfigs)
+### Step 2 — Node Prep (MachineConfigs)
 
 RHCOS does not ship with an iSCSI initiator name, and Unity requires multipath. Apply all three MachineConfigs, then wait for the worker nodes to reboot.
 
-### 2a. Generate iSCSI InitiatorName
+#### 2a. Generate iSCSI InitiatorName
 
 Creates `/etc/iscsi/initiatorname.iscsi` if missing:
 
@@ -60,7 +65,19 @@ spec:
 EOF
 ```
 
-### 2b. Enable iscsid
+??? note "Decoded gen-initiatorname.sh contents"
+    The base64 value above decodes to the following shell script placed at `/usr/local/bin/gen-initiatorname.sh`:
+
+    ```bash
+    #!/bin/sh
+    if [ ! -f /etc/iscsi/initiatorname.iscsi ]; then
+        echo "InitiatorName=$(/usr/sbin/iscsi-iname)" > /etc/iscsi/initiatorname.iscsi
+    fi
+    ```
+
+    If the initiator name file does not exist, it generates one using `iscsi-iname`.
+
+#### 2b. Enable iscsid
 
 ```bash
 cat << 'EOF' | oc apply -f -
@@ -81,9 +98,9 @@ spec:
 EOF
 ```
 
-### 2c. Multipath Configuration
+#### 2c. Multipath Configuration
 
-Enables `multipathd` with Dell Unity defaults:
+Enables `multipathd` with Dell Unity defaults. See [Multipathing](multipathing.md) for background on the configuration structure.
 
 ```bash
 cat << 'EOF' | oc apply -f -
@@ -111,7 +128,22 @@ spec:
 EOF
 ```
 
-### Wait for Rollout
+??? note "Decoded multipath.conf contents"
+    The base64 value above decodes to the following `multipath.conf`:
+
+    ```ini
+    defaults {
+        user_friendly_names yes
+        find_multipaths yes
+        polling_interval 5
+    }
+    blacklist {
+    }
+    ```
+
+    This is a minimal configuration that auto-detects multipath devices. For production environments, consult your Dell documentation for a configuration that blacklists local disks and whitelists only Unity LUNs — see [Multipathing](multipathing.md) for the recommended pattern.
+
+#### Wait for Rollout
 
 Workers reboot serially. Wait for the MachineConfigPool to finish:
 
@@ -121,7 +153,7 @@ oc get mcp worker -w
 
 All pools should show `UPDATED=True`, `UPDATING=False`, `DEGRADED=False`.
 
-### Spot-Check a Worker
+#### Spot-Check a Worker
 
 ```bash
 W=$(oc get nodes -l node-role.kubernetes.io/worker -o name | head -1)
@@ -132,7 +164,7 @@ oc debug $W -- chroot /host systemctl is-active iscsid multipathd
 !!! warning "Order matters"
     Step 2 must fully complete before deploying the driver in Step 6. If node pods CrashLoop with initiator name errors, the MachineConfig rollout was not finished before the driver was deployed.
 
-## Step 3 — Namespaces
+### Step 3 — Namespaces
 
 ```bash
 cat << 'EOF' | oc apply -f -
@@ -156,7 +188,7 @@ metadata:
 EOF
 ```
 
-## Step 4 — Install the CSM Operator
+### Step 4 — Install the CSM Operator
 
 ```bash
 cat << 'EOF' | oc apply -f -
@@ -191,7 +223,7 @@ oc get csv -n dell-csm-operator          # Phase: Succeeded
 oc get crd containerstoragemodules.storage.dell.com   # CRD exists
 ```
 
-## Step 5 — Credentials Secret
+### Step 5 — Credentials Secret
 
 Replace the array serial, Unisphere endpoint (IPv4), and password:
 
@@ -210,7 +242,7 @@ oc create secret generic unity-creds -n unity --from-file=config=/tmp/unity-cred
 rm -f /tmp/unity-creds.yaml
 ```
 
-## Step 6 — Deploy the Driver (ContainerStorageModule CR)
+### Step 6 — Deploy the Driver (ContainerStorageModule CR)
 
 ```bash
 cat << 'EOF' | oc apply -f -
@@ -253,7 +285,7 @@ EOF
 !!! tip
     If the operator rejects `configVersion`, check its logs for the version it validates: `oc get csm unity -n unity -o yaml`. Set both `configVersion` and the image tag to the version the operator expects.
 
-## Step 7 — StorageClass and VolumeSnapshotClass
+### Step 7 — StorageClass and VolumeSnapshotClass
 
 Replace `arrayId` and `storagepool` with your values from Step 1.
 
@@ -287,7 +319,7 @@ deletionPolicy: Delete
 EOF
 ```
 
-## Step 8 — Verify
+### Step 8 — Verify
 
 ```bash
 oc get csm -n unity unity -o wide          # State: Succeeded
@@ -296,7 +328,7 @@ oc get csinode -o wide                     # each worker lists csi-unity.dellemc
 oc get sc unity-iscsi
 ```
 
-## Step 9 — Smoke Test
+### Step 9 — Smoke Test
 
 ```bash
 cat << 'EOF' | oc apply -f -
@@ -346,7 +378,7 @@ oc delete pod unity-test-pod -n unity
 oc delete pvc unity-test -n unity
 ```
 
-## Troubleshooting
+### Troubleshooting
 
 | Symptom                                                                                                          | Cause                                                                             | Fix                                                                                                                              |
 | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
@@ -357,7 +389,7 @@ oc delete pvc unity-test -n unity
 | iSCSI login failures                                                                                             | Array iSCSI interfaces not on the same VLAN as nodes                              | Verify SPA/SPB iSCSI IPs are reachable from worker nodes                                                                         |
 | PVC stuck in Pending, attach failures, or missing `csi-unity.dellemc.com` topology labels after a network outage | Stale Unisphere API sessions or iSCSI logins in the driver pods                   | Restore connectivity, then restart all Unity driver pods (see below)                                                             |
 
-### Network interruption — restart driver pods
+#### Network interruption — restart driver pods
 
 After a network outage between the cluster and the Unity array (Unisphere management or the iSCSI data path), the CSI controller and node pods can keep stale sessions. Provisioning and attach then fail until the pods restart and re-login.
 

@@ -17,18 +17,7 @@ Persistent storage for OpenShift will be provided by a third-party storage vendo
 
 ## Storage Network
 
-The storage network should support jumbo frames (MTU 9000) for optimal performance. This applies to every network hop between the cluster nodes and the storage array — switches, NICs, and the storage array ports must all be configured consistently.
-
-- [ ] All switch ports on the storage VLAN/network configured for MTU 9000
-- [ ] Storage array network ports configured for MTU 9000
-- [ ] Cluster node NICs (or bond/VLAN interfaces used for storage) configured for MTU 9000
-
-!!! warning
-    If any single hop in the path does not support jumbo frames, packets will be fragmented or dropped, causing severe performance degradation or connectivity failures. Verify end-to-end with a ping test from a cluster node to the storage array:
-
-    ```bash
-    ping -M do -s 8972 {{ storage_array_ip }}
-    ```
+Storage traffic should run on a dedicated VLAN with jumbo frames (MTU 9000). Every hop between the cluster nodes and the storage array must support the same MTU. See [Storage — Storage Network](../configure-the-cluster/storage/index.md#storage-network) for the full checklist and verification steps.
 
 ## Storage Connection Protocol
 

@@ -1,9 +1,6 @@
 # OpenShift Data Foundation
 
-If you are looking at OpenShift Platform Plus (OPP) and are targeting ODF to be your storage provider, here's how to install it.
-
-!!! warning "Jumbo Frames Required"
-    The storage network must support jumbo frames (MTU 9000) end-to-end for ODF to perform properly. Ensure switches, node NICs, and storage interfaces are all configured for MTU 9000 before deploying ODF. See [Storage Network](../../prerequisites/storage.md#storage-network) prerequisites and the [Storage Network NNCP example](../networking.md#storage-network-bond-with-jumbo-frames-mtu-9000) for configuration details.
+If you are looking at OpenShift Platform Plus (OPP) and are targeting ODF to be your storage provider, here's how to install it. This assumes your worker nodes have an additional data disk, as documented in the prerequisites. 
 
 ## Install Local Storage Operator
 
@@ -11,10 +8,6 @@ If you are looking at OpenShift Platform Plus (OPP) and are targeting ODF to be 
 2. Click Install
 3. Leave all the defaults and click Install
 4. Wait for the Operator to install
-5. Go to Ecosystem -> Installed Operators -> click "Local Storage"
-6. Click on "Local Volume Discovery" tab and click "Create LocalVolumeDiscovery"
-7. Select "Disk on selected nodes" and select the appropriate nodes with the extra disk for storage
-8. Click Finish
 
 ## Install OpenShift Data Foundation
 
