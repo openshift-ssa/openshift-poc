@@ -212,7 +212,7 @@ Install based on your POC goals. Each subsection is independent.
 ### Service Mesh (out of baseline)
 
 !!! note
-    Skip unless mesh (mTLS, traffic splitting) is explicitly in POC scope. See [Service Mesh](../post-installation/service-mesh.md) and [Bookinfo](../workloads/bookinfo.md).
+    Skip unless mesh (mTLS, traffic splitting) is explicitly in POC scope. See [Service Mesh](../configure-the-cluster/optional/service-mesh.md) and [Bookinfo](../workloads-and-operations/container-workloads/bookinfo.md).
 
 | Item                                                 | Status | Notes |
 | ---------------------------------------------------- | ------ | ----- |

@@ -9,9 +9,9 @@ At the top of the page, follow the tabs left to right — each represents a phas
 | Phase                                                      | What You Do                                                                 |
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | **[Prerequisites](../prerequisites/index.md)**             | Gather requirements, provision infrastructure, configure DNS and networking |
-| **[Install the Cluster](../installation/index.md)**        | Deploy OpenShift using the Assisted or Agent-Based installer                |
-| **[Configure the Cluster](../post-installation/index.md)** | Install storage, operators, and platform capabilities                       |
-| **[Validate the POC](../workloads/index.md)**              | Run workloads and operational tests to demonstrate value                    |
+| **[Install the Cluster](../install-the-cluster/index.md)**        | Deploy OpenShift using the Assisted or Agent-Based installer                |
+| **[Configure the Cluster](../configure-the-cluster/index.md)** | Install storage, operators, and platform capabilities                       |
+| **[Workloads and Operations](../workloads-and-operations/index.md)**      | Run workloads and operational tests to demonstrate value                    |
 
 ## Important First Steps
 

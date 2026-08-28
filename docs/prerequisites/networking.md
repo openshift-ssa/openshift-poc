@@ -85,7 +85,7 @@ This separation provides:
 - **Security** — Management traffic is isolated from tenant/VM traffic
 - **QoS** — Network team can apply different QoS policies per VLAN
 
-The post-installation [Networking](../post-installation/networking.md) page has NNCP examples for configuring these bonds and VLANs after the cluster is installed.
+The post-installation [Networking](../configure-the-cluster/optional/networking.md) page has NNCP examples for configuring these bonds and VLANs after the cluster is installed.
 
 ## Required Firewall Ports
 
@@ -114,7 +114,7 @@ The table above is **node-to-node**. Also open these paths from clients, the ins
 
 ## Outbound Access
 
-The following external endpoints must be reachable from all cluster nodes (unless you are doing a [disconnected install](../installation/other/disconnected.md)):
+The following external endpoints must be reachable from all cluster nodes (unless you are doing a [disconnected install](../install-the-cluster/other-installation-methods/disconnected.md)):
 
 **Container Registries**
 

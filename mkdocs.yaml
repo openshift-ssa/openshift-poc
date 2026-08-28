@@ -22,6 +22,7 @@ theme:
         name: Switch to light mode
   features:
     - navigation.tabs
+    - navigation.indexes
     - navigation.top
     - content.code.copy
     - content.code.annotate
@@ -68,10 +69,10 @@ markdown_extensions:
 
 nav:
   - Home:
-      - Overview: home/index.md
+      - home/index.md
       - Architecture: home/architecture.md
   - Prerequisites:
-      - Overview: prerequisites/index.md
+      - prerequisites/index.md
       - POC Checklist: prerequisites/poc-checklist.md
       - Infrastructure: prerequisites/infrastructure.md
       - Networking: prerequisites/networking.md
@@ -79,68 +80,74 @@ nav:
       - Storage: prerequisites/storage.md
       - Installation Host: prerequisites/installation-host.md
   - Install the Cluster:
-      - Overview: installation/index.md
-      - Assisted Installer: installation/assisted-installer.md
-      - Agent-Based Installer: installation/agent-based.md
-      - Troubleshooting: installation/troubleshooting.md
+      - install-the-cluster/index.md
+      - Assisted Installer: install-the-cluster/assisted-installer.md
+      - Agent-Based Installer: install-the-cluster/agent-based.md
+      - Troubleshooting: install-the-cluster/troubleshooting.md
       - Other Installation Methods:
-          - Overview: installation/other/index.md
-          - Hub and Spoke: installation/other/hub-and-spoke.md
-          - VMware vSphere IPI: installation/other/vmware-install.md
-          - OpenShift on OpenShift: installation/other/openshift-on-openshift.md
-          - Disconnected: installation/other/disconnected.md
+          - install-the-cluster/other-installation-methods/index.md
+          - Hub and Spoke: install-the-cluster/other-installation-methods/hub-and-spoke.md
+          - VMware vSphere IPI: install-the-cluster/other-installation-methods/vmware-install.md
+          - OpenShift on OpenShift: install-the-cluster/other-installation-methods/openshift-on-openshift.md
+          - Disconnected: install-the-cluster/other-installation-methods/disconnected.md
   - Configure the Cluster:
-      - Overview: post-installation/index.md
+      - configure-the-cluster/index.md
       - Required:
-          - NMState Operator: post-installation/nmstate.md
+          - configure-the-cluster/required/index.md
+          - NMState Operator: configure-the-cluster/required/nmstate.md
           - Storage:
-              - Overview: post-installation/storage/index.md
-              - OpenShift Data Foundation: post-installation/storage/odf.md
-              - NetApp Trident: post-installation/storage/netapp-trident.md
-              - Dell Unity XT (iSCSI): post-installation/storage/dell/dell-unity.md
-              - VMware vSphere CSI: post-installation/storage/vsphere-csi.md
-          - Registry: post-installation/registry.md
+              - configure-the-cluster/required/storage/index.md
+              - OpenShift Data Foundation: configure-the-cluster/required/storage/odf.md
+              - NetApp Trident: configure-the-cluster/required/storage/netapp-trident.md
+              - Dell Unity XT (iSCSI): configure-the-cluster/required/storage/dell/dell-unity.md
+              - VMware vSphere CSI: configure-the-cluster/required/storage/vsphere-csi.md
+          - Registry: configure-the-cluster/required/registry.md
       - Workload Availability:
-          - Descheduler & Affinity: post-installation/workload-availability.md
-          - OADP (Backup & Restore): post-installation/oadp.md
+          - configure-the-cluster/workload-availability/index.md
+          - Descheduler & Affinity: configure-the-cluster/workload-availability/workload-availability.md
+          - OADP (Backup & Restore): configure-the-cluster/workload-availability/oadp.md
       - Virtualization & Migration:
-          - OpenShift Virtualization: post-installation/virtualization.md
-          - Migration Toolkit for Virtualization: post-installation/mtv.md
+          - configure-the-cluster/virtualization-and-migration/index.md
+          - OpenShift Virtualization: configure-the-cluster/virtualization-and-migration/virtualization.md
+          - Migration Toolkit for Virtualization: configure-the-cluster/virtualization-and-migration/mtv.md
       - Observability:
-          - Logging: post-installation/logging.md
-          - Network Observability: post-installation/network-observability.md
-          - MultiCluster Observability: post-installation/multicluster-observability.md
+          - configure-the-cluster/observability/index.md
+          - Logging: configure-the-cluster/observability/logging.md
+          - Network Observability: configure-the-cluster/observability/network-observability.md
+          - MultiCluster Observability: configure-the-cluster/observability/multicluster-observability.md
       - Optional:
-          - Identity Providers: post-installation/configuring-identity-providers.md
-          - Networking: post-installation/networking.md
-          - OpenShift GitOps: post-installation/openshift-gitops.md
-          - External Secrets Operator: post-installation/external-secrets-operator.md
-          - Service Mesh: post-installation/service-mesh.md
-          - Web Terminal: post-installation/web-terminal.md
-          - Operators from Artifactory: post-installation/operators-from-artifactory.md
-          - POC Banner: post-installation/poc-banner.md
-  - Validate the POC:
-      - Overview: workloads/index.md
+          - configure-the-cluster/optional/index.md
+          - Identity Providers: configure-the-cluster/optional/configuring-identity-providers.md
+          - Networking: configure-the-cluster/optional/networking.md
+          - OpenShift GitOps: configure-the-cluster/optional/openshift-gitops.md
+          - External Secrets Operator: configure-the-cluster/optional/external-secrets-operator.md
+          - Service Mesh: configure-the-cluster/optional/service-mesh.md
+          - Web Terminal: configure-the-cluster/optional/web-terminal.md
+          - Operators from Artifactory: configure-the-cluster/optional/operators-from-artifactory.md
+          - POC Banner: configure-the-cluster/optional/poc-banner.md
+  - Workloads and Operations:
+      - workloads-and-operations/index.md
       - Container Workloads:
-          - Overview: workloads/workload-containers.md
-          - Hello World Web Server: workloads/hello-world-web-server.md
-          - Spring PetClinic: workloads/spring-petclinic.md
-          - Kafka (Strimzi): workloads/kafka-strimzi.md
-          - Source-to-Image (S2I) Build: workloads/s2i-build.md
-          - PostgreSQL with Persistent Storage: workloads/postgresql.md
-          - PVC Read-Back Test: workloads/pvc-readback.md
-          - Bookinfo (Service Mesh): workloads/bookinfo.md
+          - workloads-and-operations/container-workloads/index.md
+          - Hello World Web Server: workloads-and-operations/container-workloads/hello-world-web-server.md
+          - Spring PetClinic: workloads-and-operations/container-workloads/spring-petclinic.md
+          - Kafka (Strimzi): workloads-and-operations/container-workloads/kafka-strimzi.md
+          - Source-to-Image (S2I) Build: workloads-and-operations/container-workloads/s2i-build.md
+          - PostgreSQL with Persistent Storage: workloads-and-operations/container-workloads/postgresql.md
+          - PVC Read-Back Test: workloads-and-operations/container-workloads/pvc-readback.md
+          - Bookinfo (Service Mesh): workloads-and-operations/container-workloads/bookinfo.md
       - Virtual Machine Workloads:
-          - Deploying Virtual Machines: workloads/workload-virtual-machines.md
-          - RHEL VM with Apache httpd: workloads/rhel-httpd-vm.md
-          - Virtual Appliances (OVA): workloads/ova-virtual-appliance.md
+          - workloads-and-operations/virtual-machine-workloads/index.md
+          - RHEL VM with Apache httpd: workloads-and-operations/virtual-machine-workloads/rhel-httpd-vm.md
+          - Virtual Appliances (OVA): workloads-and-operations/virtual-machine-workloads/ova-virtual-appliance.md
       - Operational Validation:
-          - VM Failover Test: operations/vm-failover.md
-          - Container Failover Test: operations/container-failover.md
-          - VM Backup and Restore: operations/vm-backup-restore.md
+          - workloads-and-operations/operational-validation/index.md
+          - VM Failover Test: workloads-and-operations/operational-validation/vm-failover.md
+          - Container Failover Test: workloads-and-operations/operational-validation/container-failover.md
+          - VM Backup and Restore: workloads-and-operations/operational-validation/vm-backup-restore.md
       - Day-2 Operations:
-          - Overview: operations/index.md
-          - Add Worker Node: operations/add-worker-node.md
-          - Rotate SSH Keys: operations/rotate-ssh-keys.md
-          - Machine Config: operations/machine-config.md
-          - Debugging MTU Mismatches: operations/debug-mtu.md
+          - workloads-and-operations/day-2-operations/index.md
+          - Add Worker Node: workloads-and-operations/day-2-operations/add-worker-node.md
+          - Rotate SSH Keys: workloads-and-operations/day-2-operations/rotate-ssh-keys.md
+          - Machine Config: workloads-and-operations/day-2-operations/machine-config.md
+          - Debugging MTU Mismatches: workloads-and-operations/day-2-operations/debug-mtu.md

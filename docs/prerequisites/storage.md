@@ -3,14 +3,14 @@
 Persistent storage for OpenShift will be provided by a third-party storage vendor with a supported CSI (Container Storage Interface) driver. etcd storage remains local to the control plane nodes.
 
 !!! warning "Storage Vendor Inclusion"
-    It is **highly recommended** to bring your storage vendor in to assist directly in the installation and configuration of their CSI driver. See [Post-Installation — Storage](../post-installation/storage/index.md) for CSI driver installation guidance.
+    It is **highly recommended** to bring your storage vendor in to assist directly in the installation and configuration of their CSI driver. See [Post-Installation — Storage](../configure-the-cluster/required/storage/index.md) for CSI driver installation guidance.
 
 ## Storage Requirements
 
 | Component         | Access Mode     | Minimum Size       | Provider                                 | Notes                                                                                                                 |
 | ----------------- | --------------- | ------------------ | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | etcd              | Local NVMe/SSD  | 40 GB              | Local disk                               | Not CSI                                                                                                               |
-| Internal Registry | RWX (preferred) | 100 GB             | CSI driver                               | RWO works if you set `replicas: 1` and `rolloutStrategy: Recreate` — see [Registry](../post-installation/registry.md) |
+| Internal Registry | RWX (preferred) | 100 GB             | CSI driver                               | RWO works if you set `replicas: 1` and `rolloutStrategy: Recreate` — see [Registry](../configure-the-cluster/required/registry.md) |
 | Monitoring        | RWO             | 50 GB              | CSI driver                               | Prometheus / Alertmanager PVCs                                                                                        |
 | Logging           | Object storage  | Sized by LokiStack | S3-compatible (NooBaa, StorageGRID, AWS) | Loki stores log chunks in **object storage**. Block RWO PVCs are only for Loki WAL/cache, not the 200 GB log data.    |
 | Application PVCs  | RWO/RWX         | Varies             | CSI driver                               |                                                                                                                       |
