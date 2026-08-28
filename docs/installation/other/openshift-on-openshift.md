@@ -3,7 +3,7 @@
 Hosted Control Planes (formerly HyperShift) runs OpenShift control planes as workloads on an existing OpenShift cluster (the **management cluster**). Guest clusters get a dedicated control plane in pods; worker nodes are provisioned separately.
 
 !!! warning "Not a first-day install path"
-    This page assumes you already have a management cluster with [Multicluster Engine (MCE) or Advanced Cluster Management (ACM)](fleet-management/acm-install.md) installed. Do not start here if you are installing the first cluster — use the [Assisted Installer](../assisted-installer.md) or [Agent-Based Installer](../agent-based.md) instead.
+    This page assumes you already have a management cluster with [Multicluster Engine (MCE) or Advanced Cluster Management (ACM)](hub-and-spoke.md#install-advanced-cluster-management) installed. Do not start here if you are installing the first cluster — use the [Assisted Installer](../assisted-installer.md) or [Agent-Based Installer](../agent-based.md) instead.
 
 ## Architecture Overview
 
@@ -14,7 +14,7 @@ Hosted Control Planes (formerly HyperShift) runs OpenShift control planes as wor
 ## Prerequisites
 
 - A running management cluster with cluster-admin access
-- [MCE or ACM](fleet-management/acm-install.md) installed on the management cluster
+- [MCE or ACM](hub-and-spoke.md#install-advanced-cluster-management) installed on the management cluster
 - A pull secret from [console.redhat.com](https://console.redhat.com/openshift/install/pull-secret)
 - DNS for the hosted cluster API and ingress (see [DNS Requirements](#dns-requirements))
 - Capacity on the management cluster: about **5.5 vCPU and 19 GiB RAM per hosted control plane**, plus worker capacity for the guest cluster
@@ -85,7 +85,7 @@ oc get pods -n clusters-hosted-cluster-kv
 
 The Agent platform is for bare metal or VMs booted with a discovery ISO. `--agent-namespace` is not enough by itself: you must also create an **InfraEnv**, register hosts (BareMetalHosts or discovery ISO), and approve agents before the NodePool can scale.
 
-See [Provisioning a bare metal cluster with ACM](fleet-management/acm-provision-bare-metal-cluster.md) and the [Hosted Control Planes documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/hosted_control_planes/index) for InfraEnv and agent inventory.
+See [Provisioning a bare metal spoke cluster](hub-and-spoke.md#provision-a-bare-metal-spoke-cluster) and the [Hosted Control Planes documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/hosted_control_planes/index) for InfraEnv and agent inventory.
 
 Once agents are available in the hardware inventory namespace:
 

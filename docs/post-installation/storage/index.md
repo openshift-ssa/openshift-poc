@@ -55,6 +55,8 @@ If you are using NetApp ONTAP storage, see the [NetApp Trident](netapp-trident.m
 
 If you are using Dell Unity XT over iSCSI, see the [Dell Unity XT](dell/dell-unity.md) installation guide.
 
+[Dell Technologies Container Storage Modules Administrator Guide 1.17.0](https://www.dell.com/support/product-details/en-us/product/container-storage-modules/resources/manuals)
+
 ## VMware vSphere CSI
 
 If the cluster is VMs on vSphere with `platform: vsphere`, see the [VMware vSphere CSI](vsphere-csi.md) guide.

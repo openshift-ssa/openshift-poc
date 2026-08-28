@@ -7,7 +7,7 @@ MultiCluster Observability provides centralized monitoring and metrics collectio
 !!! note
     The install example uses [OpenShift Data Foundation](storage/odf.md) (ODF) NooBaa for object storage via an `ObjectBucketClaim`. If your storage provider does not offer object storage, deploy [MinIO](#using-minio) as an S3-compatible stand-in.
 
-    Hub block storage must still be configured before installing MultiCluster Observability. See [Hub Storage](../installation/other/fleet-management/hub-storage.md).
+    Hub block storage must still be configured before installing MultiCluster Observability. See [Hub Storage](../installation/other/hub-and-spoke.md#configure-hub-storage).
 
 ## Install
 
@@ -28,7 +28,7 @@ Thanos requires a dedicated S3-compatible bucket. Use ODF if it is installed on 
 
 ### Using OpenShift Data Foundation
 
-This example uses ODF NooBaa. The `ObjectBucketClaim` storage class `openshift-storage.noobaa.io` and the in-cluster endpoint `s3.openshift-storage.svc:443` are provided by ODF. ODF must already be installed. See [Hub Storage](../installation/other/fleet-management/hub-storage.md) on a SNO hub, or [OpenShift Data Foundation](storage/odf.md) on a full cluster.
+This example uses ODF NooBaa. The `ObjectBucketClaim` storage class `openshift-storage.noobaa.io` and the in-cluster endpoint `s3.openshift-storage.svc:443` are provided by ODF. ODF must already be installed. See [Hub Storage](../installation/other/hub-and-spoke.md#configure-hub-storage) on a SNO hub, or [OpenShift Data Foundation](storage/odf.md) on a full cluster.
 
 2. Create the object bucket:
 

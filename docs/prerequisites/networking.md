@@ -114,7 +114,7 @@ The table above is **node-to-node**. Also open these paths from clients, the ins
 
 ## Outbound Access
 
-The following external endpoints must be reachable from all cluster nodes (unless you are doing a [disconnected install](../installation/disconnected/openshift-config.md)):
+The following external endpoints must be reachable from all cluster nodes (unless you are doing a [disconnected install](../installation/other/disconnected.md)):
 
 **Container Registries**
 

@@ -1,18 +1,19 @@
 # Other Installation Methods
 
-These are alternative installation methods for specific use cases:
+These are alternative installation methods for specific use cases. For most POCs, use the [Assisted Installer](../assisted-installer.md) or the [Agent-Based Installer](../agent-based.md) instead.
 
-- [VMware vSphere IPI](vmware-install.md) — Installer-Provisioned Infrastructure on VMware vSphere
-- [OpenShift on OpenShift (Hosted Control Planes)](openshift-on-openshift.md) — Nested clusters with control planes running as pods
-- [Fleet Management](fleet-management/index.md) — Multi-cluster management with ACM, including hub install and bare metal provisioning
+## Hub and Spoke
 
-## Disconnected environments
+Multi-cluster management with Advanced Cluster Management (ACM). A Single Node OpenShift (SNO) hub provisions and manages spoke clusters. See [Hub and Spoke](hub-and-spoke.md).
 
-Disconnected install is a two-step process. Set up a registry, then point OpenShift at it:
+## VMware vSphere IPI
 
-1. **Set up the registry** (choose one):
-    - [Mirror Registry (oc-mirror)](../disconnected/oc-mirror.md) — fully air-gapped
-    - [Pull-Through Cache](../disconnected/pull-through-cache.md) — Artifactory or Nexus with outbound access
-2. **[Configure OpenShift](../disconnected/openshift-config.md)** — `install-config.yaml`, catalog sources, and operators
+Installer-Provisioned Infrastructure on VMware vSphere. See [VMware vSphere IPI](vmware-install.md).
 
-For the primary POC installation methods, see the [Installation Overview](../index.md).
+## OpenShift on OpenShift
+
+Nested clusters with hosted control planes running as pods. See [OpenShift on OpenShift](openshift-on-openshift.md).
+
+## Disconnected Environments
+
+For environments where cluster nodes cannot reach the internet. Set up a mirror registry or pull-through cache, then configure OpenShift to use it. See [Disconnected](disconnected.md).
