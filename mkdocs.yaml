@@ -92,39 +92,30 @@ nav:
           - Disconnected: install-the-cluster/other-installation-methods/disconnected.md
   - Configure the Cluster:
       - configure-the-cluster/index.md
-      - Required:
-          - configure-the-cluster/required/index.md
-          - NMState Operator: configure-the-cluster/required/nmstate.md
-          - Storage:
-              - configure-the-cluster/required/storage/index.md
-              - OpenShift Data Foundation: configure-the-cluster/required/storage/odf.md
-              - NetApp Trident: configure-the-cluster/required/storage/netapp-trident.md
-              - Dell Unity XT (iSCSI): configure-the-cluster/required/storage/dell/dell-unity.md
-              - VMware vSphere CSI: configure-the-cluster/required/storage/vsphere-csi.md
-          - Registry: configure-the-cluster/required/registry.md
-      - Workload Availability:
-          - configure-the-cluster/workload-availability/index.md
-          - Descheduler & Affinity: configure-the-cluster/workload-availability/workload-availability.md
-          - OADP (Backup & Restore): configure-the-cluster/workload-availability/oadp.md
-      - Virtualization & Migration:
-          - configure-the-cluster/virtualization-and-migration/index.md
-          - OpenShift Virtualization: configure-the-cluster/virtualization-and-migration/virtualization.md
-          - Migration Toolkit for Virtualization: configure-the-cluster/virtualization-and-migration/mtv.md
-      - Observability:
-          - configure-the-cluster/observability/index.md
-          - Logging: configure-the-cluster/observability/logging.md
-          - Network Observability: configure-the-cluster/observability/network-observability.md
-          - MultiCluster Observability: configure-the-cluster/observability/multicluster-observability.md
-      - Optional:
-          - configure-the-cluster/optional/index.md
-          - Identity Providers: configure-the-cluster/optional/configuring-identity-providers.md
-          - Networking: configure-the-cluster/optional/networking.md
-          - OpenShift GitOps: configure-the-cluster/optional/openshift-gitops.md
-          - External Secrets Operator: configure-the-cluster/optional/external-secrets-operator.md
-          - Service Mesh: configure-the-cluster/optional/service-mesh.md
-          - Web Terminal: configure-the-cluster/optional/web-terminal.md
-          - Operators from Artifactory: configure-the-cluster/optional/operators-from-artifactory.md
-          - POC Banner: configure-the-cluster/optional/poc-banner.md
+      - NMState Operator: configure-the-cluster/nmstate.md
+      - Networking: configure-the-cluster/networking.md
+      - Storage:
+          - configure-the-cluster/storage/index.md
+          - OpenShift Data Foundation: configure-the-cluster/storage/odf.md
+          - NetApp Trident: configure-the-cluster/storage/netapp-trident.md
+          - Dell Unity XT (iSCSI): configure-the-cluster/storage/dell/dell-unity.md
+          - VMware vSphere CSI: configure-the-cluster/storage/vsphere-csi.md
+          - Multipathing: configure-the-cluster/storage/multipathing.md
+      - Registry: configure-the-cluster/registry.md
+      - Workload Availability: configure-the-cluster/workload-availability.md
+      - OpenShift Virtualization: configure-the-cluster/virtualization.md
+      - Migration Toolkit for Virtualization: configure-the-cluster/mtv.md
+      - OADP (Backup & Restore): configure-the-cluster/oadp.md
+      - Logging: configure-the-cluster/logging.md
+      - Network Observability: configure-the-cluster/network-observability.md
+      - MultiCluster Observability: configure-the-cluster/multicluster-observability.md
+      - Identity Providers: configure-the-cluster/configuring-identity-providers.md
+      - OpenShift GitOps: configure-the-cluster/openshift-gitops.md
+      - External Secrets Operator: configure-the-cluster/external-secrets-operator.md
+      - Service Mesh: configure-the-cluster/service-mesh.md
+      - Operators from Artifactory: configure-the-cluster/operators-from-artifactory.md
+      - Web Terminal: configure-the-cluster/web-terminal.md
+      - POC Banner: configure-the-cluster/poc-banner.md
   - Workloads and Operations:
       - workloads-and-operations/index.md
       - Container Workloads:

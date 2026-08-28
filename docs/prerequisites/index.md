@@ -11,7 +11,7 @@ For the installation, the documentation assumes a bare metal environment in an o
 
 ## VM Migration from VMware
 
-If the POC includes migrating virtual machines from VMware vSphere to OpenShift Virtualization, you must obtain the VMware Virtual Disk Development Kit (VDDK) from Broadcom **before** beginning migrations. The VDDK is no longer available for self-service download — you must open a support ticket at the [Broadcom Support Portal](https://support.broadcom.com) and they will provide the archive directly. This process can take several business days, so initiate it as early as possible in POC planning. See [Migration Toolkit for Virtualization — Obtaining the VDDK](../configure-the-cluster/virtualization-and-migration/mtv.md#obtaining-the-vddk) for full instructions.
+If the POC includes migrating virtual machines from VMware vSphere to OpenShift Virtualization, you must obtain the VMware Virtual Disk Development Kit (VDDK) from Broadcom **before** beginning migrations. The VDDK is no longer available for self-service download — you must open a support ticket at the [Broadcom Support Portal](https://support.broadcom.com) and they will provide the archive directly. This process can take several business days, so initiate it as early as possible in POC planning. See [Migration Toolkit for Virtualization — Obtaining the VDDK](../configure-the-cluster/mtv.md#obtaining-the-vddk) for full instructions.
 
 ## POC Checklist
 

@@ -9,7 +9,7 @@ This example deploys PostgreSQL from the UBI-based `registry.redhat.io/rhel9/pos
 
 ## Prerequisites
 
-- [Storage](../../configure-the-cluster/required/storage/index.md) configured with a default StorageClass
+- [Storage](../../configure-the-cluster/storage/index.md) configured with a default StorageClass
 
 ## Deploy PostgreSQL
 

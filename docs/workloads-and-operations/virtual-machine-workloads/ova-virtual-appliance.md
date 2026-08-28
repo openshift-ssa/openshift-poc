@@ -231,7 +231,7 @@ echo "https://$ROUTE"
 
 ### Attach to an External Network (NodePort or CUDN)
 
-For appliances that need Layer-2 connectivity or a routable IP, attach the VM to a secondary network using a **Cluster User Defined Network (CUDN)** or a Linux bridge. See [Networking](../../configure-the-cluster/optional/networking.md) for details.
+For appliances that need Layer-2 connectivity or a routable IP, attach the VM to a secondary network using a **Cluster User Defined Network (CUDN)** or a Linux bridge. See [Networking](../../configure-the-cluster/networking.md) for details.
 
 ## Importing with the Web Console
 
@@ -255,4 +255,4 @@ oc delete project ova-appliance
 - [Deploying Virtual Machines](./index.md) — deploy VMs from RHEL boot sources
 - [VM Failover Test](../operational-validation/vm-failover.md) — validate node-loss recovery
 - [VM Backup and Restore](../operational-validation/vm-backup-restore.md) — exercise OADP with the kubevirt plugin
-- [Migration Toolkit for Virtualization](../../configure-the-cluster/virtualization-and-migration/mtv.md) — bulk-import VMs from vSphere or other hypervisors
+- [Migration Toolkit for Virtualization](../../configure-the-cluster/mtv.md) — bulk-import VMs from vSphere or other hypervisors

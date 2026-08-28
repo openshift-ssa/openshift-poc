@@ -20,7 +20,7 @@ OpenShift Logging provides centralized log collection, storage, and querying for
 - Cluster administrator privileges
 - A StorageClass available for LokiStack internal PVCs (block storage)
 - S3-compatible object storage for log data (ODF NooBaa, NetApp StorageGRID, AWS S3, etc.)
-- [Storage](../required/storage/index.md) configured on the cluster (CSI driver installed)
+- [Storage](./storage/index.md) configured on the cluster (CSI driver installed)
 
 !!! warning "LokiStack Requires Two Types of Storage"
     - **Block storage** (via StorageClass): For internal PVCs that store the write-ahead log (WAL), index cache, and compactor working space

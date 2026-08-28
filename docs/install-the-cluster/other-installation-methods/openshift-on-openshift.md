@@ -59,7 +59,7 @@ Alternatively, download from the [OpenShift mirror](https://mirror.openshift.com
 
 ## Create a Hosted Cluster (KubeVirt workers)
 
-This is the complete, supported path when the management cluster has [OpenShift Virtualization](../../configure-the-cluster/virtualization-and-migration/virtualization.md). Workers are VMs on the management cluster.
+This is the complete, supported path when the management cluster has [OpenShift Virtualization](../../configure-the-cluster/virtualization.md). Workers are VMs on the management cluster.
 
 ```bash
 hcp create cluster kubevirt \

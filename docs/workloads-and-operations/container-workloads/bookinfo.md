@@ -3,13 +3,13 @@
 [Istio Bookinfo Sample](https://istio.io/latest/docs/examples/bookinfo/)
 
 !!! note "Out of POC baseline"
-    This demo requires [OpenShift Service Mesh](../../configure-the-cluster/optional/service-mesh.md). Skip it unless mesh is explicitly in scope.
+    This demo requires [OpenShift Service Mesh](../../configure-the-cluster/service-mesh.md). Skip it unless mesh is explicitly in scope.
 
 Bookinfo is the standard Istio sample application — a multi-service app that displays information about a book. It consists of four microservices that communicate over HTTP, making it ideal for demonstrating service mesh capabilities like mTLS, traffic management, and observability.
 
 ## Prerequisites
 
-- [OpenShift Service Mesh](../../configure-the-cluster/optional/service-mesh.md) installed and ambient mode configured
+- [OpenShift Service Mesh](../../configure-the-cluster/service-mesh.md) installed and ambient mode configured
 
 ## Architecture
 
@@ -276,7 +276,7 @@ oc get pods -n istio-system -l app=ztunnel -o wide
 oc logs -n istio-system -l app=ztunnel --tail=50 | grep HBONE
 ```
 
-The log output should show `HBONE` connections, indicating traffic is flowing through the encrypted ZTunnel. You can also use `istioctl` if installed (see [Service Mesh — Install istioctl](../../configure-the-cluster/optional/service-mesh.md#install-istioctl)):
+The log output should show `HBONE` connections, indicating traffic is flowing through the encrypted ZTunnel. You can also use `istioctl` if installed (see [Service Mesh — Install istioctl](../../configure-the-cluster/service-mesh.md#install-istioctl)):
 
 ```bash
 istioctl ztunnel-config workloads -n istio-system

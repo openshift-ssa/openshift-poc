@@ -1,6 +1,6 @@
 # VM Failover Test
 
-This guide walks through testing VM failover by creating a RHEL 9 virtual machine, simulating a node failure, and verifying the VM restarts on a healthy node within the 120-second target. This assumes [Workload Availability](../../configure-the-cluster/workload-availability/workload-availability.md) is fully configured with the 120-second failover settings.
+This guide walks through testing VM failover by creating a RHEL 9 virtual machine, simulating a node failure, and verifying the VM restarts on a healthy node within the 120-second target. This assumes [Workload Availability](../../configure-the-cluster/workload-availability.md) is fully configured with the 120-second failover settings.
 
 ## Prerequisites
 

@@ -30,7 +30,7 @@ Loki is recommended. Without Loki you still get dashboards, topology, and export
 
 - Cluster administrator privileges
 - OVN-Kubernetes as the cluster network plugin
-- [Storage](../required/storage/index.md) configured (CSI driver installed)
+- [Storage](./storage/index.md) configured (CSI driver installed)
 - A StorageClass for LokiStack internal PVCs (block storage, `ReadWriteOnce`)
 - S3-compatible object storage for flow data (ODF NooBaa, NetApp StorageGRID, AWS S3, etc.)
 - Loki Operator 6.0 or later (`stable-6.6` in this guide)
@@ -457,7 +457,7 @@ spec:
 
 `name` must match the `k8s.v1.cni.cncf.io/network-status` annotation on the virt-launcher pod (`namespace/nad-name`).
 
-See [Networking](../optional/networking.md) and [OpenShift Virtualization](../virtualization-and-migration/virtualization.md) for how those secondary networks are created.
+See [Networking](./networking.md) and [OpenShift Virtualization](./virtualization.md) for how those secondary networks are created.
 
 ## Access Control
 

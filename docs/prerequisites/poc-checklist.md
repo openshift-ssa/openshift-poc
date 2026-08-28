@@ -85,10 +85,28 @@ Complete these before scheduling the installation.
 
 ### Storage
 
-| Item                                                  | Status | Notes |
-| ----------------------------------------------------- | ------ | ----- |
-| Persistent storage backend provisioned and accessible |        |       |
-| Storage connectivity verified from node networks      |        |       |
+| Item                                                                          | Status | Notes |
+| ----------------------------------------------------------------------------- | ------ | ----- |
+| Storage array make, model, and firmware version documented                    |        |       |
+| Connection protocol identified (FC, iSCSI, NVMe/TCP, NVMe/FC, NFS)           |        |       |
+| Array type documented (ALUA, active/active symmetric, active/passive)         |        |       |
+| Number of fabric paths per node confirmed (minimum two for redundancy)        |        |       |
+| FC: HBA WWPNs collected for all nodes                                         |        |       |
+| FC: Zoning configured on both fabric switches                                 |        |       |
+| FC: LUN masking / host groups configured on the array                         |        |       |
+| iSCSI: Target portal IPs and IQN documented                                  |        |       |
+| iSCSI: CHAP credentials obtained (if required)                               |        |       |
+| NVMe-oF: Discovery controller IPs or target NQNs documented                  |        |       |
+| NVMe-oF: Array firmware confirmed to support NVMe-oF with RHCOS              |        |       |
+| Dedicated storage VLAN ID and subnet allocated                                |        |       |
+| Jumbo frames (MTU 9000) confirmed end-to-end on the storage network          |        |       |
+| Vendor-recommended `multipath.conf` device block obtained                     |        |       |
+| Multi-vendor: all vendor device blocks collected for merged `multipath.conf`  |        |       |
+| Storage array accessible from all cluster node networks                       |        |       |
+| Required firewall ports open between nodes and the storage array              |        |       |
+| Storage credentials or certificates available for CSI driver configuration    |        |       |
+| RWX support confirmed (required for Virtualization live migration + registry) |        |       |
+| CSI driver version confirmed compatible with target OCP version              |        |       |
 
 ### Installation Host
 
@@ -212,7 +230,7 @@ Install based on your POC goals. Each subsection is independent.
 ### Service Mesh (out of baseline)
 
 !!! note
-    Skip unless mesh (mTLS, traffic splitting) is explicitly in POC scope. See [Service Mesh](../configure-the-cluster/optional/service-mesh.md) and [Bookinfo](../workloads-and-operations/container-workloads/bookinfo.md).
+    Skip unless mesh (mTLS, traffic splitting) is explicitly in POC scope. See [Service Mesh](../configure-the-cluster/service-mesh.md) and [Bookinfo](../workloads-and-operations/container-workloads/bookinfo.md).
 
 | Item                                                 | Status | Notes |
 | ---------------------------------------------------- | ------ | ----- |

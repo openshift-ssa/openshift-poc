@@ -85,7 +85,7 @@ This separation provides:
 - **Security** — Management traffic is isolated from tenant/VM traffic
 - **QoS** — Network team can apply different QoS policies per VLAN
 
-The post-installation [Networking](../configure-the-cluster/optional/networking.md) page has NNCP examples for configuring these bonds and VLANs after the cluster is installed.
+The post-installation [Networking](../configure-the-cluster/networking.md) page has NNCP examples for configuring these bonds and VLANs after the cluster is installed.
 
 ## Required Firewall Ports
 

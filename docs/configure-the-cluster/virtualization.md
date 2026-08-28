@@ -3,15 +3,15 @@
 [Red Hat OpenShift Virtualization Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_virtualization/latest)
 
 !!! warning "Workload Availability Required for Live Migration Testing"
-    If you plan to test any scenarios related to node loss and live migrations, you **must** install and configure [Workload Availability](../workload-availability/workload-availability.md) prior to installing the OpenShift Virtualization Operator. The Descheduler and Node Health Check operators are what trigger live migrations when nodes become unhealthy.
+    If you plan to test any scenarios related to node loss and live migrations, you **must** install and configure [Workload Availability](./workload-availability.md) prior to installing the OpenShift Virtualization Operator. The Descheduler and Node Health Check operators are what trigger live migrations when nodes become unhealthy.
 
 ## Prerequisites
 
 - Storage configured with a default virtualization storage class
 - Set annotation `storageclass.kubevirt.io/is-default-virt-class` to `true` on the storage class
 - RWX access mode required for live migration
-- [NMState Operator](../required/nmstate.md) installed
-- Optional: [underlay / CUDN networks](../optional/networking.md) for VM IP persistence and a [dedicated live-migration network](../optional/networking.md). Needed for failover IP-sameness tests; not required to install Virtualization.
+- [NMState Operator](./nmstate.md) installed
+- Optional: [underlay / CUDN networks](./networking.md) for VM IP persistence and a [dedicated live-migration network](./networking.md). Needed for failover IP-sameness tests; not required to install Virtualization.
 
 !!! note "Planning VM Migrations from VMware?"
     If you plan to migrate VMs from VMware vSphere using the [Migration Toolkit for Virtualization](./mtv.md), you must obtain the VDDK image from Broadcom ahead of time. Broadcom has restricted access and requires a support ticket. See [Obtaining the VDDK](./mtv.md#obtaining-the-vddk) for details.
@@ -113,4 +113,4 @@ userData: |
 
 ## Descheduler for Live Migration
 
-If running the Kube Descheduler Operator alongside OpenShift Virtualization, see the [Workload Availability — Kube Descheduler](../workload-availability/workload-availability.md#kube-descheduler-operator) section for profile selection and configuration. The recommended profile for mixed clusters with VMs is `KubeVirtRelieveAndMigrate`.
+If running the Kube Descheduler Operator alongside OpenShift Virtualization, see the [Workload Availability — Kube Descheduler](./workload-availability.md#kube-descheduler-operator) section for profile selection and configuration. The recommended profile for mixed clusters with VMs is `KubeVirtRelieveAndMigrate`.

@@ -1,6 +1,6 @@
 # Container Failover Test
 
-This guide walks through testing container workload failover by deploying a sample application with multiple replicas, simulating a node failure, and verifying the pods are rescheduled to healthy nodes. This assumes [Workload Availability](../../configure-the-cluster/workload-availability/workload-availability.md) is fully configured with the 120-second failover settings.
+This guide walks through testing container workload failover by deploying a sample application with multiple replicas, simulating a node failure, and verifying the pods are rescheduled to healthy nodes. This assumes [Workload Availability](../../configure-the-cluster/workload-availability.md) is fully configured with the 120-second failover settings.
 
 ## Prerequisites
 

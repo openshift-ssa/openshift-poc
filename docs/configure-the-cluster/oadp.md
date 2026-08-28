@@ -7,7 +7,7 @@ OADP provides backup and restore capabilities for applications, virtual machines
 ## Prerequisites
 
 - Object storage available (ODF NooBaa, AWS S3, or any S3-compatible endpoint)
-- [OpenShift Virtualization](../virtualization-and-migration/virtualization.md) installed (if backing up VMs)
+- [OpenShift Virtualization](./virtualization.md) installed (if backing up VMs)
 - Cluster administrator privileges
 
 ## Install the Operator via WebUI

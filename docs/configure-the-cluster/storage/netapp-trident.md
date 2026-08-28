@@ -574,7 +574,7 @@ oc apply -f trident-csi-snapclass.yaml
 
 ## OpenShift Virtualization (KubeVirt) Configuration
 
-If you are using block-based storage classes (iSCSI, NVMe, or Fibre Channel) with [OpenShift Virtualization](../../virtualization-and-migration/virtualization.md), additional configuration is required.
+If you are using block-based storage classes (iSCSI, NVMe, or Fibre Channel) with [OpenShift Virtualization](../virtualization.md), additional configuration is required.
 
 ### Mark the StorageClass as the Default for Virtualization
 

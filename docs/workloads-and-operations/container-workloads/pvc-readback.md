@@ -4,7 +4,7 @@ A minimal workload that writes a file to a PersistentVolumeClaim, then spins up 
 
 ## Prerequisites
 
-- [Storage](../../configure-the-cluster/required/storage/index.md) configured with a default StorageClass
+- [Storage](../../configure-the-cluster/storage/index.md) configured with a default StorageClass
 
 ## Deploy
 

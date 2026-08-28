@@ -100,7 +100,7 @@ Label the node as a storage node **only if you are installing OpenShift Data Fou
 
 [OpenShift Data Foundation Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/latest)
 
-This is only needed if you are planning to use ODF as part of your OPP subscription. ODF is used here specifically for object storage required by [MultiCluster Observability](../../configure-the-cluster/observability/multicluster-observability.md). If your storage provider does not offer object storage, you can deploy MinIO instead. See [Using MinIO](../../configure-the-cluster/observability/multicluster-observability.md#using-minio).
+This is only needed if you are planning to use ODF as part of your OPP subscription. ODF is used here specifically for object storage required by [MultiCluster Observability](../../configure-the-cluster/multicluster-observability.md). If your storage provider does not offer object storage, you can deploy MinIO instead. See [Using MinIO](../../configure-the-cluster/multicluster-observability.md#using-minio).
 
 Label the hub node for ODF before creating the StorageCluster:
 

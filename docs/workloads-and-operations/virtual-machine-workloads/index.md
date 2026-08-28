@@ -1,6 +1,6 @@
 # Example Virtual Machines
 
-This guide walks through deploying an example Red Hat Enterprise Linux 9 virtual machine on OpenShift Virtualization. Use it as a smoke test after [OpenShift Virtualization](../../configure-the-cluster/virtualization-and-migration/virtualization.md) is installed, or as a starting point before [failover](../operational-validation/vm-failover.md) and [backup/restore](../operational-validation/vm-backup-restore.md) exercises.
+This guide walks through deploying an example Red Hat Enterprise Linux 9 virtual machine on OpenShift Virtualization. Use it as a smoke test after [OpenShift Virtualization](../../configure-the-cluster/virtualization.md) is installed, or as a starting point before [failover](../operational-validation/vm-failover.md) and [backup/restore](../operational-validation/vm-backup-restore.md) exercises.
 
 ## Prerequisites
 
@@ -136,4 +136,4 @@ When deleting from the web console, confirm that associated disks (PVCs) are rem
 
 - [VM Failover Test](../operational-validation/vm-failover.md) — validate node-loss recovery within the 120-second target
 - [VM Backup and Restore](../operational-validation/vm-backup-restore.md) — exercise OADP with the kubevirt plugin
-- [Networking](../../configure-the-cluster/optional/networking.md) — attach VMs to a CUDN for persistent IPAM
+- [Networking](../../configure-the-cluster/networking.md) — attach VMs to a CUDN for persistent IPAM

@@ -1,6 +1,6 @@
 # VM Backup and Restore
 
-This guide demonstrates using OADP to back up a virtual machine, make a destructive change, and then restore the VM to its previous state. This assumes [OADP](../../configure-the-cluster/workload-availability/oadp.md) is installed and configured with the `kubevirt` plugin and a valid BackupStorageLocation.
+This guide demonstrates using OADP to back up a virtual machine, make a destructive change, and then restore the VM to its previous state. This assumes [OADP](../../configure-the-cluster/oadp.md) is installed and configured with the `kubevirt` plugin and a valid BackupStorageLocation.
 
 ## Prerequisites
 

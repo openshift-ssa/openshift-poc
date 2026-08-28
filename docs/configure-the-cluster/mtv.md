@@ -7,7 +7,7 @@ The Migration Toolkit for Virtualization (MTV) enables migration of virtual mach
 ## Prerequisites
 
 - [OpenShift Virtualization](./virtualization.md) operator installed and configured
-- [Storage](../required/storage/index.md) configured with a default StorageClass (RWX recommended)
+- [Storage](./storage/index.md) configured with a default StorageClass (RWX recommended)
 - Network connectivity between the OpenShift cluster and the source hypervisor (vCenter, RHV Manager, etc.)
 - Cluster administrator privileges
 - If performing OVA conversion, an NFS share is required
