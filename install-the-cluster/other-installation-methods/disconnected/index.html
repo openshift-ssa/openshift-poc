@@ -1,0 +1,5062 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Prerequisites and installation instructions for OpenShift on-premise environments">
+      
+      
+      
+        <link rel="canonical" href="https://openshift-ssa.github.io/openshift-poc/install-the-cluster/other-installation-methods/disconnected/">
+      
+      
+        <link rel="prev" href="../openshift-on-openshift/">
+      
+      
+        <link rel="next" href="../../../configure-the-cluster/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/openshift.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Disconnected - OpenShift POC</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        
+        <link rel="stylesheet" href="../../../assets/external/fonts.googleapis.com/css.49ea35f2.css">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  <meta name="robots" content="noindex, nofollow">
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#disconnected-environments" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="OpenShift POC" class="md-header__button md-logo" aria-label="OpenShift POC" data-md-component="logo">
+      
+  <img src="../../../assets/images/openshift.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenShift POC
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Disconnected
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Home
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../prerequisites/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Prerequisites
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Install the Cluster
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../configure-the-cluster/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Configure the Cluster
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../workloads-and-operations/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Workloads and Operations
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="OpenShift POC" class="md-nav__button md-logo" aria-label="OpenShift POC" data-md-component="logo">
+      
+  <img src="../../../assets/images/openshift.png" alt="logo">
+
+    </a>
+    OpenShift POC
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../home/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_1" id="__nav_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Home
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../home/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../prerequisites/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Prerequisites
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Prerequisites
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prerequisites/poc-checklist/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC Checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prerequisites/infrastructure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Infrastructure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prerequisites/networking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prerequisites/dns/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DNS
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prerequisites/storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../prerequisites/installation-host/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation Host
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Install the Cluster
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Install the Cluster
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../assisted-installer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Assisted Installer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../agent-based/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent-Based Installer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Other Installation Methods
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Other Installation Methods
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../hub-and-spoke/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hub and Spoke
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vmware-install/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VMware vSphere IPI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../openshift-on-openshift/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenShift on OpenShift
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disconnected
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Disconnected
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mirror-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mirror Registry
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mirror Registry">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-oc-mirror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install oc-mirror
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-the-mirror-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install the Mirror Registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-the-imagesetconfiguration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create the ImageSetConfiguration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mirror-the-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mirror the Content
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract-the-openshift-install-binary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extract the openshift-install Binary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-the-mirror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify the Mirror
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-more-content-later" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding More Content Later
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-through-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull-Through Cache
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull-Through Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-remote-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure Remote Repositories
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configure Remote Repositories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jfrog-artifactory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JFrog Artifactory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sonatype-nexus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sonatype Nexus
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-upstream-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure Upstream Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure TLS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-merged-pull-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a Merged Pull Secret
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Create a Merged Pull Secret">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#artifact-repository-requires-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact repository requires authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#artifact-repository-allows-anonymous-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact repository allows anonymous access
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pre-warm-the-cache-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-Warm the Cache (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-the-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validate the Cache
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validate the Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verify-tls-connectivity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify TLS Connectivity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-registry-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Registry Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-image-pulls-through-the-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Image Pulls Through the Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-the-release-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify the Release Payload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-the-cache-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check the Cache UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-openshift-for-the-internal-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure OpenShift for the Internal Registry
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configure OpenShift for the Internal Registry">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-configure-install-configyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Configure install-config.yaml
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: Configure install-config.yaml">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imagedigestsources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        imageDigestSources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additionaltrustbundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        additionalTrustBundle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pullsecret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pullSecret
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-install-the-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Install the Cluster
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-post-install-operator-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Post-Install Operator Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Post-Install Operator Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#disable-default-catalog-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable Default Catalog Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-custom-catalog-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Custom Catalog Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-the-catalog-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify the Catalog Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worked-example-per-operator-mirror-paths-odf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked Example: Per-Operator Mirror Paths (ODF)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-cluster-upgrades" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Cluster Upgrades
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4: Cluster Upgrades">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mirror-registry-oc-mirror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mirror Registry (oc-mirror)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pull-through-cache_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull-Through Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#image-signature-verification-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image Signature Verification — Optional
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Image Signature Verification — Optional">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#confirm-sig-tags-are-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Confirm .sig tags are available
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apply-the-clusterimagepolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Apply the ClusterImagePolicy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#day-1-integration-extra-manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Day-1 Integration (Extra Manifest)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-image-mirroring-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Image Mirroring Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-node-level-image-pulls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Node-Level Image Pulls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-machineconfigpool-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check MachineConfigPool Health
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-pods-are-using-internal-registry-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Pods Are Using Internal Registry Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../configure-the-cluster/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure the Cluster
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Configure the Cluster
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/nmstate/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    NMState Operator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/networking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Networking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../configure-the-cluster/storage/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storage
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Storage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/storage/multipathing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multipathing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/storage/odf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenShift Data Foundation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/storage/vendors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vendors
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/workload-availability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workload Availability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/virtualization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenShift Virtualization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/mtv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Toolkit for Virtualization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/oadp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OADP (Backup & Restore)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/network-observability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Network Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/multicluster-observability/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MultiCluster Observability
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/configuring-identity-providers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Identity Providers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/openshift-gitops/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    OpenShift GitOps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/external-secrets-operator/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    External Secrets Operator
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/service-mesh/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Service Mesh
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/operators-from-artifactory/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operators from Artifactory
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/web-terminal/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Web Terminal
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configure-the-cluster/poc-banner/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    POC Banner
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../workloads-and-operations/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Workloads and Operations
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5" id="__nav_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Workloads and Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_2" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../workloads-and-operations/container-workloads/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Container Workloads
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5_2" id="__nav_5_2_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Container Workloads
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/container-workloads/hello-world-web-server/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Hello World Web Server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/container-workloads/spring-petclinic/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Spring PetClinic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/container-workloads/kafka-strimzi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Kafka (Strimzi)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/container-workloads/s2i-build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Source-to-Image (S2I) Build
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/container-workloads/postgresql/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PostgreSQL with Persistent Storage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/container-workloads/pvc-readback/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PVC Read-Back Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/container-workloads/bookinfo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bookinfo (Service Mesh)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../workloads-and-operations/virtual-machine-workloads/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Virtual Machine Workloads
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5_3" id="__nav_5_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Virtual Machine Workloads
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/virtual-machine-workloads/rhel-httpd-vm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RHEL VM with Apache httpd
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/virtual-machine-workloads/ova-virtual-appliance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Virtual Appliances (OVA)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_4" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../workloads-and-operations/operational-validation/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Operational Validation
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5_4" id="__nav_5_4_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Operational Validation
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/operational-validation/vm-failover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VM Failover Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/operational-validation/container-failover/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Container Failover Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/operational-validation/vm-backup-restore/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VM Backup and Restore
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5_5" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../../workloads-and-operations/day-2-operations/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Day-2 Operations
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_5_5" id="__nav_5_5_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_5_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Day-2 Operations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/day-2-operations/add-worker-node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Add Worker Node
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/day-2-operations/rotate-ssh-keys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rotate SSH Keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/day-2-operations/machine-config/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Machine Config
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../workloads-and-operations/day-2-operations/debug-mtu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Debugging MTU Mismatches
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#mirror-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mirror Registry
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Mirror Registry">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-oc-mirror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install oc-mirror
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-the-mirror-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install the Mirror Registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-the-imagesetconfiguration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create the ImageSetConfiguration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mirror-the-content" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mirror the Content
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#output-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extract-the-openshift-install-binary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extract the openshift-install Binary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-the-mirror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify the Mirror
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#adding-more-content-later" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding More Content Later
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pull-through-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull-Through Cache
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Pull-Through Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prerequisites_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-remote-repositories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure Remote Repositories
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configure Remote Repositories">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#jfrog-artifactory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JFrog Artifactory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sonatype-nexus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sonatype Nexus
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-upstream-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure Upstream Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure-tls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure TLS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-a-merged-pull-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create a Merged Pull Secret
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Create a Merged Pull Secret">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#artifact-repository-requires-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact repository requires authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#artifact-repository-allows-anonymous-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Artifact repository allows anonymous access
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pre-warm-the-cache-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pre-Warm the Cache (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validate-the-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validate the Cache
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Validate the Cache">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#verify-tls-connectivity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify TLS Connectivity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-registry-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Registry Authentication
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-image-pulls-through-the-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Image Pulls Through the Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-the-release-payload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify the Release Payload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-the-cache-ui" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check the Cache UI
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configure-openshift-for-the-internal-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configure OpenShift for the Internal Registry
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configure OpenShift for the Internal Registry">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-configure-install-configyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1: Configure install-config.yaml
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 1: Configure install-config.yaml">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#imagedigestsources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        imageDigestSources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additionaltrustbundle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        additionalTrustBundle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pullsecret" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pullSecret
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Complete Example
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-install-the-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2: Install the Cluster
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-post-install-operator-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3: Post-Install Operator Configuration
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3: Post-Install Operator Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#disable-default-catalog-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disable Default Catalog Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#create-custom-catalog-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Create Custom Catalog Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-the-catalog-source" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify the Catalog Source
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#install-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install Operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#worked-example-per-operator-mirror-paths-odf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked Example: Per-Operator Mirror Paths (ODF)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-cluster-upgrades" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4: Cluster Upgrades
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 4: Cluster Upgrades">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mirror-registry-oc-mirror" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mirror Registry (oc-mirror)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pull-through-cache_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pull-Through Cache
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#image-signature-verification-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image Signature Verification — Optional
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Image Signature Verification — Optional">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#confirm-sig-tags-are-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Confirm .sig tags are available
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apply-the-clusterimagepolicy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Apply the ClusterImagePolicy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#day-1-integration-extra-manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Day-1 Integration (Extra Manifest)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#check-image-mirroring-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check Image Mirroring Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-node-level-image-pulls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Node-Level Image Pulls
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-machineconfigpool-health" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check MachineConfigPool Health
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#verify-pods-are-using-internal-registry-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verify Pods Are Using Internal Registry Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documentation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documentation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="disconnected-environments">Disconnected Environments<a class="headerlink" href="#disconnected-environments" title="Permanent link">&para;</a></h1>
+<p>This guide covers installing OpenShift when cluster nodes cannot reach the internet. The process has two parts: set up an internal registry, then configure OpenShift to use it.</p>
+<p>Choose one registry approach based on your environment:</p>
+<table>
+<thead>
+<tr>
+<th>Approach</th>
+<th>When to Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#mirror-registry">Mirror Registry (oc-mirror)</a></td>
+<td>No system on the cluster network has outbound internet access (fully air-gapped)</td>
+</tr>
+<tr>
+<td><a href="#pull-through-cache">Pull-Through Cache</a></td>
+<td>Your artifact repository (Artifactory, Nexus) has outbound access but cluster nodes do not</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="mirror-registry">Mirror Registry<a class="headerlink" href="#mirror-registry" title="Permanent link">&para;</a></h2>
+<p><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/about-disconnected-installation-mirroring" target="_blank" rel="noopener">About disconnected installation mirroring</a> | <a href="https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2" target="_blank" rel="noopener">oc-mirror plugin v2</a></p>
+<p>Use this approach when <strong>no system on the cluster network has outbound internet access</strong> (fully air-gapped). You download content on a connected host, then transfer it to an internal registry.</p>
+<h3 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Internet ──&gt; Bastion Host ──&gt; Portable Media ──&gt; Mirror Registry ──&gt; Cluster Nodes
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>              (oc-mirror)       (optional)        (on-site)           (no internet)
+</code></pre></div>
+<p>In some environments, the bastion host has temporary internet access and direct access to the mirror registry, eliminating the need for portable media.</p>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<ul>
+<li>A bastion host with internet access (temporary or permanent) to download content</li>
+<li>At least 200 GB of available disk for the mirror registry storage</li>
+<li>A Red Hat pull secret from <a href="https://console.redhat.com/openshift/install/pull-secret" target="_blank" rel="noopener">console.redhat.com</a></li>
+<li>The <code>oc</code> CLI available on the bastion host</li>
+</ul>
+<h3 id="install-oc-mirror">Install oc-mirror<a class="headerlink" href="#install-oc-mirror" title="Permanent link">&para;</a></h3>
+<p>On the bastion host with internet access:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">OCP_VERSION</span><span class="o">=</span><span class="m">4</span>.22
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>wget<span class="w"> </span><span class="s2">&quot;https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-</span><span class="si">${</span><span class="nv">OCP_VERSION</span><span class="si">}</span><span class="s2">/oc-mirror.tar.gz&quot;</span><span class="w"> </span>-P<span class="w"> </span>/tmp
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>sudo<span class="w"> </span>tar<span class="w"> </span>-xvzf<span class="w"> </span>/tmp/oc-mirror.tar.gz<span class="w"> </span>-C<span class="w"> </span>/usr/local/bin
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>chmod<span class="w"> </span>+x<span class="w"> </span>/usr/local/bin/oc-mirror
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>oc-mirror<span class="w"> </span>version
+</code></pre></div>
+<h3 id="install-the-mirror-registry">Install the Mirror Registry<a class="headerlink" href="#install-the-mirror-registry" title="Permanent link">&para;</a></h3>
+<p>You need a container registry on the disconnected network. Options include:</p>
+<table>
+<thead>
+<tr>
+<th>Registry</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2#mirror-registry-for-red-hat-openshift" target="_blank" rel="noopener">Mirror registry for Red Hat OpenShift</a></td>
+<td>Purpose-built, minimal setup, runs with Podman</td>
+</tr>
+<tr>
+<td><a href="https://docs.redhat.com/en/documentation/red_hat_quay" target="_blank" rel="noopener">Red Hat Quay</a></td>
+<td>Full-featured, enterprise-grade</td>
+</tr>
+<tr>
+<td>JFrog Artifactory</td>
+<td>If already available in-house</td>
+</tr>
+<tr>
+<td>Harbor</td>
+<td>Open-source alternative</td>
+</tr>
+</tbody>
+</table>
+<p>To install the mirror registry for Red Hat OpenShift:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>wget<span class="w"> </span>https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz<span class="w"> </span>-P<span class="w"> </span>/tmp
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>tar<span class="w"> </span>-xvzf<span class="w"> </span>/tmp/mirror-registry.tar.gz<span class="w"> </span>-C<span class="w"> </span>/tmp
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>sudo<span class="w"> </span>/tmp/mirror-registry<span class="w"> </span>install<span class="w"> </span>--quayHostname<span class="w"> </span><span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span><span class="w"> </span>--quayRoot<span class="w"> </span>/opt/quay
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Ensure <code>/opt/quay</code> has at least 200 GB of available disk space. Mirroring an OCP release plus operators can easily exceed 100 GB.</p>
+</div>
+<p>The install command outputs the initial credentials (<code>init</code> user and generated password) and generates a self-signed root CA certificate at <code>/opt/quay/quay-rootCA/rootCA.pem</code>.</p>
+<p>Add the root CA to the bastion host's trust store:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>/opt/quay/quay-rootCA/rootCA.pem<span class="w"> </span>/etc/pki/ca-trust/source/anchors/
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>sudo<span class="w"> </span>update-ca-trust
+</code></pre></div>
+<p>Verify access:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>podman<span class="w"> </span>login<span class="w"> </span><span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443
+</code></pre></div>
+<h3 id="configure-authentication">Configure Authentication<a class="headerlink" href="#configure-authentication" title="Permanent link">&para;</a></h3>
+<p><code>oc-mirror</code> needs credentials for both the source (Red Hat) and destination (mirror) registries. Create a combined pull secret:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>cp<span class="w"> </span>~/pull-secret.txt<span class="w"> </span>~/merged-pull-secret.json
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>podman<span class="w"> </span>login<span class="w"> </span><span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443<span class="w"> </span>--authfile<span class="w"> </span>~/merged-pull-secret.json
+</code></pre></div>
+<p>This produces <code>~/merged-pull-secret.json</code> containing credentials for both Red Hat registries and your mirror. You will use this file during mirroring and later in <code>install-config.yaml</code>.</p>
+<h3 id="create-the-imagesetconfiguration">Create the ImageSetConfiguration<a class="headerlink" href="#create-the-imagesetconfiguration" title="Permanent link">&para;</a></h3>
+<p>The <code>ImageSetConfiguration</code> defines what content to mirror. Create <code>imageset-config.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mirror.openshift.io/v2alpha1</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ImageSetConfiguration</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nt">mirror</span><span class="p">:</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">platform</span><span class="p">:</span>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="nt">graph</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="nt">channels</span><span class="p">:</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stable-4.22</span>
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">        </span><span class="nt">minVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4.22.11</span>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">        </span><span class="nt">maxVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4.22.11</span>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="nt">operators</span><span class="p">:</span>
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">catalog</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.redhat.io/redhat/redhat-operator-index:v4.22</span>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">      </span><span class="nt">packages</span><span class="p">:</span>
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">local-storage-operator</span>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">lvms-operator</span>
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odf-operator</span>
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kubernetes-nmstate-operator</span>
+<a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">kubevirt-hyperconverged</span>
+<a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mtv-operator</span>
+<a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">oadp-operator</span>
+<a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openshift-gitops-operator</span>
+<a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster-logging</span>
+<a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">loki-operator</span>
+<a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">node-health-check-operator</span>
+<a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">self-node-remediation</span>
+<a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cluster-kube-descheduler-operator</span>
+<a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">netobserv-operator</span>
+<a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web-terminal</span>
+<a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="w">  </span><span class="nt">additionalImages</span><span class="p">:</span>
+<a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.redhat.io/ubi9/ubi:latest</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not include <code>storageConfig</code> in an oc-mirror <strong>v2</strong> <code>ImageSetConfiguration</code>. That field is v1-only and will cause the mirror to fail. v2 stores incremental state in the <code>--workspace</code> directory.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Only mirror the operators you plan to install. Mirroring the entire catalog is very large (hundreds of GBs) and takes a long time. You can always re-run <code>oc-mirror</code> later to add more.</p>
+</div>
+<h3 id="mirror-the-content">Mirror the Content<a class="headerlink" href="#mirror-the-content" title="Permanent link">&para;</a></h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Direct (bastion has access to both networks)</label><label for="__tabbed_1_2">Air-Gapped (two-step with portable media)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>oc-mirror-workspace
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>oc-mirror<span class="w"> </span>--config<span class="w"> </span>imageset-config.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>--workspace<span class="w"> </span>file://oc-mirror-workspace<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span>docker://<span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443/openshift<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span>--v2
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>On the internet-connected host, mirror to disk:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>oc-mirror-workspace
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>oc-mirror<span class="w"> </span>--config<span class="w"> </span>imageset-config.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span>--workspace<span class="w"> </span>file://oc-mirror-workspace<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span>file:///mnt/mirror-data<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span>--v2
+</code></pre></div>
+<p>Transfer <code>/mnt/mirror-data</code> and <code>oc-mirror-workspace</code> to the disconnected network, then load into the registry:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>oc-mirror<span class="w"> </span>--config<span class="w"> </span>imageset-config.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span>--workspace<span class="w"> </span>file://oc-mirror-workspace<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span>--from<span class="w"> </span>file:///mnt/mirror-data<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span>docker://<span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443/openshift<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span>--v2
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="output-files">Output Files<a class="headerlink" href="#output-files" title="Permanent link">&para;</a></h3>
+<p>oc-mirror v2 writes cluster resources to <code>oc-mirror-workspace/working-dir/cluster-resources/</code>:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>idms-oc-mirror.yaml</code></td>
+<td><code>ImageDigestMirrorSet</code> — tells the cluster where to find mirrored images</td>
+</tr>
+<tr>
+<td>CatalogSource YAML</td>
+<td>Points OLM to the mirrored operator catalog</td>
+</tr>
+<tr>
+<td>UpdateService YAML</td>
+<td>Cincinnati graph for disconnected upgrades (<code>platform.graph: true</code> in this example)</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>ls<span class="w"> </span>oc-mirror-workspace/working-dir/cluster-resources/
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The <code>imageDigestSources</code> values in your <code>install-config.yaml</code> must match the repository paths used by <code>oc-mirror</code>. Copy the mirror paths from the generated <code>idms-oc-mirror.yaml</code> — do not guess them.</p>
+</div>
+<h3 id="extract-the-openshift-install-binary">Extract the openshift-install Binary<a class="headerlink" href="#extract-the-openshift-install-binary" title="Permanent link">&para;</a></h3>
+<p>The <code>openshift-install</code> binary is embedded inside the release image. Extract it from the mirrored payload:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>oc<span class="w"> </span>adm<span class="w"> </span>release<span class="w"> </span>extract<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span>-a<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span>--command<span class="o">=</span>openshift-install<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443/openshift/release-images:4.22.11-x86_64
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>You can also download <code>openshift-install</code> from the <a href="https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/" target="_blank" rel="noopener">Red Hat mirror site</a> on a connected workstation and transfer it across the airgap. However, <code>oc adm release extract</code> guarantees version alignment with the mirrored payload.</p>
+</div>
+<h3 id="verify-the-mirror">Verify the Mirror<a class="headerlink" href="#verify-the-mirror" title="Permanent link">&para;</a></h3>
+<p>Confirm the release image is accessible:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>oc<span class="w"> </span>adm<span class="w"> </span>release<span class="w"> </span>info<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span>--registry-config<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443/openshift/release-images:4.22.11-x86_64
+</code></pre></div>
+<p>Confirm the operator catalog is accessible:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>skopeo<span class="w"> </span>inspect<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span>docker://<span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443/openshift/redhat/redhat-operator-index:v4.22
+</code></pre></div>
+<h3 id="adding-more-content-later">Adding More Content Later<a class="headerlink" href="#adding-more-content-later" title="Permanent link">&para;</a></h3>
+<p>Re-run <code>oc-mirror</code> with an updated <code>ImageSetConfiguration</code> to add new operators or release versions. The tool handles incremental updates:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>oc-mirror<span class="w"> </span>--config<span class="w"> </span>imageset-config.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>--workspace<span class="w"> </span>file://oc-mirror-workspace<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>docker://<span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443/openshift<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span>--v2
+</code></pre></div>
+<hr />
+<h2 id="pull-through-cache">Pull-Through Cache<a class="headerlink" href="#pull-through-cache" title="Permanent link">&para;</a></h2>
+<p>This section covers configuring an artifact repository (JFrog Artifactory or Sonatype Nexus) as a pull-through cache for container images. Use this approach when <strong>your artifact repository has outbound internet access</strong> but cluster nodes do not.</p>
+<h3 id="architecture_1">Architecture<a class="headerlink" href="#architecture_1" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>Upstream Registries ──&gt; Artifactory / Nexus ──&gt; Cluster Nodes
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>  (quay.io, etc.)       (has outbound access)    (no outbound access)
+</code></pre></div>
+<p>A pull-through cache acts as a transparent proxy. When the cluster requests an image, the cache fetches it from the upstream registry, stores a local copy, and serves it. Subsequent pulls are served from the cache. This is simpler than a full mirror because you do not need to pre-stage content.</p>
+<h3 id="prerequisites_1">Prerequisites<a class="headerlink" href="#prerequisites_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Artifact repository (Artifactory or Nexus) accessible from all cluster nodes over HTTPS</li>
+<li>Artifact repository has outbound access to:<ul>
+<li><code>quay.io</code> / <code>cdn.quay.io</code></li>
+<li><code>registry.redhat.io</code></li>
+<li><code>registry.access.redhat.com</code></li>
+<li><code>registry.connect.redhat.com</code></li>
+</ul>
+</li>
+<li>A Red Hat pull secret from <a href="https://console.redhat.com/openshift/install/pull-secret" target="_blank" rel="noopener">console.redhat.com</a></li>
+<li>Credentials for the artifact repository (only if it requires authentication for pulls; anonymous access still needs a blank pull-secret entry — see below)</li>
+<li>The CA certificate for the artifact repository (if using an internal CA)</li>
+</ul>
+<h3 id="configure-remote-repositories">Configure Remote Repositories<a class="headerlink" href="#configure-remote-repositories" title="Permanent link">&para;</a></h3>
+<p>Create remote (proxy) repositories in your artifact manager for each upstream registry.</p>
+<h4 id="jfrog-artifactory">JFrog Artifactory<a class="headerlink" href="#jfrog-artifactory" title="Permanent link">&para;</a></h4>
+<p>Create <strong>Remote Container Repositories</strong> for each upstream:</p>
+<table>
+<thead>
+<tr>
+<th>Repository Key</th>
+<th>URL</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>quay-remote</code></td>
+<td><code>https://quay.io</code></td>
+<td>OpenShift release images</td>
+</tr>
+<tr>
+<td><code>redhat-registry-remote</code></td>
+<td><code>https://registry.redhat.io</code></td>
+<td>Core Red Hat images</td>
+</tr>
+<tr>
+<td><code>redhat-access-remote</code></td>
+<td><code>https://registry.access.redhat.com</code></td>
+<td>Legacy Red Hat images (UBI, etc.)</td>
+</tr>
+<tr>
+<td><code>redhat-connect-remote</code></td>
+<td><code>https://registry.connect.redhat.com</code></td>
+<td>Certified partner operators</td>
+</tr>
+</tbody>
+</table>
+<p>For each remote repository:</p>
+<ol>
+<li>Go to <strong>Administration &gt; Repositories &gt; Remote</strong></li>
+<li>Select <strong>Docker</strong> as the package type</li>
+<li>Set the <strong>URL</strong> to the upstream registry</li>
+<li>Enable <strong>Token Authentication</strong> or provide Red Hat pull secret credentials</li>
+<li>Under <strong>Advanced</strong>, enable <strong>Store Artifacts Locally</strong> (cache)</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Create a <strong>Virtual Repository</strong> (e.g., <code>container-virtual</code>) that aggregates all the remote repositories under a single endpoint. This simplifies the cluster configuration.</p>
+</div>
+<h4 id="sonatype-nexus">Sonatype Nexus<a class="headerlink" href="#sonatype-nexus" title="Permanent link">&para;</a></h4>
+<p>Create <strong>container (proxy)</strong> repositories for each upstream:</p>
+<ol>
+<li>Go to <strong>Repository &gt; Repositories &gt; Create repository</strong></li>
+<li>Select <strong>docker (proxy)</strong></li>
+<li>Set the <strong>Remote storage</strong> URL to the upstream registry</li>
+<li>Under <strong>Container</strong>, assign an HTTPS connector port (e.g., 5000)</li>
+<li>Configure <strong>Container Bearer Token Realm</strong> in <strong>Security &gt; Realms</strong></li>
+<li>Optionally create a <strong>container (group)</strong> repository to aggregate multiple proxy repos</li>
+</ol>
+<h3 id="configure-upstream-authentication">Configure Upstream Authentication<a class="headerlink" href="#configure-upstream-authentication" title="Permanent link">&para;</a></h3>
+<p>The upstream Red Hat registries require authentication. Configure the pull-through cache with valid credentials from your Red Hat pull secret.</p>
+<p><strong>Artifactory:</strong> Add credentials to each remote repository under <strong>Advanced &gt; Username/Password</strong>, or use a token. The username is typically the service account token from your Red Hat pull secret.</p>
+<p><strong>Nexus:</strong> Add credentials in <strong>Security &gt; Realms</strong> and associate them with each proxy repository.</p>
+<h3 id="configure-tls">Configure TLS<a class="headerlink" href="#configure-tls" title="Permanent link">&para;</a></h3>
+<p>If the artifact repository uses an internal CA or self-signed certificate, you will need the CA certificate for:</p>
+<ul>
+<li>The installation host's trust store (for <code>skopeo</code> and <code>oc</code> commands)</li>
+<li>The <code>additionalTrustBundle</code> in <code>install-config.yaml</code> (so cluster nodes trust the cache)</li>
+</ul>
+<p>Add the CA to the installation host:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>sudo<span class="w"> </span>cp<span class="w"> </span>/path/to/ca-cert.pem<span class="w"> </span>/etc/pki/ca-trust/source/anchors/
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>sudo<span class="w"> </span>update-ca-trust
+</code></pre></div>
+<h3 id="create-a-merged-pull-secret">Create a Merged Pull Secret<a class="headerlink" href="#create-a-merged-pull-secret" title="Permanent link">&para;</a></h3>
+<p>The pull secret used in <code>install-config.yaml</code> must include:</p>
+<ol>
+<li>Your Red Hat pull secret (from <a href="https://console.redhat.com/openshift/install/pull-secret" target="_blank" rel="noopener">console.redhat.com</a>)</li>
+<li>An entry for your artifact repository hostname — <strong>even if the cache allows anonymous pulls</strong></li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">CRI-O requires a registry entry even for anonymous access</p>
+<p>Without an <code>auths</code> entry for the artifact repository hostname, CRI-O will not attempt to pull from it at all — even when Artifactory/Nexus requires no credentials. The entry must exist; the <code>auth</code> value may be empty.</p>
+</div>
+<h4 id="artifact-repository-requires-authentication">Artifact repository requires authentication<a class="headerlink" href="#artifact-repository-requires-authentication" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>cp<span class="w"> </span>~/pull-secret.txt<span class="w"> </span>~/merged-pull-secret.json
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>podman<span class="w"> </span>login<span class="w"> </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span><span class="w"> </span>--authfile<span class="w"> </span>~/merged-pull-secret.json
+</code></pre></div>
+<h4 id="artifact-repository-allows-anonymous-access">Artifact repository allows anonymous access<a class="headerlink" href="#artifact-repository-allows-anonymous-access" title="Permanent link">&para;</a></h4>
+<p>Add a blank <code>auth</code> entry for the registry hostname. Do <strong>not</strong> use <code>podman login</code> or <code>oc registry login --auth-basic=":"</code> — those write a non-empty credential.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>jq<span class="w"> </span>--arg<span class="w"> </span>host<span class="w"> </span><span class="s2">&quot;{{ artifactory_host }}&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="s1">&#39;.auths[$host] = {&quot;auth&quot;: &quot;&quot;}&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span>~/pull-secret.txt<span class="w"> </span>&gt;<span class="w"> </span>~/merged-pull-secret.json
+</code></pre></div>
+<p>The resulting file looks like:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="p">{</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nt">&quot;auths&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="nt">&quot;cloud.openshift.com&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;redhat-token&gt;&quot;</span><span class="p">},</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="nt">&quot;quay.io&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;redhat-token&gt;&quot;</span><span class="p">},</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">    </span><span class="nt">&quot;registry.redhat.io&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;redhat-token&gt;&quot;</span><span class="p">},</span>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">    </span><span class="nt">&quot;registry.connect.redhat.com&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&lt;redhat-token&gt;&quot;</span><span class="p">},</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="nt">&quot;{{ artifactory_host }}&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="nt">&quot;auth&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">}</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="p">}</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The Red Hat credentials remain in the pull secret for install-time use. Upstream authentication from Artifactory to Red Hat registries is configured separately on each remote repository (see <a href="#configure-upstream-authentication">Configure Upstream Authentication</a>).</p>
+</div>
+<h3 id="pre-warm-the-cache-recommended">Pre-Warm the Cache (Recommended)<a class="headerlink" href="#pre-warm-the-cache-recommended" title="Permanent link">&para;</a></h3>
+<p>While a pull-through cache populates on demand, pre-warming avoids slow first pulls during installation. <strong>Pull</strong> through the cache — do not <code>oc adm release mirror</code> / push into a remote (proxy) repository; those repos typically reject pushes.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>podman<span class="w"> </span>image<span class="w"> </span>pull<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/quay-remote/openshift-release-dev/ocp-release:4.22.11-x86_64
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>podman<span class="w"> </span>image<span class="w"> </span>pull<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">  </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/redhat-registry-remote/redhat/redhat-operator-index:v4.22
+</code></pre></div>
+<h3 id="validate-the-cache">Validate the Cache<a class="headerlink" href="#validate-the-cache" title="Permanent link">&para;</a></h3>
+<p>Before proceeding with installation, validate that the cache is correctly proxying images.</p>
+<h4 id="verify-tls-connectivity">Verify TLS Connectivity<a class="headerlink" href="#verify-tls-connectivity" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>openssl<span class="w"> </span>s_client<span class="w"> </span>-connect<span class="w"> </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>:443<span class="w"> </span>-servername<span class="w"> </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span><span class="w"> </span>&lt;/dev/null<span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="p">|</span><span class="w"> </span>openssl<span class="w"> </span>x509<span class="w"> </span>-noout<span class="w"> </span>-subject<span class="w"> </span>-issuer
+</code></pre></div>
+<h4 id="verify-registry-authentication">Verify Registry Authentication<a class="headerlink" href="#verify-registry-authentication" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>podman<span class="w"> </span>login<span class="w"> </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>skopeo<span class="w"> </span>login<span class="w"> </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>
+</code></pre></div>
+<h4 id="test-image-pulls-through-the-cache">Test Image Pulls Through the Cache<a class="headerlink" href="#test-image-pulls-through-the-cache" title="Permanent link">&para;</a></h4>
+<p>Verify that images can actually be pulled through the cache using <code>podman</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>podman<span class="w"> </span>image<span class="w"> </span>pull<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/quay-remote/openshift-release-dev/ocp-release:4.22.11-x86_64
+</code></pre></div>
+<p>If this succeeds, the cache is correctly proxying from <code>quay.io</code>. You can also inspect images without downloading all layers using <code>skopeo</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>skopeo<span class="w"> </span>inspect<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span>docker://<span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/quay-remote/openshift-release-dev/ocp-release:4.22.11-x86_64
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>skopeo<span class="w"> </span>inspect<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="w">  </span>docker://<span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/redhat-registry-remote/ubi9/ubi:latest
+</code></pre></div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If <code>podman pull</code> fails but <code>skopeo inspect</code> succeeds, the issue is usually TLS trust or credential format. Check that the CA is in <code>/etc/pki/ca-trust/source/anchors/</code> and that <code>update-ca-trust</code> has been run.</p>
+</div>
+<h4 id="verify-the-release-payload">Verify the Release Payload<a class="headerlink" href="#verify-the-release-payload" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>oc<span class="w"> </span>adm<span class="w"> </span>release<span class="w"> </span>info<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">  </span>--registry-config<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">  </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/quay-remote/openshift-release-dev/ocp-release:4.22.11-x86_64
+</code></pre></div>
+<p>This should print release metadata. If it fails, the installer will also fail — resolve the issue before proceeding.</p>
+<h4 id="check-the-cache-ui">Check the Cache UI<a class="headerlink" href="#check-the-cache-ui" title="Permanent link">&para;</a></h4>
+<p>After running the above commands, verify in the repository UI that content has been cached:</p>
+<ul>
+<li><strong>Artifactory</strong>: Navigate to <strong>Application &gt; Artifactory &gt; Artifacts</strong>, expand the remote repository, and confirm cached layers are present.</li>
+<li><strong>Nexus</strong>: Navigate to <strong>Browse &gt; repository name</strong> and verify image layers appear.</li>
+</ul>
+<hr />
+<h2 id="configure-openshift-for-the-internal-registry">Configure OpenShift for the Internal Registry<a class="headerlink" href="#configure-openshift-for-the-internal-registry" title="Permanent link">&para;</a></h2>
+<p>This section covers how to configure the OpenShift installer and post-install operators to pull images from your internal registry instead of public Red Hat registries.</p>
+<h3 id="step-1-configure-install-configyaml">Step 1: Configure install-config.yaml<a class="headerlink" href="#step-1-configure-install-configyaml" title="Permanent link">&para;</a></h3>
+<p>The standard installation process follows the <a href="../../agent-based/">Agent-Based Installer</a> guide. For a disconnected environment, you add three fields to <code>install-config.yaml</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>imageDigestSources</code></td>
+<td>Routes image pulls to your internal registry</td>
+</tr>
+<tr>
+<td><code>additionalTrustBundle</code></td>
+<td>Adds your registry's CA certificate to cluster trust</td>
+</tr>
+<tr>
+<td><code>pullSecret</code></td>
+<td>Contains credentials for both Red Hat and your internal registry</td>
+</tr>
+</tbody>
+</table>
+<h4 id="imagedigestsources">imageDigestSources<a class="headerlink" href="#imagedigestsources" title="Permanent link">&para;</a></h4>
+<p>This tells the cluster to pull images from your internal registry instead of the upstream source.</p>
+<div class="admonition warning">
+<p class="admonition-title">Order matters — most specific sources first</p>
+<p>CRI-O evaluates mirror rules sequentially from top to bottom. If a broad entry like <code>registry.redhat.io</code> appears before a more specific subpath like <code>registry.redhat.io/odf4</code>, the runtime matches the broad rule first and never reaches the specific one. Always list <strong>more specific source paths above less specific ones</strong>.</p>
+</div>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Mirror Registry (oc-mirror)</label><label for="__tabbed_2_2">Pull-Through Cache (Artifactory / Nexus)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The exact values come from <code>oc-mirror-workspace/working-dir/cluster-resources/idms-oc-mirror.yaml</code>. A typical configuration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="nt">imageDigestSources</span><span class="p">:</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">mirror_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">:8443/openshift/release-images</span>
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quay.io/openshift-release-dev/ocp-release</span>
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">mirror_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">:8443/openshift/release</span>
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quay.io/openshift-release-dev/ocp-v4.0-art-dev</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Always use the paths from the generated <code>idms-oc-mirror.yaml</code>. The paths depend on how <code>oc-mirror</code> was invoked and may differ from this example.</p>
+</div>
+</div>
+<div class="tabbed-block">
+<p>Map each upstream registry to the corresponding remote repository in your cache:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nt">imageDigestSources</span><span class="p">:</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/quay-remote</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quay.io</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/quay-remote</span>
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cdn.quay.io</span>
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/redhat-registry-remote</span>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.redhat.io</span>
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/redhat-access-remote</span>
+<a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.access.redhat.com</span>
+<a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/redhat-connect-remote</span>
+<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.connect.redhat.com</span>
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>cdn.quay.io</code> must be included — Quay redirects blob downloads to this CDN hostname. Replace mirror paths with the actual repository names in your artifact repository.</p>
+</div>
+</div>
+</div>
+</div>
+<h4 id="additionaltrustbundle">additionalTrustBundle<a class="headerlink" href="#additionaltrustbundle" title="Permanent link">&para;</a></h4>
+<p>Include the CA certificate of your internal registry so cluster nodes trust HTTPS connections to it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="nt">additionalTrustBundlePolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Always</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="nt">additionalTrustBundle</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span><span class="no">-----BEGIN CERTIFICATE-----</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">  </span><span class="no">&lt; your registry CA certificate &gt;</span>
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">  </span><span class="no">-----END CERTIFICATE-----</span>
+</code></pre></div>
+<h4 id="pullsecret">pullSecret<a class="headerlink" href="#pullsecret" title="Permanent link">&para;</a></h4>
+<p>Use the merged pull secret that contains credentials for both Red Hat registries and your internal registry (created during the registry setup step):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nt">pullSecret</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&lt;</span><span class="nv"> </span><span class="s">contents</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">~/merged-pull-secret.json</span><span class="nv"> </span><span class="s">&gt;&#39;</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Anonymous registries require a blank auth entry</p>
+<p>If your pull-through cache allows anonymous access, the pull secret must still contain an entry for the registry with an empty <code>auth</code> value — for example <code>"{{ artifactory_host }}": {"auth": ""}</code>. Do not use <code>podman login</code> or <code>oc registry login --auth-basic=":"</code> for this case; those write a non-empty credential. See <a href="#create-a-merged-pull-secret">Pull-Through Cache — Create a Merged Pull Secret</a>.</p>
+</div>
+<h4 id="complete-example">Complete Example<a class="headerlink" href="#complete-example" title="Permanent link">&para;</a></h4>
+<p>A full <code>install-config.yaml</code> for a disconnected environment (pull-through cache example):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="nt">baseDomain</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">base_domain</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">cluster_name</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="nt">controlPlane</span><span class="p">:</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">master</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w">  </span><span class="nt">architecture</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">amd64</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="w">  </span><span class="nt">hyperthreading</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Enabled</span>
+<a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="nt">compute</span><span class="p">:</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11" href="#__codelineno-30-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">worker</span>
+<a id="__codelineno-30-12" name="__codelineno-30-12" href="#__codelineno-30-12"></a><span class="w">    </span><span class="nt">architecture</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">amd64</span>
+<a id="__codelineno-30-13" name="__codelineno-30-13" href="#__codelineno-30-13"></a><span class="w">    </span><span class="nt">hyperthreading</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Enabled</span>
+<a id="__codelineno-30-14" name="__codelineno-30-14" href="#__codelineno-30-14"></a><span class="w">    </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<a id="__codelineno-30-15" name="__codelineno-30-15" href="#__codelineno-30-15"></a><span class="nt">networking</span><span class="p">:</span>
+<a id="__codelineno-30-16" name="__codelineno-30-16" href="#__codelineno-30-16"></a><span class="w">  </span><span class="nt">clusterNetwork</span><span class="p">:</span>
+<a id="__codelineno-30-17" name="__codelineno-30-17" href="#__codelineno-30-17"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.128.0.0/14</span>
+<a id="__codelineno-30-18" name="__codelineno-30-18" href="#__codelineno-30-18"></a><span class="w">      </span><span class="nt">hostPrefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">23</span>
+<a id="__codelineno-30-19" name="__codelineno-30-19" href="#__codelineno-30-19"></a><span class="w">  </span><span class="nt">machineNetwork</span><span class="p">:</span>
+<a id="__codelineno-30-20" name="__codelineno-30-20" href="#__codelineno-30-20"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">cidr</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">machine_network_cidr</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<a id="__codelineno-30-21" name="__codelineno-30-21" href="#__codelineno-30-21"></a><span class="w">  </span><span class="nt">networkType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OVNKubernetes</span>
+<a id="__codelineno-30-22" name="__codelineno-30-22" href="#__codelineno-30-22"></a><span class="w">  </span><span class="nt">serviceNetwork</span><span class="p">:</span>
+<a id="__codelineno-30-23" name="__codelineno-30-23" href="#__codelineno-30-23"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">172.30.0.0/16</span>
+<a id="__codelineno-30-24" name="__codelineno-30-24" href="#__codelineno-30-24"></a><span class="nt">platform</span><span class="p">:</span>
+<a id="__codelineno-30-25" name="__codelineno-30-25" href="#__codelineno-30-25"></a><span class="w">  </span><span class="nt">baremetal</span><span class="p">:</span>
+<a id="__codelineno-30-26" name="__codelineno-30-26" href="#__codelineno-30-26"></a><span class="w">    </span><span class="nt">apiVIPs</span><span class="p">:</span>
+<a id="__codelineno-30-27" name="__codelineno-30-27" href="#__codelineno-30-27"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">api_vip</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<a id="__codelineno-30-28" name="__codelineno-30-28" href="#__codelineno-30-28"></a><span class="w">    </span><span class="nt">ingressVIPs</span><span class="p">:</span>
+<a id="__codelineno-30-29" name="__codelineno-30-29" href="#__codelineno-30-29"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">ingress_vip</span><span class="w"> </span><span class="p p-Indicator">}}</span>
+<a id="__codelineno-30-30" name="__codelineno-30-30" href="#__codelineno-30-30"></a><span class="nt">pullSecret</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;&lt;</span><span class="nv"> </span><span class="s">contents</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">~/merged-pull-secret.json</span><span class="nv"> </span><span class="s">&gt;&#39;</span>
+<a id="__codelineno-30-31" name="__codelineno-30-31" href="#__codelineno-30-31"></a><span class="nt">sshKey</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{{</span><span class="nv"> </span><span class="s">public_key</span><span class="nv"> </span><span class="s">}}&#39;</span>
+<a id="__codelineno-30-32" name="__codelineno-30-32" href="#__codelineno-30-32"></a><span class="nt">additionalTrustBundlePolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Always</span>
+<a id="__codelineno-30-33" name="__codelineno-30-33" href="#__codelineno-30-33"></a><span class="nt">additionalTrustBundle</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<a id="__codelineno-30-34" name="__codelineno-30-34" href="#__codelineno-30-34"></a><span class="w">  </span><span class="no">-----BEGIN CERTIFICATE-----</span>
+<a id="__codelineno-30-35" name="__codelineno-30-35" href="#__codelineno-30-35"></a><span class="w">  </span><span class="no">&lt; your registry CA certificate &gt;</span>
+<a id="__codelineno-30-36" name="__codelineno-30-36" href="#__codelineno-30-36"></a><span class="w">  </span><span class="no">-----END CERTIFICATE-----</span>
+<a id="__codelineno-30-37" name="__codelineno-30-37" href="#__codelineno-30-37"></a><span class="nt">imageDigestSources</span><span class="p">:</span>
+<a id="__codelineno-30-38" name="__codelineno-30-38" href="#__codelineno-30-38"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-30-39" name="__codelineno-30-39" href="#__codelineno-30-39"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/quay-remote</span>
+<a id="__codelineno-30-40" name="__codelineno-30-40" href="#__codelineno-30-40"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quay.io</span>
+<a id="__codelineno-30-41" name="__codelineno-30-41" href="#__codelineno-30-41"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-30-42" name="__codelineno-30-42" href="#__codelineno-30-42"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/quay-remote</span>
+<a id="__codelineno-30-43" name="__codelineno-30-43" href="#__codelineno-30-43"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cdn.quay.io</span>
+<a id="__codelineno-30-44" name="__codelineno-30-44" href="#__codelineno-30-44"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-30-45" name="__codelineno-30-45" href="#__codelineno-30-45"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/redhat-registry-remote</span>
+<a id="__codelineno-30-46" name="__codelineno-30-46" href="#__codelineno-30-46"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.redhat.io</span>
+<a id="__codelineno-30-47" name="__codelineno-30-47" href="#__codelineno-30-47"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-30-48" name="__codelineno-30-48" href="#__codelineno-30-48"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/redhat-access-remote</span>
+<a id="__codelineno-30-49" name="__codelineno-30-49" href="#__codelineno-30-49"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.access.redhat.com</span>
+<a id="__codelineno-30-50" name="__codelineno-30-50" href="#__codelineno-30-50"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-30-51" name="__codelineno-30-51" href="#__codelineno-30-51"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/redhat-connect-remote</span>
+<a id="__codelineno-30-52" name="__codelineno-30-52" href="#__codelineno-30-52"></a><span class="w">    </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.connect.redhat.com</span>
+</code></pre></div>
+<h3 id="step-2-install-the-cluster">Step 2: Install the Cluster<a class="headerlink" href="#step-2-install-the-cluster" title="Permanent link">&para;</a></h3>
+<p>Follow the <a href="../../agent-based/">Agent-Based Installer</a> guide for:</p>
+<ul>
+<li>Creating <code>agent-config.yaml</code> with host network configuration</li>
+<li>Generating the bootable ISO</li>
+<li>Booting nodes and monitoring installation</li>
+</ul>
+<p>The installer uses the <code>imageDigestSources</code> to route all image pulls through your internal registry during bootstrap.</p>
+<h3 id="step-3-post-install-operator-configuration">Step 3: Post-Install Operator Configuration<a class="headerlink" href="#step-3-post-install-operator-configuration" title="Permanent link">&para;</a></h3>
+<p>After the cluster is running, configure the Operator Lifecycle Manager (OLM) to install operators from your internal registry.</p>
+<h4 id="disable-default-catalog-sources">Disable Default Catalog Sources<a class="headerlink" href="#disable-default-catalog-sources" title="Permanent link">&para;</a></h4>
+<p>The default catalog sources point to public registries. Disable them:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/ocp/install/auth/kubeconfig
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>oc<span class="w"> </span>patch<span class="w"> </span>operatorhub.config.openshift.io/cluster<span class="w"> </span>--type<span class="o">=</span>merge<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span>-p<span class="w"> </span><span class="s1">&#39;{&quot;spec&quot;:{&quot;disableAllDefaultSources&quot;:true}}&#39;</span>
+</code></pre></div>
+<h4 id="create-custom-catalog-sources">Create Custom Catalog Sources<a class="headerlink" href="#create-custom-catalog-sources" title="Permanent link">&para;</a></h4>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Mirror Registry (oc-mirror)</label><label for="__tabbed_3_2">Pull-Through Cache (Artifactory / Nexus)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Apply the catalog source generated by <code>oc-mirror</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>oc-mirror-workspace/working-dir/cluster-resources/
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>Create a catalog source that pulls the operator index through the cache:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">operators.coreos.com/v1alpha1</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CatalogSource</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redhat-operators</span>
+<a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openshift-marketplace</span>
+<a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">  </span><span class="nt">sourceType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grpc</span>
+<a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/redhat-registry-remote/redhat/redhat-operator-index:v4.22</span>
+<a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="w">  </span><span class="nt">displayName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Red</span><span class="nv"> </span><span class="s">Hat</span><span class="nv"> </span><span class="s">Operators&quot;</span>
+<a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w">  </span><span class="nt">publisher</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Red</span><span class="nv"> </span><span class="s">Hat</span><span class="nv"> </span><span class="s">(via</span><span class="nv"> </span><span class="s">internal</span><span class="nv"> </span><span class="s">registry)&quot;</span>
+<a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="w">  </span><span class="nt">updateStrategy</span><span class="p">:</span>
+<a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="w">    </span><span class="nt">registryPoll</span><span class="p">:</span>
+<a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">60m</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>catalog-source.yaml
+</code></pre></div>
+</div>
+</div>
+</div>
+<h4 id="verify-the-catalog-source">Verify the Catalog Source<a class="headerlink" href="#verify-the-catalog-source" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>oc<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>openshift-marketplace
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>oc<span class="w"> </span>get<span class="w"> </span>catalogsource<span class="w"> </span>-n<span class="w"> </span>openshift-marketplace
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>oc<span class="w"> </span>get<span class="w"> </span>packagemanifest<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-10
+</code></pre></div>
+<p>The catalog pod should be <code>Running</code> and package manifests should be listed.</p>
+<h4 id="install-operators">Install Operators<a class="headerlink" href="#install-operators" title="Permanent link">&para;</a></h4>
+<p>With the catalog source active, operators install normally:</p>
+<ul>
+<li><strong>Web Console</strong>: Navigate to <strong>Ecosystem &gt; Software Catalog</strong>, find the operator, and click <strong>Install</strong></li>
+<li><strong>CLI</strong>: Create a <code>Subscription</code> resource referencing your catalog source:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">operators.coreos.com/v1alpha1</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Subscription</span>
+<a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odf-operator</span>
+<a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openshift-storage</span>
+<a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="w">  </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stable-4.22</span>
+<a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odf-operator</span>
+<a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">redhat-operators</span>
+<a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="w">  </span><span class="nt">sourceNamespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openshift-marketplace</span>
+<a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="w">  </span><span class="nt">installPlanApproval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Automatic</span>
+</code></pre></div>
+<h4 id="worked-example-per-operator-mirror-paths-odf">Worked Example: Per-Operator Mirror Paths (ODF)<a class="headerlink" href="#worked-example-per-operator-mirror-paths-odf" title="Permanent link">&para;</a></h4>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Use this pattern only when operator images live in <strong>dedicated repository paths</strong> (for example <code>{{ artifactory_host }}/odf4</code>) rather than the full-registry remotes configured in Step 1 (<code>redhat-registry-remote</code>, etc.). If you already mirrored <code>registry.redhat.io</code> wholesale via <code>imageDigestSources</code> / CatalogSource above, skip this section — install ODF from that catalog normally.</p>
+</div>
+<p>When operators are staged under separate Artifactory paths, you need an additional <code>ImageDigestMirrorSet</code> for those paths <strong>and</strong> a CatalogSource that points at the mirrored index.</p>
+<div class="admonition tip">
+<p class="admonition-title">IDMS ordering with mixed mirrors</p>
+<p>If you have both a broad mirror for <code>registry.redhat.io</code> (from your install-config <code>imageDigestSources</code>) and a per-operator IDMS for a subpath like <code>registry.redhat.io/odf4</code>, the <strong>per-operator IDMS must be applied separately</strong> or its entries must appear <strong>above</strong> the broad entry. CRI-O evaluates rules top-to-bottom; the first match wins. A broad <code>registry.redhat.io</code> rule before <code>registry.redhat.io/odf4</code> will route ODF pulls to the wrong mirror path.</p>
+</div>
+<ol>
+<li>
+<p>Disable default catalog sources (if not already done):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>oc<span class="w"> </span>patch<span class="w"> </span>operatorhub.config.openshift.io/cluster<span class="w"> </span>--type<span class="o">=</span>merge<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="w">  </span>-p<span class="w"> </span><span class="s1">&#39;{&quot;spec&quot;:{&quot;disableAllDefaultSources&quot;:true}}&#39;</span>
+</code></pre></div>
+</li>
+<li>
+<p>Create an <code>ImageDigestMirrorSet</code> for the operator image paths:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config.openshift.io/v1</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ImageDigestMirrorSet</span>
+<a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odf-artifactory-mirror</span>
+<a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="w">  </span><span class="nt">imageDigestMirrors</span><span class="p">:</span>
+<a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/odf4</span>
+<a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a><span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.redhat.io/odf4</span>
+<a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mirrors</span><span class="p">:</span>
+<a id="__codelineno-38-11" name="__codelineno-38-11" href="#__codelineno-38-11"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/rhel9</span>
+<a id="__codelineno-38-12" name="__codelineno-38-12" href="#__codelineno-38-12"></a><span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.redhat.io/rhel9</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>odf-idms.yaml
+</code></pre></div>
+</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Applying an IDMS triggers a rolling reboot of all nodes as the Machine Config Operator updates <code>/etc/containers/registries.conf</code>. Wait for all nodes to return to <code>Ready</code> (<code>oc get nodes -w</code>) before proceeding.</p>
+</div>
+<ol>
+<li>
+<p>Deploy a CatalogSource pointing at the mirrored operator index. Adjust the image path to match your Artifactory layout:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">operators.coreos.com/v1alpha1</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">CatalogSource</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odf-catalog</span>
+<a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openshift-marketplace</span>
+<a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="w">  </span><span class="nt">sourceType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grpc</span>
+<a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a><span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/olm/redhat-operator-index:v4.22</span>
+<a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="w">  </span><span class="nt">displayName</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Local</span><span class="nv"> </span><span class="s">ODF</span><span class="nv"> </span><span class="s">Artifactory</span><span class="nv"> </span><span class="s">Catalog&quot;</span>
+<a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a><span class="w">  </span><span class="nt">publisher</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Internal</span><span class="nv"> </span><span class="s">Artifactory&quot;</span>
+<a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a><span class="w">  </span><span class="nt">updateStrategy</span><span class="p">:</span>
+<a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a><span class="w">    </span><span class="nt">registryPoll</span><span class="p">:</span>
+<a id="__codelineno-40-13" name="__codelineno-40-13" href="#__codelineno-40-13"></a><span class="w">      </span><span class="nt">interval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30m</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>odf-catalog.yaml
+</code></pre></div>
+</li>
+<li>
+<p>Verify the catalog pod starts:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>oc<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>openshift-marketplace
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>oc<span class="w"> </span>get<span class="w"> </span>catalogsource<span class="w"> </span>odf-catalog<span class="w"> </span>-n<span class="w"> </span>openshift-marketplace
+</code></pre></div>
+</li>
+<li>
+<p>Install the operator:</p>
+<ul>
+<li><strong>Web Console</strong>: <strong>Ecosystem &gt; Software Catalog</strong> → search for "OpenShift Data Foundation" → Install</li>
+<li><strong>CLI</strong>: Create a Subscription that references this catalog by name (<code>source: odf-catalog</code>):</li>
+</ul>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">operators.coreos.com/v1alpha1</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Subscription</span>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odf-operator</span>
+<a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openshift-storage</span>
+<a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a><span class="w">  </span><span class="nt">channel</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">stable-4.22</span>
+<a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odf-operator</span>
+<a id="__codelineno-43-9" name="__codelineno-43-9" href="#__codelineno-43-9"></a><span class="w">  </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">odf-catalog</span>
+<a id="__codelineno-43-10" name="__codelineno-43-10" href="#__codelineno-43-10"></a><span class="w">  </span><span class="nt">sourceNamespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openshift-marketplace</span>
+<a id="__codelineno-43-11" name="__codelineno-43-11" href="#__codelineno-43-11"></a><span class="w">  </span><span class="nt">installPlanApproval</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Automatic</span>
+</code></pre></div>
+</li>
+</ol>
+<h3 id="step-4-cluster-upgrades">Step 4: Cluster Upgrades<a class="headerlink" href="#step-4-cluster-upgrades" title="Permanent link">&para;</a></h3>
+<h4 id="mirror-registry-oc-mirror">Mirror Registry (oc-mirror)<a class="headerlink" href="#mirror-registry-oc-mirror" title="Permanent link">&para;</a></h4>
+<p>Mirror the new release version before starting the upgrade:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="c1"># Update imageset-config.yaml with the new version range, then:</span>
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>oc-mirror<span class="w"> </span>--config<span class="w"> </span>imageset-config.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="w">  </span>--workspace<span class="w"> </span>file://oc-mirror-workspace<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="w">  </span>docker://<span class="o">{{</span><span class="w"> </span>mirror_host<span class="w"> </span><span class="o">}}</span>:8443/openshift<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a><span class="w">  </span>--authfile<span class="w"> </span>~/merged-pull-secret.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a><span class="w">  </span>--v2
+</code></pre></div>
+<p>Apply the updated cluster resources (including the <code>UpdateService</code> CR from <code>platform.graph: true</code>), then initiate the upgrade:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>oc-mirror-workspace/working-dir/cluster-resources/
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>oc<span class="w"> </span>get<span class="w"> </span>updateservice<span class="w"> </span>-A
+<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>oc<span class="w"> </span>adm<span class="w"> </span>upgrade
+</code></pre></div>
+<p>The <code>UpdateService</code> provides the Cincinnati graph so <code>oc adm upgrade</code> can list and select versions without reaching <code>api.openshift.com</code>. Bump <code>minVersion</code>/<code>maxVersion</code> in <code>imageset-config.yaml</code> to <code>{{ new_ocp_release }}</code> before the mirror run.</p>
+<h4 id="pull-through-cache_1">Pull-Through Cache<a class="headerlink" href="#pull-through-cache_1" title="Permanent link">&para;</a></h4>
+<p>The cache fetches the new release image on demand. Simply initiate the upgrade:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>oc<span class="w"> </span>adm<span class="w"> </span>upgrade
+</code></pre></div>
+<p>If the cluster cannot reach the update graph service, specify the release image directly:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>oc<span class="w"> </span>adm<span class="w"> </span>upgrade<span class="w"> </span>--to-image<span class="o">={{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/quay-remote/openshift-release-dev/ocp-release:<span class="o">{{</span><span class="w"> </span>new_ocp_release<span class="w"> </span><span class="o">}}</span>-x86_64<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="w">  </span>--allow-explicit-upgrade
+</code></pre></div>
+<hr />
+<h2 id="image-signature-verification-optional">Image Signature Verification — Optional<a class="headerlink" href="#image-signature-verification-optional" title="Permanent link">&para;</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Image signature verification is <strong>optional security hardening</strong>. The cluster installs and operates correctly without it. Add this when you want cryptographic proof that images pulled from your internal registry are genuinely signed by Red Hat.</p>
+</div>
+<p>Red Hat publishes image signatures as <strong>sigstore attachments</strong> stored alongside images (as <code>sha256-&lt;digest&gt;.sig</code> tags). If your registry serves these <code>.sig</code> tags, you can enforce signature verification with a <code>ClusterImagePolicy</code>.</p>
+<h3 id="confirm-sig-tags-are-available">Confirm .sig tags are available<a class="headerlink" href="#confirm-sig-tags-are-available" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>skopeo<span class="w"> </span>list-tags<span class="w"> </span>docker://<span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/quay-remote/openshift-release-dev/ocp-release<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s1">&#39;\.sig$&#39;</span>
+</code></pre></div>
+<p>If no <code>.sig</code> tags appear, your registry is not caching signature attachments and this feature cannot be used.</p>
+<h3 id="apply-the-clusterimagepolicy">Apply the ClusterImagePolicy<a class="headerlink" href="#apply-the-clusterimagepolicy" title="Permanent link">&para;</a></h3>
+<p>Fetch the Red Hat release signing public key on a <strong>connected</strong> host (the disconnected bastion cannot reach <code>security.access.redhat.com</code>). Transfer the base64 string to the install host:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="c1"># On a host with outbound internet</span>
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>curl<span class="w"> </span>-s<span class="w"> </span>https://security.access.redhat.com/data/63405576.txt<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-w0
+</code></pre></div>
+<p>Apply a policy with <code>remapIdentity</code> — this tells the policy the signature was made for the <code>quay.io</code> identity even though images are pulled from your registry:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">config.openshift.io/v1</span>
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ClusterImagePolicy</span>
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openshift-release-mirror</span>
+<a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a><span class="w">  </span><span class="nt">scopes</span><span class="p">:</span>
+<a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/quay-remote/openshift-release-dev/ocp-release</span>
+<a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a><span class="w">  </span><span class="nt">policy</span><span class="p">:</span>
+<a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a><span class="w">    </span><span class="nt">rootOfTrust</span><span class="p">:</span>
+<a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a><span class="w">      </span><span class="nt">policyType</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PublicKey</span>
+<a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a><span class="w">      </span><span class="nt">publicKey</span><span class="p">:</span>
+<a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a><span class="w">        </span><span class="nt">keyData</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;base64-key-from-above&gt;</span>
+<a id="__codelineno-50-13" name="__codelineno-50-13" href="#__codelineno-50-13"></a><span class="w">    </span><span class="nt">signedIdentity</span><span class="p">:</span>
+<a id="__codelineno-50-14" name="__codelineno-50-14" href="#__codelineno-50-14"></a><span class="w">      </span><span class="nt">matchPolicy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RemapIdentity</span>
+<a id="__codelineno-50-15" name="__codelineno-50-15" href="#__codelineno-50-15"></a><span class="w">      </span><span class="nt">remapIdentity</span><span class="p">:</span>
+<a id="__codelineno-50-16" name="__codelineno-50-16" href="#__codelineno-50-16"></a><span class="w">        </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{{</span><span class="w"> </span><span class="nv">artifactory_host</span><span class="w"> </span><span class="p p-Indicator">}}</span><span class="l l-Scalar l-Scalar-Plain">/quay-remote/openshift-release-dev/ocp-release</span>
+<a id="__codelineno-50-17" name="__codelineno-50-17" href="#__codelineno-50-17"></a><span class="w">        </span><span class="nt">signedPrefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">quay.io/openshift-release-dev/ocp-release</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Do not create or edit a <code>ClusterImagePolicy</code> named <code>openshift</code> — that name is reserved for the built-in release policy.</p>
+</div>
+<h3 id="day-1-integration-extra-manifest">Day-1 Integration (Extra Manifest)<a class="headerlink" href="#day-1-integration-extra-manifest" title="Permanent link">&para;</a></h3>
+<p>To enforce signature verification from first boot, place the <code>ClusterImagePolicy</code> in the <code>openshift/</code> directory before generating the ISO:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>install/
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>├── install-config.yaml
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>├── agent-config.yaml
+<a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a>└── openshift/
+<a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a>    └── 99-cluster-image-policy.yaml
+</code></pre></div>
+<p>The installer embeds it into the ISO's Ignition config and applies it during bootstrap.</p>
+<div class="admonition note">
+<p class="admonition-title">Bootstrap timing</p>
+<p>The <code>ClusterImagePolicy</code> is applied by the MCO once the cluster API is up. The initial release payload pull during bootstrap is governed by the bootstrap node's own <code>policy.json</code> (seeded from the pull secret and mirror config). The extra-manifest CIP governs the running cluster — day-2 pulls, operator images, and upgrades.</p>
+</div>
+<hr />
+<h2 id="verification">Verification<a class="headerlink" href="#verification" title="Permanent link">&para;</a></h2>
+<h3 id="check-image-mirroring-configuration">Check Image Mirroring Configuration<a class="headerlink" href="#check-image-mirroring-configuration" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>oc<span class="w"> </span>get<span class="w"> </span>imagedigestmirrorset<span class="w"> </span>-o<span class="w"> </span>yaml
+</code></pre></div>
+<h3 id="verify-node-level-image-pulls">Verify Node-Level Image Pulls<a class="headerlink" href="#verify-node-level-image-pulls" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>oc<span class="w"> </span>debug<span class="w"> </span>node/&lt;worker-node&gt;<span class="w"> </span>--<span class="w"> </span>chroot<span class="w"> </span>/host<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a><span class="w">  </span>crictl<span class="w"> </span>pull<span class="w"> </span><span class="o">{{</span><span class="w"> </span>artifactory_host<span class="w"> </span><span class="o">}}</span>/redhat-registry-remote/ubi9/ubi:latest
+</code></pre></div>
+<h3 id="check-machineconfigpool-health">Check MachineConfigPool Health<a class="headerlink" href="#check-machineconfigpool-health" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>oc<span class="w"> </span>get<span class="w"> </span>mcp
+</code></pre></div>
+<p>All pools should show <code>UPDATED=True</code>, <code>UPDATING=False</code>, <code>DEGRADED=False</code>.</p>
+<h3 id="verify-pods-are-using-internal-registry-images">Verify Pods Are Using Internal Registry Images<a class="headerlink" href="#verify-pods-are-using-internal-registry-images" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>oc<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">&#39;{range .items[*]}{.spec.containers[*].image}{&quot;\n&quot;}{end}&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span>-u<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-20
+</code></pre></div>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ImagePullBackOff</code> on any pod</td>
+<td>Pull secret missing registry creds</td>
+<td>Update global pull secret</td>
+</tr>
+<tr>
+<td><code>x509: certificate signed by unknown authority</code></td>
+<td>CA not in <code>additionalTrustBundle</code></td>
+<td>Add registry CA certificate</td>
+</tr>
+<tr>
+<td>CatalogSource pod not starting</td>
+<td>Catalog image path incorrect</td>
+<td>Verify remote repo name in image path</td>
+</tr>
+<tr>
+<td>Operator shows available but install hangs</td>
+<td>Bundle images routing to wrong repo</td>
+<td>Add missing source to <code>ImageDigestMirrorSet</code></td>
+</tr>
+<tr>
+<td>MachineConfigPool degraded</td>
+<td><code>imageDigestSources</code> mismatch</td>
+<td>Verify paths match registry layout</td>
+</tr>
+<tr>
+<td>Upgrade shows no available versions</td>
+<td>Update graph unreachable</td>
+<td>Use <code>--to-image</code> with explicit release image</td>
+</tr>
+</tbody>
+</table>
+<p>For common installation issues, see <a href="../../troubleshooting/">Troubleshooting</a>.</p>
+<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/about-disconnected-installation-mirroring" target="_blank" rel="noopener">About disconnected installation mirroring</a></li>
+<li><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2" target="_blank" rel="noopener">oc-mirror plugin v2</a></li>
+<li><a href="https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2#mirror-registry-for-red-hat-openshift" target="_blank" rel="noopener">Mirror registry for Red Hat OpenShift</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.indexes", "navigation.top", "content.code.copy", "content.code.annotate", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
