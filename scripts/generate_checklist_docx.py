@@ -359,8 +359,26 @@ add_checklist_table([
 
 add_section_heading('Storage')
 add_checklist_table([
-    'Persistent storage backend provisioned and accessible',
-    'Storage connectivity verified from node networks',
+    'Storage array make, model, and firmware version documented',
+    'Connection protocol identified (FC, iSCSI, NVMe/TCP, NVMe/FC, NFS)',
+    'Array type documented (ALUA, active/active symmetric, active/passive)',
+    'Number of fabric paths per node confirmed (minimum two for redundancy)',
+    'FC: HBA WWPNs collected for all nodes',
+    'FC: Zoning configured on both fabric switches',
+    'FC: LUN masking / host groups configured on the array',
+    'iSCSI: Target portal IPs and IQN documented',
+    'iSCSI: CHAP credentials obtained (if required)',
+    'NVMe-oF: Discovery controller IPs or target NQNs documented',
+    'NVMe-oF: Array firmware confirmed to support NVMe-oF with RHCOS',
+    'Dedicated storage VLAN ID and subnet allocated',
+    'Jumbo frames (MTU 9000) confirmed end-to-end on the storage network',
+    'Vendor-recommended multipath.conf device block obtained',
+    'Multi-vendor: all vendor device blocks collected for merged multipath.conf',
+    'Storage array accessible from all cluster node networks',
+    'Required firewall ports open between nodes and the storage array',
+    'Storage credentials or certificates available for CSI driver configuration',
+    'RWX support confirmed (required for Virtualization live migration + registry)',
+    'CSI driver version confirmed compatible with target OCP version',
 ])
 
 add_section_heading('Installation host')
@@ -391,24 +409,28 @@ add_checklist_table([
 ])
 
 # Phase 4
-add_phase_heading('Phase 4: Post-installation (required)')
+add_phase_heading('Phase 4: Configure the cluster (required)')
 doc.add_paragraph('These must be completed before deploying workloads.')
 add_checklist_table([
-    'NMState operator installed (required for network configuration)',
+    'NMState operator installed',
+    'Network configuration applied (bonds, VLANs, storage network NNCPs)',
+    'Jumbo frames (MTU 9000) verified end-to-end on the storage network',
     'Storage driver installed and StorageClasses created',
     'Default StorageClass set',
+    'Multipath configured and verified (iSCSI/FC only \u2014 MachineConfig applied)',
     'RWO PVC created, bound, and data write/read verified',
     'RWX PVC created and bound successfully (if applicable)',
     'Internal image registry configured with persistent storage',
 ])
 
 # Phase 5
-add_phase_heading('Phase 5: Post-installation (optional)')
+add_phase_heading('Phase 5: Configure the cluster (additional)')
 doc.add_paragraph('Install based on your POC goals. Each subsection is independent.')
 
 add_section_heading('Networking')
 add_checklist_table([
-    'Additional network configuration applied (bridges, secondary NICs)',
+    'OVS bridge trunk configured for VM secondary networks (if applicable)',
+    'ClusterUserDefinedNetwork (CUDN) created for VM IPAM (if applicable)',
     'Ingress/Route exposes an application externally',
     'DNS resolution works from within pods (internal and external)',
 ])
@@ -471,10 +493,17 @@ add_checklist_table([
 
 add_section_heading('Security and access')
 add_checklist_table([
-    'Identity provider configured (LDAP, OIDC, etc.) — before demo day; keep kubeadmin until an IdP user has cluster-admin',
+    'Identity provider configured (LDAP, OIDC, etc.) \u2014 before demo day; keep kubeadmin until an IdP user has cluster-admin',
     'RBAC groups mapped correctly (members get expected roles)',
     'kubeadmin secret removed after IdP verification (if desired)',
+    'External Secrets Operator installed (if integrating Vault, AWS Secrets Manager, etc.)',
     'Non-production banner applied to the console',
+])
+
+add_section_heading('Additional tools')
+add_checklist_table([
+    'Web Terminal operator installed (embedded CLI in the web console)',
+    'Operators from Artifactory configured (if private registry for catalog)',
 ])
 
 # Phase 6
@@ -516,6 +545,7 @@ add_checklist_table([
     'VM deployed from template \u2014 boots, SSH, storage functional',
     'Live migration tested (move VM between nodes without downtime)',
     'Snapshot and restore tested',
+    'OVA virtual appliance deployed (if applicable)',
 ])
 
 # Phase 8
@@ -552,6 +582,7 @@ add_section_heading('Monitoring and troubleshooting')
 add_checklist_table([
     'Monitoring dashboards accessible',
     'Alerts fire correctly (trigger test alert, verify delivery)',
+    'MTU verified end-to-end (no silent packet drops)',
     'must-gather diagnostic bundle collected and reviewed',
     'Log collection validated (node, pod, operator logs)',
     'Common failure modes understood by the customer team',

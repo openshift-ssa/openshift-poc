@@ -134,7 +134,7 @@ Complete these before scheduling the installation.
 
 | Item                                                | Status | Notes |
 | --------------------------------------------------- | ------ | ----- |
-| Installation method selected                        |        |       |
+| Installation method selected (Assisted or Agent-Based preferred) |        |       |
 | Cluster installation completed successfully         |        |       |
 | All nodes showing `Ready` status                    |        |       |
 | All ClusterOperators Available=True, Degraded=False |        |       |
@@ -144,32 +144,36 @@ Complete these before scheduling the installation.
 
 ---
 
-## Phase 4: Post-Installation (Required)
+## Phase 4: Configure the Cluster (Required)
 
 These must be completed before deploying workloads.
 
-| Item                                                            | Status | Notes |
-| --------------------------------------------------------------- | ------ | ----- |
-| NMState operator installed (required for network configuration) |        |       |
-| Storage driver installed and StorageClasses created             |        |       |
-| Default StorageClass set                                        |        |       |
-| RWO PVC created, bound, and data write/read verified            |        |       |
-| RWX PVC created and bound successfully (if applicable)          |        |       |
-| Internal image registry configured with persistent storage      |        |       |
+| Item                                                                         | Status | Notes |
+| ---------------------------------------------------------------------------- | ------ | ----- |
+| NMState operator installed                                                   |        |       |
+| Network configuration applied (bonds, VLANs, storage network NNCPs)          |        |       |
+| Jumbo frames (MTU 9000) verified end-to-end on the storage network           |        |       |
+| Storage driver installed and StorageClasses created                           |        |       |
+| Default StorageClass set                                                     |        |       |
+| Multipath configured and verified (iSCSI/FC only — MachineConfig applied)    |        |       |
+| RWO PVC created, bound, and data write/read verified                         |        |       |
+| RWX PVC created and bound successfully (if applicable)                       |        |       |
+| Internal image registry configured with persistent storage                   |        |       |
 
 ---
 
-## Phase 5: Post-Installation (Optional)
+## Phase 5: Configure the Cluster (Additional)
 
 Install based on your POC goals. Each subsection is independent.
 
 ### Networking
 
-| Item                                                               | Status | Notes |
-| ------------------------------------------------------------------ | ------ | ----- |
-| Additional network configuration applied (bridges, secondary NICs) |        |       |
-| Ingress/Route exposes an application externally                    |        |       |
-| DNS resolution works from within pods (internal and external)      |        |       |
+| Item                                                                         | Status | Notes |
+| ---------------------------------------------------------------------------- | ------ | ----- |
+| OVS bridge trunk configured for VM secondary networks (if applicable)        |        |       |
+| ClusterUserDefinedNetwork (CUDN) created for VM IPAM (if applicable)         |        |       |
+| Ingress/Route exposes an application externally                              |        |       |
+| DNS resolution works from within pods (internal and external)                |        |       |
 
 ### Workload Availability
 
@@ -244,7 +248,15 @@ Install based on your POC goals. Each subsection is independent.
 | Identity provider configured (LDAP, OIDC, etc.) — before demo day; keep `kubeadmin` until an IdP user has `cluster-admin` |        |       |
 | RBAC groups mapped correctly (members get expected roles)                                                                 |        |       |
 | `kubeadmin` secret removed after IdP verification (if desired)                                                            |        |       |
+| External Secrets Operator installed (if integrating Vault, AWS Secrets Manager, etc.)                                     |        |       |
 | Non-production banner applied to the console                                                                              |        |       |
+
+### Additional Tools
+
+| Item                                                                    | Status | Notes |
+| ----------------------------------------------------------------------- | ------ | ----- |
+| Web Terminal operator installed (embedded CLI in the web console)       |        |       |
+| Operators from Artifactory configured (if private registry for catalog) |        |       |
 
 ---
 
@@ -290,6 +302,7 @@ Deploy workloads to validate platform capabilities.
 | VM deployed from template — boots, SSH, storage functional     |        |       |
 | Live migration tested (move VM between nodes without downtime) |        |       |
 | Snapshot and restore tested                                    |        |       |
+| OVA virtual appliance deployed (if applicable)                 |        |       |
 
 ---
 
@@ -334,6 +347,7 @@ Demonstrate Day 2 operations and resilience.
 | Alerts fire correctly (trigger test alert, verify delivery) |        |       |
 | must-gather diagnostic bundle collected and reviewed        |        |       |
 | Log collection validated (node, pod, operator logs)         |        |       |
+| MTU verified end-to-end (no silent packet drops)            |        |       |
 | Common failure modes understood by the customer team        |        |       |
 
 ---
