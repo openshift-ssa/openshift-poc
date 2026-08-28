@@ -1,6 +1,12 @@
-# VMware vSphere CSI
+# VMware
 
-[VMware vSphere CSI Driver Operator Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/storage/using-container-storage-interface-csi#persistent-storage-vsphere) | [Assisted Installer vSphere Post-Install Configuration](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/2026/html/installing_openshift_container_platform_with_the_assisted_installer/installing-on-vsphere)
+[VMware vSphere CSI Driver Operator Official Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/storage/using-container-storage-interface-csi#persistent-storage-vsphere)  
+[Assisted Installer vSphere Post-Install Configuration](https://docs.redhat.com/en/documentation/assisted_installer_for_openshift_container_platform/2026/html/installing_openshift_container_platform_with_the_assisted_installer/installing-on-vsphere)
+
+!!! important "Use the Official Documentation"
+    Always refer to the official vendor documentation for the latest installation and configuration guidance. The examples below are field notes from POC engagements and may not reflect the most current driver versions or recommended settings.
+
+# VMware vSphere CSI
 
 When OpenShift is installed on vSphere with `platform: vsphere`, the **vSphere CSI Driver Operator** and CSI driver are installed automatically in the `openshift-cluster-csi-drivers` namespace. A default StorageClass called `thin-csi` is created and ready to use.
 

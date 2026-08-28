@@ -5,6 +5,9 @@ After the cluster is running, install your vendor's CSI driver to provide persis
 !!! warning "Storage Vendor Inclusion"
     It is **highly recommended** to bring your storage vendor in to assist directly in the installation and configuration of their CSI driver. While the Red Hat sales engineers are multidisciplinary and bring tons of expertise, it is impossible for them to keep up with the nuances and best practices of every single storage provider in the market.
 
+!!! important "Use the Official Documentation"
+    Always refer to the official vendor documentation for the latest installation and configuration guidance. The examples are field notes from POC engagements and may not reflect the most current driver versions or recommended settings.
+
 ## OpenShift Virtualization Storage Requirements
 
 If you are planning on running virtual machines using OpenShift Virtualization, the live migration feature requires shared storage with ReadWriteMany (RWX) access mode. A VM's disk PVCs must be RWX for it to migrate — during migration the VM runs briefly on both source and destination nodes, so the disk volume has to be mountable on two nodes at once, which RWO can't do.
