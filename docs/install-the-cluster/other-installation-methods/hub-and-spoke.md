@@ -395,34 +395,148 @@ Once the InfraEnv is created, register bare metal hosts. ACM will automatically 
 
 Repeat the following for each host in the spoke cluster:
 
-1. Create the BMC secret:
-
-  ```bash
-  oc create secret generic {{ hostname }}-bmc-secret \
-    --from-literal=username={{ bmc_username }} \
-    --from-literal=password={{ bmc_password }} \
-    -n {{ spoke_cluster_name }}
-  ```
-
-2. Create the BareMetalHost:
+1. Create the BMC credentials Secret:
 
   ```yaml
-  apiVersion: metal3.io/v1alpha1
-  kind: BareMetalHost
+  apiVersion: v1
+  kind: Secret
   metadata:
-    name: {{ hostname }}
+    name: {{ hostname }}-bmc-secret
     namespace: {{ spoke_cluster_name }}
-    labels:
-      infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
-  spec:
-    bmc:
-      address: {{ bmc_address }}
-      credentialsName: "{{ hostname }}-bmc-secret"
-      disableCertificateVerification: true
-    bootMACAddress: {{ boot_mac_address }}
-    online: true
-    automatedCleaningMode: disabled
+  type: Opaque
+  stringData:
+    username: {{ bmc_username }}
+    password: {{ bmc_password }}
   ```
+
+  ```bash
+  oc apply -f {{ hostname }}-bmc-secret.yaml
+  ```
+
+    !!! tip
+        Using `stringData:` lets you supply plain-text values. If you prefer `data:`, base64-encode first: `echo -n 'value' | base64`.
+
+2. Create the BareMetalHost. The `bmc.address` format is vendor-specific — use the correct scheme and system ID for your hardware:
+
+    === "Dell iDRAC"
+
+        ```yaml
+        apiVersion: metal3.io/v1alpha1
+        kind: BareMetalHost
+        metadata:
+          name: {{ hostname }}
+          namespace: {{ spoke_cluster_name }}
+          labels:
+            infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+        spec:
+          online: true
+          bootMACAddress: {{ boot_mac_address }}
+          bmc:
+            address: idrac-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1
+            credentialsName: {{ hostname }}-bmc-secret
+            disableCertificateVerification: true
+          bootMode: UEFI
+          rootDeviceHints:
+            deviceName: /dev/sda
+          automatedCleaningMode: disabled
+        ```
+
+        !!! warning "Dell-Specific Requirements"
+            - **iDRAC firmware** — virtual media via Redfish needs a reasonably current iDRAC. On iDRAC 9, use **4.40.00.00 or newer**; older firmware has flaky or missing virtual-media Redfish support. iDRAC 8 works but is more limited.
+            - **Enterprise/Datacenter license** — virtual media requires it. The Express license does not expose the virtual media endpoint.
+
+        !!! tip "`idrac-virtualmedia` vs `redfish-virtualmedia`"
+            Ironic ships a Dell-optimized driver, `idrac-virtualmedia://`, which uses the same address format but handles Dell quirks (like boot-mode setting) more reliably. It is supported on OpenShift and is the recommended default for Dell hardware. Fall back to `redfish-virtualmedia://` only if you hit issues.
+
+        !!! tip "`rootDeviceHints` on Dell"
+            If these are PERC RAID setups, `/dev/sda` is usually correct. On NVMe or multi-disk boxes, prefer matching by `wwn` or `serialNumber` so you don't install to the wrong disk if a reboot reorders device names.
+
+    === "HPE iLO"
+
+        ```yaml
+        apiVersion: metal3.io/v1alpha1
+        kind: BareMetalHost
+        metadata:
+          name: {{ hostname }}
+          namespace: {{ spoke_cluster_name }}
+          labels:
+            infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+        spec:
+          online: true
+          bootMACAddress: {{ boot_mac_address }}
+          bmc:
+            address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
+            credentialsName: {{ hostname }}-bmc-secret
+            disableCertificateVerification: true
+          bootMode: UEFI
+          rootDeviceHints:
+            deviceName: /dev/sda
+          automatedCleaningMode: disabled
+        ```
+
+    === "Lenovo XCC"
+
+        ```yaml
+        apiVersion: metal3.io/v1alpha1
+        kind: BareMetalHost
+        metadata:
+          name: {{ hostname }}
+          namespace: {{ spoke_cluster_name }}
+          labels:
+            infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+        spec:
+          online: true
+          bootMACAddress: {{ boot_mac_address }}
+          bmc:
+            address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
+            credentialsName: {{ hostname }}-bmc-secret
+            disableCertificateVerification: true
+          bootMode: UEFI
+          rootDeviceHints:
+            deviceName: /dev/sda
+          automatedCleaningMode: disabled
+        ```
+
+    === "Supermicro"
+
+        ```yaml
+        apiVersion: metal3.io/v1alpha1
+        kind: BareMetalHost
+        metadata:
+          name: {{ hostname }}
+          namespace: {{ spoke_cluster_name }}
+          labels:
+            infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+        spec:
+          online: true
+          bootMACAddress: {{ boot_mac_address }}
+          bmc:
+            address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
+            credentialsName: {{ hostname }}-bmc-secret
+            disableCertificateVerification: true
+          bootMode: UEFI
+          rootDeviceHints:
+            deviceName: /dev/sda
+          automatedCleaningMode: disabled
+        ```
+
+    ??? info "Field Reference"
+        | Field                            | Description                                                                                                                                               |
+        | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+        | `bmc.address`                    | The `redfish-virtualmedia://` scheme avoids the provisioning-network requirement. The system ID at the end is vendor-specific (see tabs above).            |
+        | `bootMACAddress`                 | MAC of the NIC the host boots from — **not** the BMC's MAC address.                                                                                      |
+        | `disableCertificateVerification` | Usually required since BMCs ship with self-signed certs. Remove it if you have installed valid certificates.                                              |
+        | `bootMode`                       | `UEFI` (default), `legacy`, or `UEFISecureBoot`.                                                                                                         |
+        | `rootDeviceHints`                | Optional but recommended so Ironic installs to the correct disk. Can also match on `model`, `serialNumber`, `wwn`, `minSizeGigabytes`, etc.               |
+        | `automatedCleaningMode`          | Set to `disabled` for POC to skip the disk-wipe step during provisioning. In production, consider leaving it enabled.                                     |
+
+    !!! tip "Discovering the System ID"
+        If you're unsure of the system ID for your hardware, query the Redfish API:
+        ```bash
+        curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/ \
+          -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
+        ```
+        See [Infrastructure — BMC / Out-of-Band Management](../../prerequisites/infrastructure.md#bmc-out-of-band-management) for more details.
 
   ```bash
   oc apply -f {{ hostname }}-bmh.yaml
@@ -435,11 +549,90 @@ Repeat the following for each host in the spoke cluster:
   oc get agents -n {{ spoke_cluster_name }} -w
   ```
 
-  Each host will transition through: `registering` -> `inspecting` -> `available`. Once all hosts show as agents, you can create the cluster.
+  Each host will transition through: `registering` → `inspecting` → `available`. Once all hosts show as agents, you can create the cluster.
+
+### Approve Agents
+
+Before creating the cluster, verify all agents are discovered and approve them. Agents must be approved before they can be assigned to a cluster.
+
+1. List the agents and confirm all expected hosts appear:
+
+  ```bash
+  oc get agents -n {{ spoke_cluster_name }}
+  ```
+
+  You should see one agent per BareMetalHost.
+
+2. Approve each agent:
+
+  ```bash
+  oc patch agent {{ agent_name }} -n {{ spoke_cluster_name }} \
+    --type merge -p '{"spec":{"approved":true}}'
+  ```
+
+  Or approve all at once:
+
+  ```bash
+  for agent in $(oc get agents -n {{ spoke_cluster_name }} -o jsonpath='{.items[*].metadata.name}'); do
+    oc patch agent "$agent" -n {{ spoke_cluster_name }} \
+      --type merge -p '{"spec":{"approved":true}}'
+  done
+  ```
+
+3. Set the role for each agent. You need exactly 3 `master` agents and the rest as `worker`:
+
+  ```bash
+  oc patch agent {{ agent_name }} -n {{ spoke_cluster_name }} \
+    --type merge -p '{"spec":{"role":"master"}}'
+  ```
+
+  !!! tip
+      If you don't set roles manually, the installer will auto-assign them, but it's better to be explicit — especially if your control plane nodes differ from your workers in hardware specs.
+
+### Static IP Configuration (Optional)
+
+If the spoke cluster nodes require static IPs (no DHCP), create `NMStateConfig` resources **before** the hosts boot. The InfraEnv injects these into the discovery ISO automatically.
+
+```yaml
+apiVersion: agent-install.openshift.io/v1beta1
+kind: NMStateConfig
+metadata:
+  name: {{ hostname }}
+  namespace: {{ spoke_cluster_name }}
+  labels:
+    infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+spec:
+  config:
+    interfaces:
+      - name: eno1
+        type: ethernet
+        state: up
+        ipv4:
+          enabled: true
+          address:
+            - ip: {{ host_ip }}
+              prefix-length: {{ prefix_length }}
+          dhcp: false
+    dns-resolver:
+      config:
+        server:
+          - {{ dns_server }}
+    routes:
+      config:
+        - destination: 0.0.0.0/0
+          next-hop-address: {{ gateway }}
+          next-hop-interface: eno1
+  interfaces:
+    - name: eno1
+      macAddress: {{ boot_mac_address }}
+```
+
+!!! note
+    The `interfaces[].macAddress` at the bottom maps the NMState config to the correct physical NIC. The interface name (`eno1`) must match the actual NIC name on the host. If you are unsure, boot one host with DHCP first and check `ip link`.
 
 ### Create the Cluster
 
-Once all hosts are registered as agents, create the cluster resources to trigger installation.
+Once all agents are approved and showing `known` status, create the cluster resources to trigger installation.
 
 !!! tip "Choosing a ClusterImageSet"
     The `imageSetRef.name` must reference a `ClusterImageSet` that exists on the hub. ACM installs several automatically. List available versions with:
@@ -509,27 +702,80 @@ Once all hosts are registered as agents, create the cluster resources to trigger
   oc apply -f cluster-deployment.yaml
   ```
 
-2. Monitor the installation:
+2. Verify all agents are bound to the cluster before installation begins:
+
+  ```bash
+  oc get agents -n {{ spoke_cluster_name }} \
+    -o custom-columns=NAME:.metadata.name,ROLE:.spec.role,APPROVED:.spec.approved,STATUS:.status.debugInfo.state
+  ```
+
+  All agents should show `approved: true` and status `binding` or `known`. If any agent shows `insufficient`, check its conditions:
+
+  ```bash
+  oc get agent {{ agent_name }} -n {{ spoke_cluster_name }} -o jsonpath='{.status.conditions}' | jq .
+  ```
+
+3. Monitor the installation:
+
+  ```bash
+  oc get agentclusterinstall {{ spoke_cluster_name }} -n {{ spoke_cluster_name }} -o jsonpath='{.status.conditions}' | jq .
+  ```
+
+  Or watch for completion:
 
   ```bash
   oc get agentclusterinstall {{ spoke_cluster_name }} -n {{ spoke_cluster_name }} -w
   ```
 
-  The status will progress through `requirements-met` -> `installing` -> `installed`.
+  The installation progresses through: `requirements-met` → `preparing-to-install` → `installing` → `finalizing` → `installed`. A typical 6-node cluster takes 45–60 minutes.
 
-3. Once complete, retrieve the kubeconfig and credentials:
+  !!! warning
+      If the status stalls on `installing` for more than 90 minutes, check the individual host progress:
+      ```bash
+      oc get agents -n {{ spoke_cluster_name }} \
+        -o custom-columns=NAME:.metadata.name,STAGE:.status.progress.currentStage,PROGRESS:.status.progress.progressInfo
+      ```
+
+4. Once complete, retrieve the kubeconfig and credentials:
 
   ```bash
   oc get secret {{ spoke_cluster_name }}-admin-kubeconfig -n {{ spoke_cluster_name }} \
     -o jsonpath='{.data.kubeconfig}' | base64 -d > {{ spoke_cluster_name }}-kubeconfig
-
-  oc get secret {{ spoke_cluster_name }}-admin-password -n {{ spoke_cluster_name }} \
-    -o jsonpath='{.data.password}' | base64 -d
   ```
 
-4. Verify the spoke cluster:
+  Retrieve the `kubeadmin` password:
+
+  ```bash
+  oc get secret {{ spoke_cluster_name }}-admin-password -n {{ spoke_cluster_name }} \
+    -o jsonpath='{.data.password}' | base64 -d && echo
+  ```
+
+5. Verify the spoke cluster:
 
   ```bash
   oc --kubeconfig={{ spoke_cluster_name }}-kubeconfig get nodes
   oc --kubeconfig={{ spoke_cluster_name }}-kubeconfig get clusterversion
+  oc --kubeconfig={{ spoke_cluster_name }}-kubeconfig get co
   ```
+
+  All nodes should be `Ready`, the cluster version should match the target release, and all ClusterOperators should show `Available=True`.
+
+6. Verify the spoke is managed by ACM:
+
+  ```bash
+  oc get managedcluster {{ spoke_cluster_name }}
+  ```
+
+  The cluster should show `HubAcceptedManagedCluster=True` and `ManagedClusterConditionAvailable=True`.
+
+### Troubleshooting
+
+| Symptom                                      | Likely Cause                                                       | Fix                                                                                                           |
+| -------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| BMH stays in `registering`                   | BMC unreachable or credentials wrong                               | Verify `curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/` works from the hub; check the Secret               |
+| BMH `provisioning` but host doesn't boot ISO | Virtual media not supported or firmware too old                    | Check iDRAC/iLO firmware version; confirm Enterprise/Datacenter license (Dell)                                |
+| Agent shows `insufficient`                   | Host doesn't meet minimum requirements (CPU, RAM, disk)            | Check `oc get agent <name> -o jsonpath='{.status.conditions}'`; resolve the flagged validation                |
+| Agent shows `pending-for-input`              | Missing network config or role assignment                          | Approve the agent and assign a role (`master` or `worker`)                                                    |
+| Install stalls at `installing`               | Host stuck downloading or writing to disk                          | Check per-host progress with `oc get agents` custom-columns; look for disk or network errors                  |
+| Install fails with certificate errors        | BMC cert verification failing                                      | Ensure `disableCertificateVerification: true` is set on the BareMetalHost                                     |
+| Spoke cluster not showing in ACM             | ManagedCluster not created or klusterlet not deployed              | Check `oc get managedcluster`; the ClusterDeployment should auto-create it                                    |
