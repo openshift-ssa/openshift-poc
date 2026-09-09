@@ -11,7 +11,8 @@
 - Set annotation `storageclass.kubevirt.io/is-default-virt-class` to `true` on the storage class
 - RWX access mode required for live migration
 - [NMState Operator](./nmstate.md) installed
-- Optional: [underlay / CUDN networks](./networking.md) for VM IP persistence and a [dedicated live-migration network](./networking.md). Needed for failover IP-sameness tests; not required to install Virtualization.
+- Optional: [underlay / CUDN networks](./networking.md) for VM IP persistence. Needed for failover IP-sameness tests; not required to install Virtualization.
+- Optional: a dedicated live-migration network on a separate VLAN to isolate migration traffic from workload traffic. Use the [Storage Network Bond with Jumbo Frames](./networking.md#storage-network-bond-with-jumbo-frames-mtu-9000) NNCP as a pattern — create a similar bond/VLAN for the migration network, then configure the `HyperConverged` CR to use it (see [OpenShift Virtualization docs — live migration network](https://docs.redhat.com/en/documentation/red_hat_openshift_virtualization/latest/html/virtual_machines/live-migration#virt-configuring-a-live-migration-network)).
 
 !!! note "Planning VM Migrations from VMware?"
     If you plan to migrate VMs from VMware vSphere using the [Migration Toolkit for Virtualization](./mtv.md), you must obtain the VDDK image from Broadcom ahead of time. Broadcom has restricted access and requires a support ticket. See [Obtaining the VDDK](./mtv.md#obtaining-the-vddk) for details.

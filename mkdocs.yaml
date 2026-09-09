@@ -104,6 +104,7 @@ nav:
       - OpenShift Virtualization: configure-the-cluster/virtualization.md
       - Migration Toolkit for Virtualization: configure-the-cluster/mtv.md
       - OADP (Backup & Restore): configure-the-cluster/oadp.md
+      - Monitoring and Alerting: configure-the-cluster/monitoring.md
       - Logging: configure-the-cluster/logging.md
       - Network Observability: configure-the-cluster/network-observability.md
       - MultiCluster Observability: configure-the-cluster/multicluster-observability.md
@@ -136,7 +137,9 @@ nav:
           - VM Backup and Restore: workloads-and-operations/operational-validation/vm-backup-restore.md
       - Day-2 Operations:
           - workloads-and-operations/day-2-operations/index.md
+          - Cluster Upgrade: workloads-and-operations/day-2-operations/cluster-upgrade.md
           - Add Worker Node: workloads-and-operations/day-2-operations/add-worker-node.md
           - Rotate SSH Keys: workloads-and-operations/day-2-operations/rotate-ssh-keys.md
           - Machine Config: workloads-and-operations/day-2-operations/machine-config.md
+          - must-gather: workloads-and-operations/day-2-operations/must-gather.md
           - Debugging MTU Mismatches: workloads-and-operations/day-2-operations/debug-mtu.md
