@@ -79,7 +79,7 @@ extra:
 
 Use these in any markdown page with `{{ ocp_version }}` or `{{ ocp_release }}`. The [mkdocs-macros-plugin](https://mkdocs-macros-plugin.readthedocs.io/) substitutes them at build time. To update the version across all pages, change the values in `mkdocs.yaml`.
 
-Undefined `{{ placeholder }}` variables (e.g., `{{ mirror_host }}`, `{{ bmc_ip }}`) are intentionally left as-is for users to fill in. This is controlled by the `on_undefined: keep` setting in the macros plugin config.
+Undefined `{{ placeholder }}` variables (e.g., `{{ mirror_host }}`, `{{ bmc_ip }}`) are intentionally left as-is for users to fill in. The macros plugin is set to `on_undefined: warn` — undefined variables will produce a build warning but still render as the literal `{{ ... }}` string, making them easy for users to spot and replace.
 
 ## Contributing
 

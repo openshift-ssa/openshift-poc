@@ -17,3 +17,19 @@ spec:
   color: '#ffffff'
   backgroundColor: '#aa4f13'
 ```
+
+Or apply from the CLI:
+
+```bash
+cat << 'EOF' | oc apply -f -
+apiVersion: console.openshift.io/v1
+kind: ConsoleNotification
+metadata:
+  name: poc-notification
+spec:
+  text: POC Environment
+  location: BannerTop
+  color: '#ffffff'
+  backgroundColor: '#aa4f13'
+EOF
+```

@@ -67,6 +67,9 @@ This multi-version setup is what makes Bookinfo useful for traffic management de
     -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/platform/kube/bookinfo.yaml
   ```
 
+  !!! note
+      This pulls from the `master` branch of the upstream Istio repo. If the URL fails, check whether Istio has renamed the branch to `main`, or download the manifests from a [tagged release](https://github.com/istio/istio/releases) instead.
+
 4. Wait for all pods to be running:
 
   ```bash

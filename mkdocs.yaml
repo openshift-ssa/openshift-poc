@@ -37,7 +37,7 @@ plugins:
       links_attr_map:
         target: _blank
   - macros:
-      on_undefined: keep
+      on_undefined: warn
 
 extra:
   ocp_version: "4.22"

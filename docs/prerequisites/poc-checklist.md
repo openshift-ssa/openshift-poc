@@ -6,6 +6,19 @@ Use this as a tracker for your POC engagement. Not every item will apply to ever
 
 [Download as Word Document](../assets/downloads/poc-checklist.docx){ .md-button }
 
+??? tip "Minimum Viable POC (Time-Constrained Engagements)"
+    If time is limited, focus on these core items to demonstrate OpenShift value in 2–3 days:
+
+    1. **Install** — Deploy with Assisted Installer or Agent-Based Installer
+    2. **Storage** — Install your vendor's CSI driver, create a default StorageClass
+    3. **Registry** — Configure the internal image registry with persistent storage
+    4. **Workload** — Deploy Hello World + PostgreSQL (validates networking and storage)
+    5. **Virtualization** — Install OpenShift Virtualization, deploy a RHEL VM
+    6. **Failover** — Run the VM failover test (demonstrates node-loss recovery)
+    7. **Upgrade** — Apply a z-stream update (demonstrates lifecycle management)
+
+    Everything else in this checklist is valuable but can be deferred to follow-up sessions.
+
 ---
 
 ## Phase 1: Discovery and Scoping

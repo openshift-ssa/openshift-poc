@@ -24,7 +24,7 @@ Confirm with your storage vendor which access modes are supported:
 
 ## Vendor Compatibility
 
-Verify your storage vendor and driver version are listed in the [Red Hat Ecosystem Catalog](https://catalog.redhat.com) for your target OpenShift version. See the left navigation for vendor-specific installation guides.
+Verify your storage vendor and driver version are listed in the [Red Hat Ecosystem Catalog](https://catalog.redhat.com) for your target OpenShift version. See the [Storage Vendors](./vendors.md) page for links to vendor-specific installation guides (Dell, Pure Storage, NetApp, vSphere CSI).
 
 ## Storage Network
 

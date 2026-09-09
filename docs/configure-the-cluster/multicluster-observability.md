@@ -212,7 +212,7 @@ Continue with [Create the MultiClusterObservability instance](#create-the-multic
 
 `storageConfig.storageClass` is the block StorageClass for Thanos component PVCs (`alertmanager`, `compact`, `receive`, `rule`, `store`). It is independent of whether object storage is ODF or MinIO. Change `lvms-local-storage` if that is not the StorageClass on your hub.
 
-5. Create the MultiClusterObservability instance:
+4. Create the MultiClusterObservability instance:
 
   ```yaml
   apiVersion: observability.open-cluster-management.io/v1beta2
@@ -242,7 +242,7 @@ Continue with [Create the MultiClusterObservability instance](#create-the-multic
   oc apply -f multiclusterobservability.yaml
   ```
 
-6. Watch it deploy:
+5. Watch it deploy:
 
   ```bash
   oc get multiclusterobservability -w

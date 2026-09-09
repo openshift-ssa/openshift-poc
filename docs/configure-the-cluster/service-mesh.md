@@ -249,3 +249,7 @@ spec:
 ```bash
 oc apply -f waypoint.yaml
 ```
+
+## Next Steps
+
+- [Bookinfo (Service Mesh Demo)](../workloads-and-operations/container-workloads/bookinfo.md) — Deploy the standard Istio sample application to demonstrate mTLS, traffic splitting, and canary deployments with ambient mode

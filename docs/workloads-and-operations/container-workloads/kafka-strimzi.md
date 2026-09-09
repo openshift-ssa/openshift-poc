@@ -81,8 +81,8 @@ Strimzi now requires KRaft (no ZooKeeper). Create a dual-role node pool and a Ka
       strimzi.io/kraft: enabled
   spec:
     kafka:
-      version: 4.2.0
-      metadataVersion: 4.2-IV0
+      version: 4.2.0             # Match to your Strimzi operator version
+      metadataVersion: 4.2-IV0   # Must match the Kafka version
       listeners:
         - name: plain
           port: 9092
@@ -109,6 +109,9 @@ Strimzi now requires KRaft (no ZooKeeper). Create a dual-role node pool and a Ka
       topicOperator: {}
       userOperator: {}
   ```
+
+  !!! note "Kafka and Metadata Versions"
+      The `version` and `metadataVersion` values must match your installed Strimzi operator. Check supported versions: `oc get csv -n openshift-operators -o jsonpath='{.items[?(@.metadata.name=="strimzi-cluster-operator*")].spec.version}'`. See [Strimzi supported versions](https://strimzi.io/downloads/) for the compatibility matrix.
 
   ```bash
   oc apply -f kafka-cluster.yaml

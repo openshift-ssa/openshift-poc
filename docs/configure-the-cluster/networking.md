@@ -50,6 +50,20 @@ For storage over LACP, layer3+4 is the usual choice because it lets multiple ses
 
 Do not place VM (or pod) traffic on the same VLAN used for cluster management (API, machine network, ingress). Management traffic carries etcd heartbeats, API server requests, and node health checks — all of which are latency-sensitive and critical to cluster stability. VM workloads can generate unpredictable bursts of broadcast, multicast, or high-bandwidth traffic that saturate the segment, causing etcd leader elections, API timeouts, or nodes flapping to `NotReady`. Keeping them on separate VLANs also gives you independent broadcast domains, lets you apply distinct QoS and firewall policies per network, and makes troubleshooting straightforward since a noisy VM cannot interfere with cluster control-plane communication.
 
+## Quick Reference
+
+| What You Need | Example |
+|---------------|---------|
+| Simple bond with a static IP | [2-eth Bond1 (LACP) with IP](#2-eth-bond1-lacp-with-ip) |
+| Bond as a VLAN trunk (no IP on the bond) | [2-eth Bond1 (LACP) with trunk](#2-eth-bond1-lacp-with-trunk) |
+| Bond + tagged VLAN with IP | [2-eth Bond (LACP) with VLAN](#2-eth-bond-lacp-with-vlan) |
+| Redundancy without LACP | [2-eth Bond (Active-Backup) with VLAN](#2-eth-bond-active-backup-with-vlan) |
+| Dedicated storage network (MTU 9000) | [Storage Network Bond with Jumbo Frames](#storage-network-bond-with-jumbo-frames-mtu-9000) |
+| OVS bridge for VM/pod underlay | [OVS Bridge Trunk](#ovs-bridge-trunk) |
+| L3 network for pods/VMs (IPAM) | [CUDN with IPAM](#cudn-with-ipam) |
+| L2 network for pods/VMs (external DHCP) | [CUDN without IPAM](#cudn-without-ipam) |
+| Remove an interface | [Removing NMState Configurations](#removing-nmstate-configurations) |
+
 ## NodeNetworkConfigurationPolicy Examples
 
 ### Bonds and Vlans

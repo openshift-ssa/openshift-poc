@@ -78,6 +78,9 @@ spec:
         name: allow-external-secrets-egress
 ```
 
+!!! info "Why the `networkPolicies` block?"
+    The External Secrets controller pod must make outbound HTTPS calls to reach your external vault (HashiCorp Vault, AWS Secrets Manager, Azure Key Vault, etc.). The `egress: [{}]` rule creates a NetworkPolicy that allows **all** outbound traffic from the controller. Without it, clusters with default-deny network policies will block the controller from fetching secrets. In production, restrict the egress rule to the specific vault endpoint IP/port.
+
 ```bash
 oc apply -f external-secrets-config.yaml
 ```

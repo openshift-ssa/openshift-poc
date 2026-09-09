@@ -120,7 +120,7 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
 
 #### Create the Group Sync Configuration
 
-6. Create a sync configuration file. This example uses Active Directory (`augmentedActiveDirectory`):
+7. Create a sync configuration file. This example uses Active Directory (`augmentedActiveDirectory`):
 
   ```yaml
   kind: LDAPSyncConfig
@@ -152,7 +152,7 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
 
   For OpenLDAP or FreeIPA, replace the `augmentedActiveDirectory` block with `rfc2307` (groups own a `member` / `memberUid` attribute).
 
-7. Create a dedicated namespace, ConfigMap (sync YAML + CA), and bind-password secret:
+8. Create a dedicated namespace, ConfigMap (sync YAML + CA), and bind-password secret:
 
   ```bash
   oc create namespace ldap-sync
@@ -169,19 +169,19 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
 
 #### Run the Sync
 
-8. Preview what will be synced (dry run):
+9. Preview what will be synced (dry run):
 
   ```bash
   oc adm groups sync --sync-config=sync.yaml
   ```
 
-9. Run the sync:
+10. Run the sync:
 
   ```bash
   oc adm groups sync --sync-config=sync.yaml --confirm
   ```
 
-10. Verify the groups were created:
+11. Verify the groups were created:
 
   ```bash
   oc get groups
@@ -189,19 +189,19 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
 
 #### Assign Roles to Groups
 
-11. Grant cluster-admin to an admin group:
+12. Grant cluster-admin to an admin group:
 
   ```bash
   oc adm policy add-cluster-role-to-group cluster-admin {{ admin_group_name }}
   ```
 
-12. Grant view access to a read-only group across the cluster:
+13. Grant view access to a read-only group across the cluster:
 
   ```bash
   oc adm policy add-cluster-role-to-group view {{ readonly_group_name }}
   ```
 
-13. Grant edit access to a developer group in a specific namespace:
+14. Grant edit access to a developer group in a specific namespace:
 
   ```bash
   oc adm policy add-role-to-group edit {{ dev_group_name }} -n {{ namespace }}

@@ -23,7 +23,7 @@ metadata:
   name: web-terminal
   namespace: openshift-operators
 spec:
-  channel: fast
+  channel: fast  # Web Terminal only publishes on 'fast' — there is no 'stable' channel for this operator
   name: web-terminal
   source: redhat-operators
   sourceNamespace: openshift-marketplace

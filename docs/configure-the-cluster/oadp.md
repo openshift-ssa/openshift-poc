@@ -175,3 +175,7 @@ oc get pods -n openshift-adp
 ```
 
 You should see Velero and node-agent pods running.
+
+## Next Steps
+
+- [VM Backup and Restore](../workloads-and-operations/operational-validation/vm-backup-restore.md) — Exercise a full backup → destructive change → restore cycle using OADP with the kubevirt plugin

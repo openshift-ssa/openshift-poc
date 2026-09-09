@@ -13,6 +13,21 @@ At the top of the page, follow the tabs left to right — each represents a phas
 | **[Configure the Cluster](../configure-the-cluster/index.md)** | Install storage, operators, and platform capabilities                       |
 | **[Workloads and Operations](../workloads-and-operations/index.md)**      | Run workloads and operational tests to demonstrate value                    |
 
+## Template Variables
+
+Throughout this site, values like `{{ cluster_name }}`, `{{ base_domain }}`, `{{ storage_class }}`, and `{{ bmc_ip }}` are placeholders — replace them with values specific to your environment before running any command. They are rendered as-is in code blocks to make them easy to spot and search for.
+
+Common variables used across the documentation:
+
+| Variable | Meaning | Example |
+|----------|---------|---------|
+| `{{ cluster_name }}` | Your cluster's name | `ocp-poc` |
+| `{{ base_domain }}` | Your DNS base domain | `example.com` |
+| `{{ ocp_version }}` | OpenShift minor version (auto-filled) | `{{ ocp_version }}` |
+| `{{ ocp_release }}` | OpenShift full release version (auto-filled) | `{{ ocp_release }}` |
+| `{{ storage_class }}` | Your default StorageClass name | `unity-iscsi` |
+| `{{ bmc_ip }}` | BMC/iDRAC/iLO IP address | `10.0.1.100` |
+
 ## Important First Steps
 
 1. Read and understand the [prerequisites](../prerequisites/index.md) associated with installing a POC environment for OpenShift.

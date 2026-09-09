@@ -39,3 +39,7 @@ If you are looking at OpenShift Platform Plus (OPP) and are targeting ODF to be 
   -> Click Next
 
 13. Click Finish
+
+## Install via YAML (Alternative)
+
+If you prefer a CLI-driven install, the ODF operator and StorageCluster can also be deployed with YAML. See the [OpenShift Data Foundation documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/latest/html/deploying_openshift_data_foundation_using_bare_metal_infrastructure/index) for the full manifest-based installation procedure. The hub-and-spoke guide also shows a [YAML-based ODF install on SNO](../../install-the-cluster/other-installation-methods/hub-and-spoke.md#optional--install-openshift-data-foundation-object-storage).

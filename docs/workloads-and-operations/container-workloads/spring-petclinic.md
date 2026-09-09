@@ -72,7 +72,7 @@ Alternatively, deploy a pre-built image:
       spec:
         containers:
           - name: petclinic
-            image: docker.io/springcommunity/spring-petclinic:latest
+            image: docker.io/springcommunity/spring-petclinic:latest  # (1)
             ports:
               - containerPort: 8080
             resources:
@@ -95,6 +95,9 @@ Alternatively, deploy a pre-built image:
               initialDelaySeconds: 60
               periodSeconds: 10
   ```
+
+  !!! warning "Docker Hub Rate Limits"
+      The `docker.io` image is subject to Docker Hub pull rate limits (100 pulls per 6 hours for anonymous users). If the image pull fails with `toomanyrequests`, either authenticate with a Docker Hub account via a pull secret, or use the S2I deployment method above which builds from source.
 
   ```bash
   oc apply -f petclinic-deployment.yaml
