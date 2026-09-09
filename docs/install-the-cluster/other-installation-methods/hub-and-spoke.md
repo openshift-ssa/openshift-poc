@@ -428,6 +428,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
     metadata:
       name: {{ hostname }}
       namespace: {{ spoke_cluster_name }}
+      annotations:
+        inspect.metal3.io/disabled: ""
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     spec:
@@ -442,6 +444,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         deviceName: /dev/sda
       automatedCleaningMode: disabled
     ```
+
+    * The namespace for the InfraEnv and BareMetalHost must be the same
 
     !!! warning "Dell-Specific Requirements"
         - **iDRAC firmware** — virtual media via Redfish needs a reasonably current iDRAC. On iDRAC 9, use **4.40.00.00 or newer**; older firmware has flaky or missing virtual-media Redfish support. iDRAC 8 works but is more limited.
@@ -461,6 +465,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
     metadata:
       name: {{ hostname }}
       namespace: {{ spoke_cluster_name }}
+      annotations:
+        inspect.metal3.io/disabled: ""
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     spec:
@@ -484,6 +490,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
     metadata:
       name: {{ hostname }}
       namespace: {{ spoke_cluster_name }}
+      annotations:
+        inspect.metal3.io/disabled: ""
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     spec:
@@ -507,6 +515,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
     metadata:
       name: {{ hostname }}
       namespace: {{ spoke_cluster_name }}
+      annotations:
+        inspect.metal3.io/disabled: ""
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     spec:
@@ -525,6 +535,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
 ??? info "Field Reference"
     | Field                            | Description                                                                                                                                               |
     | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | `inspect.metal3.io/disabled`     | Annotation that skips Ironic hardware inspection. Required for ACM/InfraEnv host inventory so hosts register as agents instead of staying in `inspecting`. |
     | `bmc.address`                    | The `redfish-virtualmedia://` scheme avoids the provisioning-network requirement. The system ID at the end is vendor-specific (see tabs above).            |
     | `bootMACAddress`                 | MAC of the NIC the host boots from — **not** the BMC's MAC address.                                                                                      |
     | `disableCertificateVerification` | Usually required since BMCs ship with self-signed certs. Remove it if you have installed valid certificates.                                              |
@@ -553,7 +564,23 @@ oc get bmh -n {{ spoke_cluster_name }}
 oc get agents -n {{ spoke_cluster_name }} -w
 ```
 
-Each host will transition through: `registering` → `inspecting` → `available`. Once all hosts show as agents, you can create the cluster.
+With `inspect.metal3.io/disabled` set, each host transitions through: `registering` → `available` (Ironic hardware inspection is skipped). ACM then boots the InfraEnv discovery ISO via virtual media so the host registers as an Agent. Once all hosts show as agents, you can create the cluster.
+
+!!! warning
+    Do not omit `inspect.metal3.io/disabled` on ACM/InfraEnv BareMetalHosts. Without it, the host stays in Ironic `inspecting` waiting for the IPA ramdisk instead of registering as an assisted-installer agent.
+
+##### What happens during discovery boot
+
+After the BareMetalHost is `available`, the Bare Metal Operator attaches the InfraEnv discovery ISO and powers the host on:
+
+1. **Power on** — The Bare Metal Operator sends a power-on command via the BMC (iDRAC, iLO, XCC, etc.).
+2. **Hardware POST** — The server runs its Power-On Self-Test. Depending on the hardware, this alone can take **5–15 minutes**.
+3. **Virtual media boot** — The server boots the discovery ISO mounted by the BMC (not PXE / IPA inspection).
+4. **Agent startup** — The assisted installer agent starts and applies any matching `NMStateConfig`.
+5. **Call home** — The agent registers with the hub; `oc get agents` shows the new host.
+
+!!! tip "Watch the BMC console"
+    If you are waiting for the agent to come up, open the server's remote console (iDRAC, iLO, XCC) and watch the screen. Once you see the Linux kernel booting, the agent is only seconds away from starting. Long waits are often still in POST — not a hang.
 
 ### Approve Agents
 
@@ -777,6 +804,7 @@ Once all agents are approved and showing `known` status, create the cluster reso
 | Symptom                                      | Likely Cause                                                       | Fix                                                                                                           |
 | -------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
 | BMH stays in `registering`                   | BMC unreachable or credentials wrong                               | Verify `curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/` works from the hub; check the Secret               |
+| BMH stays in `inspecting`                    | Missing `inspect.metal3.io/disabled` (Ironic IPA inspect path)     | Add annotation `inspect.metal3.io/disabled: ""` on the BareMetalHost; confirm InfraEnv label and `online: true` |
 | BMH `provisioning` but host doesn't boot ISO | Virtual media not supported or firmware too old                    | Check iDRAC/iLO firmware version; confirm Enterprise/Datacenter license (Dell)                                |
 | Agent shows `insufficient`                   | Host doesn't meet minimum requirements (CPU, RAM, disk)            | Check `oc get agent <name> -o jsonpath='{.status.conditions}'`; resolve the flagged validation                |
 | Agent shows `pending-for-input`              | Missing network config or role assignment                          | Approve the agent and assign a role (`master` or `worker`)                                                    |
