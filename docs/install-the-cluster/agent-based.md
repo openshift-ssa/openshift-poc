@@ -212,7 +212,7 @@ If your environment uses active-backup bonding instead of LACP:
             address:
               - ip: 10.0.0.7
                 prefix-length: 28
-            dhcp: falsehttps://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index#root-device-hints_preparing-to-install-with-agent-based-installer
+            dhcp: false
           link-aggregation:
             mode: active-backup
             port:

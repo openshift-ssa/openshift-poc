@@ -38,13 +38,15 @@ The static site is output to the `site/` directory.
 docs/
 ├── home/                         # Landing page and architecture overview
 ├── prerequisites/                # Infrastructure, networking, DNS, storage, POC checklist
-├── installation/                 # Assisted Installer, agent-based, troubleshooting
-│   ├── disconnected/             # oc-mirror, pull-through cache, OpenShift config
-│   └── other/                    # vSphere IPI, hosted control planes, fleet management
-├── post-installation/            # Day-2 operators, storage, networking, virtualization
-│   └── storage/                  # ODF, NetApp Trident, Dell Unity, vSphere CSI
-├── workloads/                    # Container and VM workload examples
-├── operations/                   # Failover tests, backup/restore, node management
+├── install-the-cluster/          # Assisted Installer, agent-based, troubleshooting
+│   └── other-installation-methods/  # Hub and spoke, vSphere IPI, hosted control planes, disconnected
+├── configure-the-cluster/        # Day-2 operators, storage, networking, virtualization
+│   └── storage/                  # ODF, NetApp Trident, Dell Unity, Pure Storage, vSphere CSI
+├── workloads-and-operations/     # Workload examples and operational validation
+│   ├── container-workloads/      # Hello World, PetClinic, Kafka, S2I, PostgreSQL, Bookinfo
+│   ├── virtual-machine-workloads/  # RHEL httpd VM, OVA virtual appliances
+│   ├── operational-validation/   # Failover tests, backup/restore
+│   └── day-2-operations/         # Add worker node, rotate SSH keys, MachineConfig, MTU debug
 └── assets/
     ├── downloads/                # Generated POC checklist .docx (created at build/deploy)
     ├── images/                   # Logos and diagrams
@@ -53,12 +55,12 @@ docs/
 
 ## Documentation Sections
 
-| Section | Description |
-| ------- | ----------- |
-| [Prerequisites](docs/prerequisites/index.md) | Infrastructure, networking, DNS, storage, and a full POC checklist |
-| [Install the Cluster](docs/installation/index.md) | Assisted Installer, Agent-Based, disconnected, other methods |
-| [Configure the Cluster](docs/post-installation/index.md) | Storage, virtualization, MTV, OADP, logging, GitOps |
-| [Validate the POC](docs/workloads/index.md) | Sample containers, VMs, failover, and day-2 operations |
+| Section                                                              | Description                                                  |
+| -------------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Prerequisites](docs/prerequisites/index.md)                        | Infrastructure, networking, DNS, storage, and a full POC checklist |
+| [Install the Cluster](docs/install-the-cluster/index.md)            | Assisted Installer, Agent-Based, disconnected, other methods |
+| [Configure the Cluster](docs/configure-the-cluster/index.md)        | Storage, virtualization, MTV, OADP, logging, GitOps          |
+| [Workloads and Operations](docs/workloads-and-operations/index.md)   | Sample containers, VMs, failover, and day-2 operations       |
 
 ## Sitewide Variables
 

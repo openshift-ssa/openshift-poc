@@ -2,7 +2,7 @@
 
 The OpenShift internal image registry is deployed by default with ephemeral storage. Images stored in the registry are lost if the registry pod is rescheduled. Configure it to use a Persistent Volume Claim (PVC).
 
-## Configure the Registry with Block Storage
+## Configure the Registry with Persistent Storage
 
 1. Go to the WebUI, click the circle plus, select Import YAML
 2. Paste the following to create the PVC for the storage
