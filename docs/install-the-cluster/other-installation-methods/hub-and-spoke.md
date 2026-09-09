@@ -393,163 +393,167 @@ Once the InfraEnv is created, register bare metal hosts. ACM will automatically 
 !!! info "BMC Address Formats"
     The `bmc.address` field varies by hardware vendor. See [Infrastructure — BMC / Out-of-Band Management](../../prerequisites/infrastructure.md#bmc-out-of-band-management) for the address format table and instructions on discovering the system ID via the Redfish API.
 
-Repeat the following for each host in the spoke cluster:
+Repeat the following for each host in the spoke cluster.
 
-1. Create the BMC credentials Secret:
+#### 1. Create the BMC credentials Secret
 
-  ```yaml
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: {{ hostname }}-bmc-secret
-    namespace: {{ spoke_cluster_name }}
-  type: Opaque
-  stringData:
-    username: {{ bmc_username }}
-    password: {{ bmc_password }}
-  ```
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ hostname }}-bmc-secret
+  namespace: {{ spoke_cluster_name }}
+type: Opaque
+stringData:
+  username: {{ bmc_username }}
+  password: {{ bmc_password }}
+```
 
-  ```bash
-  oc apply -f {{ hostname }}-bmc-secret.yaml
-  ```
+```bash
+oc apply -f {{ hostname }}-bmc-secret.yaml
+```
 
-    !!! tip
-        Using `stringData:` lets you supply plain-text values. If you prefer `data:`, base64-encode first: `echo -n 'value' | base64`.
+!!! tip
+    Using `stringData:` lets you supply plain-text values. If you prefer `data:`, base64-encode first: `echo -n 'value' | base64`.
 
-2. Create the BareMetalHost. The `bmc.address` format is vendor-specific — use the correct scheme and system ID for your hardware:
+#### 2. Create the BareMetalHost
 
-    === "Dell iDRAC"
+The `bmc.address` format is vendor-specific — use the correct scheme and system ID for your hardware:
 
-        ```yaml
-        apiVersion: metal3.io/v1alpha1
-        kind: BareMetalHost
-        metadata:
-          name: {{ hostname }}
-          namespace: {{ spoke_cluster_name }}
-          labels:
-            infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
-        spec:
-          online: true
-          bootMACAddress: {{ boot_mac_address }}
-          bmc:
-            address: idrac-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1
-            credentialsName: {{ hostname }}-bmc-secret
-            disableCertificateVerification: true
-          bootMode: UEFI
-          rootDeviceHints:
-            deviceName: /dev/sda
-          automatedCleaningMode: disabled
-        ```
+=== "Dell iDRAC"
 
-        !!! warning "Dell-Specific Requirements"
-            - **iDRAC firmware** — virtual media via Redfish needs a reasonably current iDRAC. On iDRAC 9, use **4.40.00.00 or newer**; older firmware has flaky or missing virtual-media Redfish support. iDRAC 8 works but is more limited.
-            - **Enterprise/Datacenter license** — virtual media requires it. The Express license does not expose the virtual media endpoint.
+    ```yaml
+    apiVersion: metal3.io/v1alpha1
+    kind: BareMetalHost
+    metadata:
+      name: {{ hostname }}
+      namespace: {{ spoke_cluster_name }}
+      labels:
+        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+    spec:
+      online: true
+      bootMACAddress: {{ boot_mac_address }}
+      bmc:
+        address: idrac-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1
+        credentialsName: {{ hostname }}-bmc-secret
+        disableCertificateVerification: true
+      bootMode: UEFI
+      rootDeviceHints:
+        deviceName: /dev/sda
+      automatedCleaningMode: disabled
+    ```
 
-        !!! tip "`idrac-virtualmedia` vs `redfish-virtualmedia`"
-            Ironic ships a Dell-optimized driver, `idrac-virtualmedia://`, which uses the same address format but handles Dell quirks (like boot-mode setting) more reliably. It is supported on OpenShift and is the recommended default for Dell hardware. Fall back to `redfish-virtualmedia://` only if you hit issues.
+    !!! warning "Dell-Specific Requirements"
+        - **iDRAC firmware** — virtual media via Redfish needs a reasonably current iDRAC. On iDRAC 9, use **4.40.00.00 or newer**; older firmware has flaky or missing virtual-media Redfish support. iDRAC 8 works but is more limited.
+        - **Enterprise/Datacenter license** — virtual media requires it. The Express license does not expose the virtual media endpoint.
 
-        !!! tip "`rootDeviceHints` on Dell"
-            If these are PERC RAID setups, `/dev/sda` is usually correct. On NVMe or multi-disk boxes, prefer matching by `wwn` or `serialNumber` so you don't install to the wrong disk if a reboot reorders device names.
+    !!! tip "`idrac-virtualmedia` vs `redfish-virtualmedia`"
+        Ironic ships a Dell-optimized driver, `idrac-virtualmedia://`, which uses the same address format but handles Dell quirks (like boot-mode setting) more reliably. It is supported on OpenShift and is the recommended default for Dell hardware. Fall back to `redfish-virtualmedia://` only if you hit issues.
 
-    === "HPE iLO"
+    !!! tip "`rootDeviceHints` on Dell"
+        If these are PERC RAID setups, `/dev/sda` is usually correct. On NVMe or multi-disk boxes, prefer matching by `wwn` or `serialNumber` so you don't install to the wrong disk if a reboot reorders device names.
 
-        ```yaml
-        apiVersion: metal3.io/v1alpha1
-        kind: BareMetalHost
-        metadata:
-          name: {{ hostname }}
-          namespace: {{ spoke_cluster_name }}
-          labels:
-            infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
-        spec:
-          online: true
-          bootMACAddress: {{ boot_mac_address }}
-          bmc:
-            address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
-            credentialsName: {{ hostname }}-bmc-secret
-            disableCertificateVerification: true
-          bootMode: UEFI
-          rootDeviceHints:
-            deviceName: /dev/sda
-          automatedCleaningMode: disabled
-        ```
+=== "HPE iLO"
 
-    === "Lenovo XCC"
+    ```yaml
+    apiVersion: metal3.io/v1alpha1
+    kind: BareMetalHost
+    metadata:
+      name: {{ hostname }}
+      namespace: {{ spoke_cluster_name }}
+      labels:
+        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+    spec:
+      online: true
+      bootMACAddress: {{ boot_mac_address }}
+      bmc:
+        address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
+        credentialsName: {{ hostname }}-bmc-secret
+        disableCertificateVerification: true
+      bootMode: UEFI
+      rootDeviceHints:
+        deviceName: /dev/sda
+      automatedCleaningMode: disabled
+    ```
 
-        ```yaml
-        apiVersion: metal3.io/v1alpha1
-        kind: BareMetalHost
-        metadata:
-          name: {{ hostname }}
-          namespace: {{ spoke_cluster_name }}
-          labels:
-            infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
-        spec:
-          online: true
-          bootMACAddress: {{ boot_mac_address }}
-          bmc:
-            address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
-            credentialsName: {{ hostname }}-bmc-secret
-            disableCertificateVerification: true
-          bootMode: UEFI
-          rootDeviceHints:
-            deviceName: /dev/sda
-          automatedCleaningMode: disabled
-        ```
+=== "Lenovo XCC"
 
-    === "Supermicro"
+    ```yaml
+    apiVersion: metal3.io/v1alpha1
+    kind: BareMetalHost
+    metadata:
+      name: {{ hostname }}
+      namespace: {{ spoke_cluster_name }}
+      labels:
+        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+    spec:
+      online: true
+      bootMACAddress: {{ boot_mac_address }}
+      bmc:
+        address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
+        credentialsName: {{ hostname }}-bmc-secret
+        disableCertificateVerification: true
+      bootMode: UEFI
+      rootDeviceHints:
+        deviceName: /dev/sda
+      automatedCleaningMode: disabled
+    ```
 
-        ```yaml
-        apiVersion: metal3.io/v1alpha1
-        kind: BareMetalHost
-        metadata:
-          name: {{ hostname }}
-          namespace: {{ spoke_cluster_name }}
-          labels:
-            infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
-        spec:
-          online: true
-          bootMACAddress: {{ boot_mac_address }}
-          bmc:
-            address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
-            credentialsName: {{ hostname }}-bmc-secret
-            disableCertificateVerification: true
-          bootMode: UEFI
-          rootDeviceHints:
-            deviceName: /dev/sda
-          automatedCleaningMode: disabled
-        ```
+=== "Supermicro"
 
-    ??? info "Field Reference"
-        | Field                            | Description                                                                                                                                               |
-        | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-        | `bmc.address`                    | The `redfish-virtualmedia://` scheme avoids the provisioning-network requirement. The system ID at the end is vendor-specific (see tabs above).            |
-        | `bootMACAddress`                 | MAC of the NIC the host boots from — **not** the BMC's MAC address.                                                                                      |
-        | `disableCertificateVerification` | Usually required since BMCs ship with self-signed certs. Remove it if you have installed valid certificates.                                              |
-        | `bootMode`                       | `UEFI` (default), `legacy`, or `UEFISecureBoot`.                                                                                                         |
-        | `rootDeviceHints`                | Optional but recommended so Ironic installs to the correct disk. Can also match on `model`, `serialNumber`, `wwn`, `minSizeGigabytes`, etc.               |
-        | `automatedCleaningMode`          | Set to `disabled` for POC to skip the disk-wipe step during provisioning. In production, consider leaving it enabled.                                     |
+    ```yaml
+    apiVersion: metal3.io/v1alpha1
+    kind: BareMetalHost
+    metadata:
+      name: {{ hostname }}
+      namespace: {{ spoke_cluster_name }}
+      labels:
+        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+    spec:
+      online: true
+      bootMACAddress: {{ boot_mac_address }}
+      bmc:
+        address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
+        credentialsName: {{ hostname }}-bmc-secret
+        disableCertificateVerification: true
+      bootMode: UEFI
+      rootDeviceHints:
+        deviceName: /dev/sda
+      automatedCleaningMode: disabled
+    ```
 
-    !!! tip "Discovering the System ID"
-        If you're unsure of the system ID for your hardware, query the Redfish API:
-        ```bash
-        curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/ \
-          -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
-        ```
-        See [Infrastructure — BMC / Out-of-Band Management](../../prerequisites/infrastructure.md#bmc-out-of-band-management) for more details.
+??? info "Field Reference"
+    | Field                            | Description                                                                                                                                               |
+    | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | `bmc.address`                    | The `redfish-virtualmedia://` scheme avoids the provisioning-network requirement. The system ID at the end is vendor-specific (see tabs above).            |
+    | `bootMACAddress`                 | MAC of the NIC the host boots from — **not** the BMC's MAC address.                                                                                      |
+    | `disableCertificateVerification` | Usually required since BMCs ship with self-signed certs. Remove it if you have installed valid certificates.                                              |
+    | `bootMode`                       | `UEFI` (default), `legacy`, or `UEFISecureBoot`.                                                                                                         |
+    | `rootDeviceHints`                | Optional but recommended so Ironic installs to the correct disk. Can also match on `model`, `serialNumber`, `wwn`, `minSizeGigabytes`, etc.               |
+    | `automatedCleaningMode`          | Set to `disabled` for POC to skip the disk-wipe step during provisioning. In production, consider leaving it enabled.                                     |
 
-  ```bash
-  oc apply -f {{ hostname }}-bmh.yaml
-  ```
+!!! tip "Discovering the System ID"
+    If you're unsure of the system ID for your hardware, query the Redfish API:
 
-3. Watch for hosts to boot and register as agents:
+    ```bash
+    curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/ \
+      -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
+    ```
 
-  ```bash
-  oc get bmh -n {{ spoke_cluster_name }}
-  oc get agents -n {{ spoke_cluster_name }} -w
-  ```
+    See [Infrastructure — BMC / Out-of-Band Management](../../prerequisites/infrastructure.md#bmc-out-of-band-management) for more details.
 
-  Each host will transition through: `registering` → `inspecting` → `available`. Once all hosts show as agents, you can create the cluster.
+```bash
+oc apply -f {{ hostname }}-bmh.yaml
+```
+
+#### 3. Watch for hosts to boot and register as agents
+
+```bash
+oc get bmh -n {{ spoke_cluster_name }}
+oc get agents -n {{ spoke_cluster_name }} -w
+```
+
+Each host will transition through: `registering` → `inspecting` → `available`. Once all hosts show as agents, you can create the cluster.
 
 ### Approve Agents
 
