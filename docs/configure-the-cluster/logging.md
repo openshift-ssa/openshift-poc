@@ -1,6 +1,6 @@
 # OpenShift Logging
 
-[Red Hat OpenShift Logging Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_logging/6.5/html-single/installing_logging/index)
+[Red Hat OpenShift Logging Documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_logging/6.6/html-single/installing_logging/index)
 
 OpenShift Logging provides centralized log collection, storage, and querying for application, infrastructure, and audit logs. The stack consists of three operators:
 
@@ -215,6 +215,9 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
      tenants:
        mode: openshift-logging
    ```
+
+   !!! tip "Schema Version"
+       The `version: v13` and `effectiveDate` values above match the Loki Operator `stable-6.6` channel at the time of writing. If you are using a newer channel, check the [Loki Operator documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_logging/6.6/html-single/installing_logging/index) for the current schema version.
 
 !!! note "If using self-signed storage certificates"
     Add the TLS section to the LokiStack CR. `caName` references a **ConfigMap** in the LokiStack namespace containing the CA bundle. `caKey` specifies the key within that ConfigMap (defaults to `service-ca.crt` if omitted).

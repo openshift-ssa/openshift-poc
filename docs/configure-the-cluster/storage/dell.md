@@ -141,7 +141,8 @@ EOF
     }
     ```
 
-    This is a minimal configuration that auto-detects multipath devices. For production environments, consult your Dell documentation for a configuration that blacklists local disks and whitelists only Unity LUNs — see [Multipathing](multipathing.md) for the recommended pattern.
+    !!! warning "POC-Only Configuration"
+        This minimal config uses `find_multipaths yes` with an empty `blacklist {}`, which lets `multipathd` auto-detect devices with multiple paths. It works for a POC where the only multipathed devices are Unity LUNs, but contradicts the [Multipathing](multipathing.md) best practice of `find_multipaths no` with explicit `blacklist` / `blacklist_exceptions` / `devices` blocks. For production, obtain Dell's recommended `multipath.conf` for Unity XT — it will include a proper `device {}` block with vendor-tuned failover parameters.
 
 #### Wait for Rollout
 

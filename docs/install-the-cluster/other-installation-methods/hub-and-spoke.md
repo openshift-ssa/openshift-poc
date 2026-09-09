@@ -224,8 +224,8 @@ spec:
   name: advanced-cluster-management
 ```
 
-!!! note
-    The ACM channel must match your OCP version. Verify the default channel: `oc get packagemanifest advanced-cluster-management -o jsonpath='{.status.defaultChannel}'`
+!!! warning "Verify the ACM Channel"
+    The `release-2.17` channel above is an example and must match your OCP version. Before applying, verify the default channel: `oc get packagemanifest advanced-cluster-management -o jsonpath='{.status.defaultChannel}'`
 
 ```bash
 oc apply -f acm-operator.yaml

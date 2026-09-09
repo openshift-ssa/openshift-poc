@@ -68,6 +68,9 @@ spec:
   sourceNamespace: openshift-marketplace
 ```
 
+!!! note
+    The MTV channel is version-specific and may not match your environment. Verify the default channel before applying: `oc get packagemanifest mtv-operator -o jsonpath='{.status.defaultChannel}'`
+
 ```bash
 oc apply -f mtv-operator.yaml
 ```

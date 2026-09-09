@@ -43,7 +43,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 12. Open the VM console from the WebUI:
     - Virtualization -> VirtualMachines -> click `backup-test-vm` -> Console tab
-13. Login to the guest OS (default credentials from the template)
+13. Login to the guest OS. The RHEL 9 template injects a `cloud-user` account via cloud-init — use the credentials shown on the VM's **Overview** tab in the WebUI (typically `cloud-user` with a generated or template-defined password). If no password is shown, use `virtctl console backup-test-vm -n vm-backup-test` and reset the password from the serial console.
 14. Format and mount the data disk, then write test data:
 
   ```bash
@@ -78,6 +78,9 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
     storageLocation: dpa-1
     ttl: 720h0m0s
   ```
+
+!!! note "storageLocation Name"
+    The `storageLocation: dpa-1` value follows OADP's auto-naming convention: `<dpa-name>-1`. If you named your `DataProtectionApplication` something other than `dpa`, adjust accordingly (e.g., `my-dpa-1`). Verify with: `oc get backupstoragelocations -n openshift-adp`
 
 !!! note
     This backs up **all** resources in the `vm-backup-test` namespace. Namespace-scoped backup ensures the VirtualMachine, its DataVolumes, PVCs, and associated secrets are all captured together.

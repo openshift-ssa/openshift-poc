@@ -58,13 +58,16 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
   The `NODE` column shows where the VM is currently scheduled.
 
-14. Check the IP address assigned to the VM via IPAM. This IP is assigned by the CUDN (ClusterUserDefinedNetwork) and persists with the VM across node migrations and failovers:
+14. Check the IP address assigned to the VM:
 
   ```bash
   oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.interfaces}' | jq
   ```
 
   Record the IP address — you will verify it stays the same after failover.
+
+  !!! note "Persistent IP Across Failover"
+      If you have configured a ClusterUserDefinedNetwork (CUDN) with persistent IPAM and attached the VM to it, the IP address is allocated to the VM itself (not the node) and will follow the VM to the new node. Without a CUDN, the VM gets a new pod network IP after failover — the VM still recovers, but clients connecting by IP will need to discover the new address.
 
 15. Optionally, open the VM console from the WebUI to confirm the guest OS is up:
     - Virtualization -> VirtualMachines -> click `failover-test-vm` -> Console tab
@@ -127,7 +130,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
   oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.interfaces}' | jq
   ```
 
-  The IP address should be **identical** to what was recorded before the failover. This is because the CUDN with persistent IPAM allocates the IP to the VM itself (not the node), so when the VM restarts on a different node, it retains the same IP. Clients connecting to this IP will be able to reach the VM on its new node without any DNS or configuration changes.
+  If you have a CUDN with persistent IPAM configured, the IP address should be **identical** to what was recorded before the failover — the IP is allocated to the VM, not the node. Without a CUDN, the VM receives a new pod network IP, which is expected.
 
 22. Check the data disk is still attached:
 
