@@ -7,6 +7,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 - OADP operator installed with BackupStorageLocation showing `Available`
 - OpenShift Virtualization installed
 - RWX-capable StorageClass available
+- A `VolumeSnapshotClass` for your CSI driver (`oc get volumesnapshotclass`) — required for CSI snapshot-based VM backups
 
 ## Create a Test Virtual Machine
 
@@ -21,30 +22,43 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 4. Name the VM `backup-test-vm`
 5. Click "Customize VirtualMachine"
 
+### Set Login Credentials
+
+6. Open the **Scripts** tab
+7. Under **Cloud-init**, set a password for the guest user (RHEL cloud images have no usable default password):
+
+  ```yaml
+  #cloud-config
+  user: cloud-user
+  password: Pass123!
+  chpasswd:
+    expire: false
+  ```
+
 ### Add a Data Disk
 
-6. Click on the "Disks" tab
-7. Click "Add disk"
-8. Configure the data disk:
+8. Click on the "Disks" tab
+9. Click "Add disk"
+10. Configure the data disk:
     - Name: `data-disk`
     - Source: Blank
     - Size: 5 GiB
     - Type: Disk
     - StorageClass: your default StorageClass
     - Access Mode: ReadWriteMany (RWX)
-9. Click Add
+11. Click Add
 
 ### Start the VM
 
-10. Click "Create VirtualMachine"
-11. Wait for the VM status to show "Running"
+12. Click "Create VirtualMachine"
+13. Wait for the VM status to show "Running"
 
 ## Write Test Data
 
-12. Open the VM console from the WebUI:
+14. Open the VM console from the WebUI:
     - Virtualization -> VirtualMachines -> click `backup-test-vm` -> Console tab
-13. Login to the guest OS. The RHEL 9 template injects a `cloud-user` account via cloud-init — use the credentials shown on the VM's **Overview** tab in the WebUI (typically `cloud-user` with a generated or template-defined password). If no password is shown, use `virtctl console backup-test-vm -n vm-backup-test` and reset the password from the serial console.
-14. Format and mount the data disk, then write test data:
+15. Log in as `cloud-user` / `Pass123!`
+16. Format and mount the data disk, then write test data:
 
   ```bash
   sudo mkfs.xfs /dev/vdb
@@ -56,7 +70,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
   You should see: `OADP backup test - original data`
 
-15. Confirm the data is written:
+17. Confirm the data is written:
 
   ```bash
   ls -la /mnt/data/
@@ -64,7 +78,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Take a Backup
 
-16. Create a Backup CR to capture the running VM and its disks:
+18. Create a Backup CR to capture the running VM and its disks:
 
   ```yaml
   apiVersion: velero.io/v1
@@ -88,13 +102,13 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 !!! info "Crash-Consistent Backups"
     OADP with the `kubevirt` and `csi` plugins can back up running VMs using CSI volume snapshots. The resulting backup is crash-consistent — equivalent to an unexpected power loss. This is sufficient for most workloads. If you need application-consistent backups (e.g., databases), either stop the VM first or use the QEMU guest agent for filesystem freeze/thaw.
 
-17. Apply the backup:
+19. Apply the backup:
 
   ```bash
   oc apply -f backup.yaml
   ```
 
-18. Watch the backup progress:
+20. Watch the backup progress:
 
   ```bash
   oc get backup backup-test-vm-backup-1 -n openshift-adp -w
@@ -102,7 +116,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
   Wait for the `PHASE` to show `Completed`.
 
-19. Verify the backup contents:
+21. Verify the backup contents:
 
   ```bash
   oc get backup backup-test-vm-backup-1 -n openshift-adp -o jsonpath='{.status.phase}'
@@ -110,7 +124,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Make a Destructive Change
 
-20. Open the VM console and modify the data:
+22. Open the VM console and modify the data:
 
   ```bash
   sudo mount /dev/vdb /mnt/data
@@ -121,7 +135,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
   You should see: `THIS DATA HAS BEEN MODIFIED`
 
-21. Stop the VM:
+23. Stop the VM:
 
   ```bash
   virtctl stop backup-test-vm -n vm-backup-test
@@ -129,24 +143,26 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Delete the VM
 
-22. Delete the VM and its PVCs to simulate a disaster:
+24. Delete the VM and all PVCs in the namespace to simulate a disaster:
 
   ```bash
   oc delete vm backup-test-vm -n vm-backup-test
-  oc delete pvc -l app=backup-test-vm -n vm-backup-test
+  oc delete pvc --all -n vm-backup-test
   ```
 
-23. Confirm the VM is gone:
+  Template/console VMs do not consistently label disks with `app=backup-test-vm`. Deleting all PVCs in the test namespace ensures root and data disks are removed so restore must recreate them.
+
+25. Confirm the VM and PVCs are gone:
 
   ```bash
-  oc get vm backup-test-vm -n vm-backup-test
+  oc get vm,pvc -n vm-backup-test
   ```
 
-  Should return `NotFound`.
+  Should return no VirtualMachine or PVC resources.
 
 ## Restore from Backup
 
-24. Create a Restore CR pointing to the backup:
+26. Create a Restore CR pointing to the backup:
 
   ```yaml
   apiVersion: velero.io/v1
@@ -165,7 +181,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
   oc apply -f restore.yaml
   ```
 
-25. Watch the restore progress:
+27. Watch the restore progress:
 
   ```bash
   oc get restore backup-test-vm-restore-1 -n openshift-adp -w
@@ -175,13 +191,13 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Verify the Restore
 
-26. Confirm the VM exists again:
+28. Confirm the VM exists again:
 
   ```bash
   oc get vm backup-test-vm -n vm-backup-test
   ```
 
-27. Start the restored VM:
+29. Start the restored VM:
 
   ```bash
   virtctl start backup-test-vm -n vm-backup-test
@@ -193,7 +209,7 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
   oc get vmi backup-test-vm -n vm-backup-test -w
   ```
 
-28. Open the VM console and verify the original data is restored:
+30. Open the VM console and verify the original data is restored:
 
   ```bash
   sudo mount /dev/vdb /mnt/data
@@ -220,11 +236,11 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 
 ## Cleanup
 
-29. Delete the test resources:
+31. Delete the test resources:
 
   ```bash
-  oc delete vm backup-test-vm -n vm-backup-test
-  oc delete pvc -l app=backup-test-vm -n vm-backup-test
+  oc delete vm backup-test-vm -n vm-backup-test --ignore-not-found
+  oc delete pvc --all -n vm-backup-test --ignore-not-found
   oc delete backup backup-test-vm-backup-1 -n openshift-adp
   oc delete restore backup-test-vm-restore-1 -n openshift-adp
   oc delete project vm-backup-test

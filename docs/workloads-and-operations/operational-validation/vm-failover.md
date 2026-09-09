@@ -21,15 +21,17 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 3. Select "From template" and choose "Red Hat Enterprise Linux 9"
 4. Give it a name (e.g., `failover-test-vm`)
 5. Ensure the VM is configured with:
-    - `runStrategy: Always` (this is what tells the cluster to restart the VM if it stops unexpectedly)
-    - `evictionStrategy: LiveMigrate`
+    - `runStrategy: Always` (required — tells the cluster to restart the VM after node loss)
 6. Click "Customize VirtualMachine" to edit the details before creating
+
+!!! note "Failover vs live migration"
+    This test simulates hard node failure (`systemctl reboot`). Recovery is a **cold restart** driven by Workload Availability (NHC/SNR) and `runStrategy: Always`. `evictionStrategy: LiveMigrate` applies to drains and upgrades — it does **not** live-migrate a VM off a node that has already died. You may still set LiveMigrate for day-2 drain behavior, but it is not what makes this failover test succeed.
 
 ### Add a Data Disk
 
-6. Click on the "Disks" tab
-7. Click "Add disk"
-8. Configure the data disk:
+7. Click on the "Disks" tab
+8. Click "Add disk"
+9. Configure the data disk:
     - Name: `data-disk`
     - Source: Blank
     - Size: 10 GiB
@@ -40,17 +42,30 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 !!! warning
     Both the root disk and the data disk must use RWX access mode for failover to work. If either disk is RWO, the VM cannot start on a new node until the old node's lease expires (6+ minutes).
 
-9. Click Add
-10. Also verify the root disk is using RWX access mode — edit it if necessary
+10. Click Add
+11. Also verify the root disk is using RWX access mode — edit it if necessary
+
+### Set Login Credentials
+
+12. Open the **Scripts** tab
+13. Under **Cloud-init**, set a guest password (RHEL cloud images have no usable default):
+
+  ```yaml
+  #cloud-config
+  user: cloud-user
+  password: Pass123!
+  chpasswd:
+    expire: false
+  ```
 
 ### Start the VM
 
-11. Click "Create VirtualMachine"
-12. Wait for the VM status to show "Running"
+14. Click "Create VirtualMachine"
+15. Wait for the VM status to show "Running"
 
 ## Verify the VM is Running
 
-13. From the CLI, confirm the VM is running and note which node it is on:
+16. From the CLI, confirm the VM is running and note which node it is on:
 
   ```bash
   oc get vmi failover-test-vm -n vm-failover-test -o wide
@@ -58,7 +73,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
   The `NODE` column shows where the VM is currently scheduled.
 
-14. Check the IP address assigned to the VM:
+17. Check the IP address assigned to the VM:
 
   ```bash
   oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.interfaces}' | jq
@@ -69,19 +84,20 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
   !!! note "Persistent IP Across Failover"
       If you have configured a ClusterUserDefinedNetwork (CUDN) with persistent IPAM and attached the VM to it, the IP address is allocated to the VM itself (not the node) and will follow the VM to the new node. Without a CUDN, the VM gets a new pod network IP after failover — the VM still recovers, but clients connecting by IP will need to discover the new address.
 
-15. Optionally, open the VM console from the WebUI to confirm the guest OS is up:
+18. Optionally, open the VM console from the WebUI to confirm the guest OS is up:
     - Virtualization -> VirtualMachines -> click `failover-test-vm` -> Console tab
+    - Log in as `cloud-user` / `Pass123!`
 
 ## Simulate Node Failure
 
-16. Record the node name where the VM is running:
+19. Record the node name where the VM is running:
 
   ```bash
   NODE=$(oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.nodeName}')
   echo "VM is on node: $NODE"
   ```
 
-17. Start a timer and then restart the node to simulate a failure:
+20. Start a timer and then restart the node to simulate a failure:
 
   ```bash
   date +%T && oc debug node/$NODE -- chroot /host systemctl reboot
@@ -92,7 +108,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
 ## Watch the Failover
 
-18. Immediately watch the VM instance for changes:
+21. Immediately watch the VM instance for changes:
 
   ```bash
   oc get vmi failover-test-vm -n vm-failover-test -w
@@ -105,7 +121,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
     - After ~85-90s: node gets the `out-of-service` taint, pods are deleted
     - After ~100-120s: VM restarts on a different node
 
-19. Once the VM shows `Running` again, check the timestamp:
+22. Once the VM shows `Running` again, check the timestamp:
 
   ```bash
   date +%T
@@ -116,7 +132,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
 ## Verify the Failover
 
-20. Confirm the VM is fully running on the new node:
+23. Confirm the VM is fully running on the new node:
 
   ```bash
   oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.phase}'
@@ -124,7 +140,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
   Should output: `Running`
 
-21. Verify the IP address followed the VM to the new node:
+24. Verify the IP address followed the VM to the new node:
 
   ```bash
   oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.status.interfaces}' | jq
@@ -132,18 +148,18 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
   If you have a CUDN with persistent IPAM configured, the IP address should be **identical** to what was recorded before the failover — the IP is allocated to the VM, not the node. Without a CUDN, the VM receives a new pod network IP, which is expected.
 
-22. Check the data disk is still attached:
+25. Check the data disk is still attached:
 
   ```bash
   oc get vmi failover-test-vm -n vm-failover-test -o jsonpath='{.spec.volumes[*].name}'
   ```
 
-23. Open the VM console from the WebUI to confirm the guest OS has booted:
+26. Open the VM console from the WebUI to confirm the guest OS has booted:
     - Virtualization -> VirtualMachines -> click `failover-test-vm` -> Console tab
     - Login and verify the data disk is mounted (if it was mounted in the guest)
     - Run `ip addr` inside the guest to confirm the IP matches
 
-24. Review the remediation events:
+27. Review the remediation events:
 
   ```bash
   oc get selfnoderemediation -A
@@ -164,13 +180,13 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
 ## Cleanup
 
-25. Delete the test VM:
+28. Delete the test VM:
 
   ```bash
   oc delete vm failover-test-vm -n vm-failover-test
   ```
 
-26. Wait for the rebooted node to come back and verify it rejoins the cluster:
+29. Wait for the rebooted node to come back and verify it rejoins the cluster:
 
   ```bash
   oc get nodes -w
@@ -178,7 +194,7 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 
   The node should return to `Ready` status after it finishes rebooting.
 
-27. Delete the test namespace:
+30. Delete the test namespace:
 
   ```bash
   oc delete project vm-failover-test

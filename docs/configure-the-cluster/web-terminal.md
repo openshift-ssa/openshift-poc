@@ -75,7 +75,29 @@ oc apply -f devworkspace-config.yaml
 
 ## Configure Network Policies
 
-If your cluster uses network policies that restrict pod communication, the web terminal workspace pods need to be able to reach the OpenShift API server. If terminals fail to connect, ensure the namespace where the terminal runs allows egress to the API server.
+If your cluster uses network policies that restrict pod communication, web terminal workspace pods need egress to the OpenShift API server. Example allow-all egress for a project where terminals run (tighten for production):
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-web-terminal-egress
+  namespace: {{ namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      controller.devfile.io/devworkspace_cr_owner: web-terminal
+  policyTypes:
+    - Egress
+  egress:
+    - {}
+```
+
+```bash
+oc apply -f web-terminal-egress.yaml
+```
+
+If terminals fail to connect, also confirm DNS and that the project can reach the Kubernetes API service.
 
 ## Uninstall
 

@@ -18,6 +18,8 @@ Deploy sample applications to validate the platform's container orchestration, s
 ## Virtual Machine Workloads
 
 - [Deploying Virtual Machines](./virtual-machine-workloads/index.md) — Create and manage VMs using OpenShift Virtualization
+- [RHEL VM with Apache httpd](./virtual-machine-workloads/rhel-httpd-vm.md) — RHEL 9 VM serving a page via Route
+- [Virtual Appliances (OVA)](./virtual-machine-workloads/ova-virtual-appliance.md) — Import OVA appliances into OpenShift Virtualization
 
 ## Operational Validation
 
@@ -32,7 +34,9 @@ Demonstrate resilience, backup/restore, and failover capabilities:
 Demonstrate cluster lifecycle management:
 
 - [Day-2 Overview](./day-2-operations/index.md) — Summary of operational procedures
+- [Cluster Upgrade](./day-2-operations/cluster-upgrade.md) — Apply a z-stream or minor version update
 - [Add Worker Node](./day-2-operations/add-worker-node.md) — Expand cluster capacity with a new worker
 - [Rotate SSH Keys](./day-2-operations/rotate-ssh-keys.md) — Replace SSH keys on all cluster nodes
 - [Machine Config](./day-2-operations/machine-config.md) — Apply node-level configuration changes
+- [must-gather](./day-2-operations/must-gather.md) — Collect diagnostics for support cases
 - [Debugging MTU Mismatches](./day-2-operations/debug-mtu.md) — Diagnose network MTU issues

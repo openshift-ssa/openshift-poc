@@ -83,6 +83,7 @@ This example deploys PostgreSQL from the UBI-based `registry.redhat.io/rhel9/pos
             volumeMounts:
               - name: postgresql-data
                 mountPath: /var/lib/pgsql/data
+                subPath: pgdata
             readinessProbe:
               tcpSocket:
                 port: 5432

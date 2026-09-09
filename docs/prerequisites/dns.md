@@ -14,8 +14,11 @@ Validate the DNS using dig:
 
 ```bash
 dig +noall +answer @{{ nameserver_ip }} api.{{ cluster_name }}.{{ base_domain }}
+dig +noall +answer @{{ nameserver_ip }} api-int.{{ cluster_name }}.{{ base_domain }}
 dig +noall +answer @{{ nameserver_ip }} test.apps.{{ cluster_name }}.{{ base_domain }}
 ```
+
+`api` and `api-int` should both resolve to the API VIP (or the SNO node IP).
 
 ---
 

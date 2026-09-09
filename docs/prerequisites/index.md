@@ -6,7 +6,7 @@ For the installation, the documentation assumes a bare metal environment in an o
 
 ## Red Hat Account
 
-- You need a [Red Hat account](https://www.redhat.com/wapps/ugc/register.html) associated with your organization. Do not use personal Red Hat accounts for business purposes.
+- You need a [Red Hat account](https://access.redhat.com/registration) associated with your organization. Do not use personal Red Hat accounts for business purposes.
 - Evaluation subscriptions are required for any proof of concept using Red Hat products. DO NOT START installation until the trial subscriptions have been created and allocated to the Red Hat user account of the person associated with doing the install.
 
 ## VM Migration from VMware

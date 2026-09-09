@@ -54,9 +54,12 @@ platform:
     additionalNTPServers:
       - {{ ntp_server_1 }}
       - {{ ntp_server_2 }}
-pullSecret: 'value from ~/pull-secret.txt'
-sshKey: 'value from ~/.ssh/ocp.pub'
+pullSecret: '{{ pull_secret }}'
+sshKey: '{{ public_key }}'
 ```
+
+!!! tip
+    Replace `{{ pull_secret }}` with the full JSON contents of your pull secret (single line) and `{{ public_key }}` with the contents of your SSH public key file. Example: `pullSecret: '{"auths":{...}}'` and `sshKey: 'ssh-ed25519 AAAA...'`.
 
 ### Proxy Configuration
 
@@ -226,7 +229,7 @@ If your environment uses active-backup bonding instead of LACP:
       dns-resolver:
         config:
           server:
-            - 10.0.0.2
+            - {{ nameserver_ip }}
       routes:
         config:
           - destination: 0.0.0.0/0

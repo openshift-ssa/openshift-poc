@@ -19,14 +19,16 @@ Throughout this site, values like `{{ cluster_name }}`, `{{ base_domain }}`, `{{
 
 Common variables used across the documentation:
 
+{% raw %}
 | Variable | Meaning | Example |
 |----------|---------|---------|
 | `{{ cluster_name }}` | Your cluster's name | `ocp-poc` |
 | `{{ base_domain }}` | Your DNS base domain | `example.com` |
-| `{{ ocp_version }}` | OpenShift minor version (auto-filled) | `{{ ocp_version }}` |
-| `{{ ocp_release }}` | OpenShift full release version (auto-filled) | `{{ ocp_release }}` |
+| `{{ ocp_version }}` | OpenShift minor version (auto-filled at build) | `4.22` |
+| `{{ ocp_release }}` | OpenShift full release version (auto-filled at build) | `4.22.11` |
 | `{{ storage_class }}` | Your default StorageClass name | `unity-iscsi` |
 | `{{ bmc_ip }}` | BMC/iDRAC/iLO IP address | `10.0.1.100` |
+{% endraw %}
 
 ## Important First Steps
 

@@ -1,6 +1,6 @@
 # Infrastructure
 
-All nodes are bare metal servers in an on-premise environment. Provision compute resources that meet or exceed the minimum requirements for each node type.
+Provision compute resources that meet or exceed the minimum requirements for each node type. Primary POC paths use **bare metal**, but [Agent-Based](../install-the-cluster/agent-based.md) and [vSphere IPI](../install-the-cluster/other-installation-methods/vmware-install.md) installs on virtual machines are also supported — see [Prerequisites](index.md).
 
 !!! info "OpenShift Terminology"
     A quick note on terminology. In OpenShift, the same server can be described at three layers:  
@@ -33,10 +33,10 @@ Consider these minimum values — the more the better.
 ### Hardware Notes
 
 !!! tip "Do I need an installation host?"
-    No, as long as the computer we are working from has full access to all the necessary tools or is able to get them without opening tickets (oc, openshift-install, kubectl, helm, kustomize, nmstatectl, git, podman, istioctl, etc). However, if the work is proceeding and the laptop or environment that is currently being used is not available (PTO, sick, etc), then everything comes to a halt. We **highly recommend** working from a centralized installation host to ensure not only access but also compatibility with the examples in this guide. 
+    No, as long as the computer you are working from can install the tools listed in [Installation Host](installation-host.md) without opening tickets (`oc`, `openshift-install`, `nmstatectl`, `git`, `podman`, and related utilities). Optional day-2 tools such as `helm`, `kustomize`, or `istioctl` are only needed for specific workloads. We **highly recommend** a centralized installation host so work does not stop if a laptop is unavailable. 
 
 !!! note "Machine Type"
-    The installation and hub machine can be either a virtual machine or bare metal host. They just need network access to the other hosts. The cluster machines should be bare metal. 
+    The installation and hub machine can be either a virtual machine or bare metal host. They just need network access to the other hosts. Cluster nodes are typically bare metal for production-like POCs; virtual machines (for example on vSphere) are valid when following the Agent-Based or vSphere IPI guides. 
 
 !!! note "CPU Architecture" 
     For the POC, prefer the same vendor and generation CPU architectures across all machines. 
@@ -49,7 +49,7 @@ Consider these minimum values — the more the better.
 
 ## Network Interface Requirements
 
-Only a single NIC is required for OpenShift. To perform more advanced networking, 4 x 10 GbE is recommended for bond0/bond1. Production setups are typically 3 bond pairs - mgmt (access), data (trunked), storage (access). 
+Only a single NIC is required for OpenShift. To perform more advanced networking, 4 x 10 GbE is recommended for bond0/bond1. Production Virtualization setups typically use **two bonds** — mgmt (bond0) and a trunked data plane (bond1) with VLANs for VM, storage, and live migration — see [Networking](networking.md#production-multi-bond-architecture). A third physical bond for storage is optional when the network team requires a dedicated uplink instead of a storage VLAN. 
 
 ## Machine Information
 

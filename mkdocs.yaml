@@ -1,5 +1,5 @@
 site_name: OpenShift POC
-site_description: Prerequisites and installation instructions for OpenShift on-premise environments
+site_description: Prerequisites, installation, configuration, and workload validation for OpenShift on-premise POCs
 site_url: https://openshift-ssa.github.io/openshift-poc
 
 theme:

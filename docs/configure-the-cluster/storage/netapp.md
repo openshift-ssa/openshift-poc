@@ -1,4 +1,4 @@
-# NetApp
+# NetApp Trident
 
 [NetApp Trident Documentation](https://docs.netapp.com/us-en/trident/)  
 [Requirements](https://docs.netapp.com/us-en/trident/trident-get-started/requirements.html)
@@ -6,9 +6,6 @@
 
 !!! important "Use the Official Documentation"
     Always refer to the official vendor documentation for the latest installation and configuration guidance. The examples below are field notes from POC engagements and may not reflect the most current driver versions or recommended settings.
-
-
-# NetApp Trident
 
 NetApp Trident is a CSI driver that provides dynamic storage provisioning for Kubernetes clusters using NetApp ONTAP storage systems. It supports NFS (FlexVol and FlexGroup), iSCSI, NVMe/TCP, and Fibre Channel protocols. This guide targets **Trident 26.06**.
 

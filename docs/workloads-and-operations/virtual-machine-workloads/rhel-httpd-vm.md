@@ -85,7 +85,7 @@ Choose one of the two options below.
 
 === "Option B: Quick CLI"
 
-    Create the VM using `virtctl`. This does not include cloud-init for httpd — you will need to install it manually after the VM boots.
+    Create the VM using `virtctl` with cloud-init credentials. This does **not** install httpd automatically — install and start it manually after the VM boots (see step 3).
 
     ```bash
     virtctl create vm \
@@ -93,6 +93,8 @@ Choose one of the two options below.
       --instancetype u1.medium \
       --preference rhel.9 \
       --volume-import type:ds,src:openshift-virtualization-os-images/rhel9 \
+      --cloud-init-user cloud-user \
+      --cloud-init-password Pass123! \
       | oc apply -n rhel-httpd -f -
     ```
 
@@ -110,10 +112,20 @@ oc get vmi rhel-httpd -n rhel-httpd -w
 virtctl console rhel-httpd -n rhel-httpd
 ```
 
-3. Log in as `cloud-user` / `Pass123!` and verify:
+3. Log in as `cloud-user` / `Pass123!`. If you used Option A, verify httpd:
 
 ```bash
 systemctl status httpd
+curl localhost
+```
+
+If you used Option B, install and start httpd first:
+
+```bash
+sudo dnf install -y httpd
+sudo systemctl enable httpd --now
+echo '<html><body><h1>Hello from OpenShift Virtualization</h1><p>Served by Apache httpd on RHEL 9</p></body></html>' | sudo tee /var/www/html/index.html
+sudo restorecon -Rv /var/www/html
 curl localhost
 ```
 

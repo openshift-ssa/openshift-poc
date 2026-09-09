@@ -13,11 +13,16 @@ From a Linux configuration perspective:
 - VLANs can have a `base-iface` of an existing `ethernet` or `bond`
 - You can have multiple VLANs from a trunked `base-iface`
 
-### Typical OpenShift Production Setup — 3 Bonds (LACP)
+### Typical OpenShift Production Setup
 
-- `bond0` — management bond for cluster traffic
-- `bond1` — data bond for pod network
-- `bond2` — storage network
+Two common LACP layouts:
+
+| Layout | Bonds | When to use |
+|--------|-------|-------------|
+| **2-bond (recommended for Virtualization)** | `bond0` mgmt/cluster; `bond1` trunk carrying VM, storage, and live-migration VLANs | Matches [Prerequisites — Networking](../prerequisites/networking.md#production-multi-bond-architecture) |
+| **3-bond** | `bond0` mgmt; `bond1` data/pods; `bond2` storage | When storage must be on a dedicated physical uplink instead of a VLAN on bond1 |
+
+Examples below cover both patterns. Prefer the 2-bond + VLAN model for OpenShift Virtualization POCs unless your network team requires a separate storage bond.
 
 ## The Full Stack for Underlay Networking
 
@@ -59,6 +64,7 @@ Do not place VM (or pod) traffic on the same VLAN used for cluster management (A
 | Bond + tagged VLAN with IP | [2-eth Bond (LACP) with VLAN](#2-eth-bond-lacp-with-vlan) |
 | Redundancy without LACP | [2-eth Bond (Active-Backup) with VLAN](#2-eth-bond-active-backup-with-vlan) |
 | Dedicated storage network (MTU 9000) | [Storage Network Bond with Jumbo Frames](#storage-network-bond-with-jumbo-frames-mtu-9000) |
+| Live migration VLAN for Virtualization | [Live Migration Network VLAN](#live-migration-network-vlan-openshift-virtualization) |
 | OVS bridge for VM/pod underlay | [OVS Bridge Trunk](#ovs-bridge-trunk) |
 | L3 network for pods/VMs (IPAM) | [CUDN with IPAM](#cudn-with-ipam) |
 | L2 network for pods/VMs (external DHCP) | [CUDN without IPAM](#cudn-without-ipam) |
@@ -285,6 +291,39 @@ Builds a dedicated storage bond with jumbo frames and a tagged VLAN for storage 
     ```bash
     oc debug node/{{ node_name }} -- chroot /host ip link show bond-storage
     ```
+
+#### Live Migration Network VLAN (OpenShift Virtualization)
+
+Reuse the same bond/trunk pattern for a dedicated live-migration VLAN (for example VLAN 300 on `bond1` from [Prerequisites — Networking](../prerequisites/networking.md#production-multi-bond-architecture)). Apply an NNCP that creates the VLAN interface on workers, then point the HyperConverged live migration network at that underlay — see [Virtualization prerequisites](./virtualization.md) and the [live migration network docs](https://docs.redhat.com/en/documentation/red_hat_openshift_virtualization/latest/html/virtual_machines/live-migration#virt-configuring-a-live-migration-network).
+
+```yaml
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: live-migration-vlan-{{ hostname }}
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: {{ hostname }}
+  desiredState:
+    interfaces:
+      - name: bond1.{{ migration_vlan_id }}
+        type: vlan
+        state: up
+        mtu: 9000
+        vlan:
+          base-iface: bond1
+          id: {{ migration_vlan_id }}
+        ipv4:
+          enabled: true
+          address:
+            - ip: {{ migration_ip }}
+              prefix-length: 24
+          dhcp: false
+        ipv6:
+          enabled: false
+```
+
+This assumes `bond1` already exists as a trunk (see examples above). Use a dedicated VLAN ID that matches your switch configuration — do not share the management VLAN.
 
 ### OVS Bridge Trunk
 

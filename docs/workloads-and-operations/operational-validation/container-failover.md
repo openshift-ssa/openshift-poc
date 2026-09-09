@@ -6,7 +6,9 @@ This guide walks through testing container workload failover by deploying a samp
 
 - Workload Availability operators installed (NHC, SNR, Descheduler)
 - At least 3 worker nodes
-- A default StorageClass available (for testing with persistent volumes)
+
+!!! note
+    A default StorageClass is **not** required for the primary Deployment in this guide (it has no volume). Add a PVC only if you extend the test to cover RWO failover.
 
 ## Deploy a Sample Application
 

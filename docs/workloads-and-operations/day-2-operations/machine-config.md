@@ -90,7 +90,7 @@ Butane transpiles human-readable configs into MachineConfig resources, avoiding 
 
   ```yaml
   variant: openshift
-  version: 4.22.0  # Must match your OCP minor version (e.g., 4.23.0 for OCP 4.23)
+  version: {{ ocp_version }}.0  # Must match your OCP minor version (e.g., 4.23.0 for OCP 4.23)
   metadata:
     name: 99-worker-example
     labels:
@@ -123,7 +123,7 @@ Instead of `inline`, reference a local file:
 
 ```yaml
 variant: openshift
-version: 4.22.0  # Must match your OCP minor version
+version: {{ ocp_version }}.0  # Must match your OCP minor version
 metadata:
   name: 99-worker-example
   labels:

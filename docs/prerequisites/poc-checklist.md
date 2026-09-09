@@ -13,9 +13,10 @@ Use this as a tracker for your POC engagement. Not every item will apply to ever
     2. **Storage** — Install your vendor's CSI driver, create a default StorageClass
     3. **Registry** — Configure the internal image registry with persistent storage
     4. **Workload** — Deploy Hello World + PostgreSQL (validates networking and storage)
-    5. **Virtualization** — Install OpenShift Virtualization, deploy a RHEL VM
-    6. **Failover** — Run the VM failover test (demonstrates node-loss recovery)
-    7. **Upgrade** — Apply a z-stream update (demonstrates lifecycle management)
+    5. **Workload Availability** — Install NHC, SNR, and Descheduler (required before Virtualization if you will test failover)
+    6. **Virtualization** — Install OpenShift Virtualization, deploy a RHEL VM
+    7. **Failover** — Run the VM failover test (demonstrates node-loss recovery within ~120s)
+    8. **Upgrade** — Apply a z-stream update (demonstrates lifecycle management)
 
     Everything else in this checklist is valuable but can be deferred to follow-up sessions.
 
@@ -129,7 +130,7 @@ Complete these before scheduling the installation.
 | Pull secret downloaded from Red Hat console                                               |        |       |
 | SSH key pair generated                                                                    |        |       |
 | Disconnected: registry set up (oc-mirror **or** pull-through cache)                       |        |       |
-| Disconnected: install-config imageContentSources and OLM catalogs pointed at the registry |        |       |
+| Disconnected: install-config `imageDigestSources` (or ImageDigestMirrorSet) and OLM catalogs pointed at the registry |        |       |
 
 ### VM Migration Prerequisites
 
@@ -163,7 +164,7 @@ These must be completed before deploying workloads.
 
 | Item                                                                         | Status | Notes |
 | ---------------------------------------------------------------------------- | ------ | ----- |
-| NMState operator installed                                                   |        |       |
+| NMState operator installed (if bonds/VLANs/OVS are in scope)                  |        |       |
 | Network configuration applied (bonds, VLANs, storage network NNCPs)          |        |       |
 | Jumbo frames (MTU 9000) verified end-to-end on the storage network           |        |       |
 | Storage driver installed and StorageClasses created                           |        |       |
@@ -191,7 +192,7 @@ Install based on your POC goals. Each subsection is independent.
 ### Workload Availability
 
 !!! warning
-    If the POC includes OpenShift Virtualization, install Workload Availability **before** installing the Virtualization operator. The node health check and descheduler operators are what trigger live migrations when nodes become unhealthy.
+    If the POC includes OpenShift Virtualization, install Workload Availability **before** installing the Virtualization operator. Node Health Check and Self Node Remediation handle node-loss **failover** (cold restart). The Descheduler live-migrates VMs under load when they use `evictionStrategy: LiveMigrate` — that is a separate path from hard node failure.
 
 | Item                                                    | Status | Notes |
 | ------------------------------------------------------- | ------ | ----- |

@@ -134,6 +134,8 @@ When deleting from the web console, confirm that associated disks (PVCs) are rem
 
 ## Next Steps
 
+- [RHEL VM with Apache httpd](./rhel-httpd-vm.md) — Serve a webpage from a RHEL VM via an OpenShift Route
+- [Virtual Appliances (OVA)](./ova-virtual-appliance.md) — Import OVA appliances
 - [VM Failover Test](../operational-validation/vm-failover.md) — validate node-loss recovery within the 120-second target
 - [VM Backup and Restore](../operational-validation/vm-backup-restore.md) — exercise OADP with the kubevirt plugin
 - [Networking](../../configure-the-cluster/networking.md) — attach VMs to a CUDN for persistent IPAM

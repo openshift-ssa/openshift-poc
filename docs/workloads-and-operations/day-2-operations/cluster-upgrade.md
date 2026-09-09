@@ -2,7 +2,7 @@
 
 [Red Hat OpenShift Update Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/updating_clusters/index)
 
-This procedure walks through upgrading an OpenShift cluster to a new z-stream (e.g., 4.22.10 → 4.22.11) or minor version (e.g., 4.22 → 4.23). Validating a cluster upgrade is a key POC milestone — it proves the cluster can be maintained without downtime.
+This procedure walks through upgrading an OpenShift cluster to a new z-stream (e.g., {{ ocp_version }}.x → a newer z-stream) or minor version. Validating a cluster upgrade is a key POC milestone — it proves the cluster can be maintained with minimal disruption when workloads use PDBs and migratable VMs.
 
 ## Prerequisites
 
@@ -13,16 +13,17 @@ This procedure walks through upgrading an OpenShift cluster to a new z-stream (e
 
 ## Pre-Upgrade Health Check
 
-Before starting, confirm the cluster is healthy:
+Before starting, confirm the cluster is healthy and upgradeable:
 
 ```bash
 oc get clusterversion
+oc get clusterversion -o jsonpath='{.items[0].status.conditions[?(@.type=="Upgradeable")].status}{"\n"}'
 oc get co | grep -v "True.*False.*False"
 oc get nodes
 oc get mcp
 ```
 
-All ClusterOperators should show `AVAILABLE=True`, `PROGRESSING=False`, `DEGRADED=False`. All nodes should be `Ready`. All MachineConfigPools should show `UPDATED=True`.
+`Upgradeable` should be `True`. All ClusterOperators should show `AVAILABLE=True`, `PROGRESSING=False`, `DEGRADED=False`. All nodes should be `Ready`. All MachineConfigPools should show `UPDATED=True`.
 
 !!! warning "Do Not Upgrade a Degraded Cluster"
     Resolve any degraded ClusterOperators or unhealthy nodes before starting an upgrade. Upgrading a degraded cluster can make conditions worse and harder to troubleshoot.
@@ -124,13 +125,13 @@ While the upgrade is in progress, verify that workloads remain available:
 oc get pods -A | grep -v Running | grep -v Completed
 ```
 
-If you deployed workloads from the [Container Workloads](../container-workloads/index.md) or [Virtual Machine Workloads](../virtual-machine-workloads/index.md) sections, confirm they are still serving traffic:
+If you deployed workloads from the [Container Workloads](../container-workloads/index.md) or [Virtual Machine Workloads](../virtual-machine-workloads/index.md) sections, confirm they are still serving traffic. Example if Hello World is installed:
 
 ```bash
 curl -sk https://$(oc get route hello-world -n hello-world -o jsonpath='{.spec.host}')
 ```
 
-VMs with `evictionStrategy: LiveMigrate` will live-migrate off nodes before they are rebooted. Watch for migration events:
+VMs with `evictionStrategy: LiveMigrate` will live-migrate off nodes before they are drained for reboot. Watch for migration events:
 
 ```bash
 oc get vmi -A -w
@@ -164,12 +165,14 @@ Once the upgrade completes:
   oc get mcp
   ```
 
-5. Check for any alerts:
+5. Check for firing alerts (not just rule definitions):
 
   ```bash
-  oc get prometheusrule -A 2>/dev/null
-  oc adm top nodes
+  oc -n openshift-monitoring exec -c prometheus prometheus-k8s-0 -- \
+    curl -s 'http://localhost:9090/api/v1/alerts' | jq '.data.alerts[] | select(.state=="firing") | .labels.alertname'
   ```
+
+  Or review **Observe → Alerting** in the web console.
 
 ## Troubleshooting
 

@@ -40,6 +40,19 @@ If you are looking at OpenShift Platform Plus (OPP) and are targeting ODF to be 
 
 13. Click Finish
 
+## Verify
+
+```bash
+oc get storagecluster -n openshift-storage
+oc get pods -n openshift-storage
+oc get storageclass
+oc get volumesnapshotclass
+```
+
+Expect the StorageCluster to show a healthy phase, Ceph pods `Running`, and StorageClasses such as `ocs-storagecluster-ceph-rbd` (block) and `ocs-storagecluster-cephfs` (filesystem). ODF uses Ceph on local disks — `dm-multipath` is not required for ODF itself.
+
+For OpenShift Virtualization, confirm a StorageClass is annotated as the default virt class (`storageclass.kubevirt.io/is-default-virt-class: "true"`) if you selected that option in the wizard.
+
 ## Install via YAML (Alternative)
 
 If you prefer a CLI-driven install, the ODF operator and StorageCluster can also be deployed with YAML. See the [OpenShift Data Foundation documentation](https://docs.redhat.com/en/documentation/red_hat_openshift_data_foundation/latest/html/deploying_openshift_data_foundation_using_bare_metal_infrastructure/index) for the full manifest-based installation procedure. The hub-and-spoke guide also shows a [YAML-based ODF install on SNO](../../install-the-cluster/other-installation-methods/hub-and-spoke.md#optional--install-openshift-data-foundation-object-storage).

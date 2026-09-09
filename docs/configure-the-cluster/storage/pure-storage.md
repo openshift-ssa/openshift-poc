@@ -34,10 +34,21 @@ PX-CSI provisions FlashArray and FlashBlade volumes directly — there is no sof
 - FlashArray or FlashBlade with API access configured
 - FlashArray management endpoint IP and API token
 - OpenShift cluster with worker nodes connected to the storage network
-- For block volumes (iSCSI, NVMe-oF, FC): multipath and udev configuration via MachineConfig — see [Multipathing](multipathing.md)
+- For block volumes over **iSCSI or Fibre Channel**: multipath and udev configuration via MachineConfig — see [Multipathing](multipathing.md)
+- For **NVMe-oF** (NVMe/TCP, NVMe/FC, NVMe/RoCE): the kernel uses native NVMe ANA — you typically do **not** need `dm-multipath`. Follow the [FlashArray preparation guide](https://docs.portworx.com/portworx-csi/install/prepare/flash-array) for any Pure-specific udev rules
 - For NFS (FlashBlade File Services): no multipath or udev configuration needed
 
-### Step 1 — Create the FlashArray Secret
+### Step 1 — Create the Namespace
+
+```bash
+oc create namespace portworx
+oc label namespace portworx \
+  pod-security.kubernetes.io/enforce=privileged \
+  pod-security.kubernetes.io/audit=privileged \
+  pod-security.kubernetes.io/warn=privileged
+```
+
+### Step 2 — Create the FlashArray Secret
 
 Create a `pure.json` file with your FlashArray management endpoint and API token:
 
@@ -72,7 +83,7 @@ If you are also using FlashBlade, add a `FlashBlades` section to the same file:
 }
 ```
 
-Create the secret in the namespace where PX-CSI will be installed:
+Create the secret in the `portworx` namespace created in Step 1:
 
 ```bash
 oc create secret generic px-pure-secret \
@@ -83,7 +94,7 @@ oc create secret generic px-pure-secret \
 !!! warning
     The secret must be named `px-pure-secret` — PX-CSI looks for this specific name at startup.
 
-### Step 2 — Install the Portworx Operator
+### Step 3 — Install the Portworx Operator
 
 From the OpenShift web console:
 
@@ -95,15 +106,6 @@ Or via CLI:
 
 ```bash
 cat << 'EOF' | oc apply -f -
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: portworx
-  labels:
-    pod-security.kubernetes.io/enforce: privileged
-    pod-security.kubernetes.io/audit: privileged
-    pod-security.kubernetes.io/warn: privileged
----
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
@@ -134,7 +136,7 @@ oc get installplan -n portworx
 oc patch installplan <name> -n portworx --type merge -p '{"spec":{"approved":true}}'
 ```
 
-### Step 3 — Generate and Deploy the StorageCluster
+### Step 4 — Generate and Deploy the StorageCluster
 
 Use [Portworx Central](https://central.portworx.com) to generate a StorageCluster spec tailored to your environment. Select **PX-CSI** as the product and **OpenShift 4+** as the distribution.
 
@@ -150,7 +152,7 @@ metadata:
     portworx.io/is-openshift: "true"
     portworx.io/misc-args: "--oem px-csi"
 spec:
-  image: portworx/px-pure-csi-driver:26.1.0
+  image: portworx/px-pure-csi-driver:26.1.0  # Replace with the version from Portworx Central
   imagePullPolicy: Always
   csi:
     enabled: true
@@ -190,7 +192,7 @@ Apply the spec:
 oc apply -f storagecluster.yaml
 ```
 
-### Step 4 — Verify
+### Step 5 — Verify
 
 ```bash
 oc get storagecluster -n portworx
@@ -200,7 +202,7 @@ oc get sc
 
 PX-CSI automatically creates a set of default StorageClasses during installation. You can use these or create custom ones.
 
-### Step 5 — Create a StorageClass (Optional)
+### Step 6 — Create a StorageClass (Optional)
 
 If you need a custom StorageClass:
 

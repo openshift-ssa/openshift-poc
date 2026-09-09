@@ -100,7 +100,7 @@ EOF
 
 #### 2c. Multipath Configuration
 
-Enables `multipathd` with Dell Unity defaults. See [Multipathing](multipathing.md) for background on the configuration structure.
+Enables `multipathd` with the recommended blacklist / whitelist pattern. See [Multipathing](multipathing.md) for background. Confirm the Unity `vendor` / `product` strings from an attached LUN (`multipathd show paths`) or Dell documentation — `DGC` is the common SCSI vendor string for Unity.
 
 ```bash
 cat << 'EOF' | oc apply -f -
@@ -120,7 +120,7 @@ spec:
           mode: 0644
           overwrite: true
           contents:
-            source: data:text/plain;base64,ZGVmYXVsdHMgewogICAgdXNlcl9mcmllbmRseV9uYW1lcyB5ZXMKICAgIGZpbmRfbXVsdGlwYXRocyB5ZXMKICAgIHBvbGxpbmdfaW50ZXJ2YWwgNQp9CmJsYWNrbGlzdCB7Cn0K
+            source: data:text/plain;base64,ZGVmYXVsdHMgewogICAgdXNlcl9mcmllbmRseV9uYW1lcyB5ZXMKICAgIGZpbmRfbXVsdGlwYXRocyBubwogICAgcG9sbGluZ19pbnRlcnZhbCA1Cn0KYmxhY2tsaXN0IHsKICAgIGRldmljZSB7CiAgICAgICAgdmVuZG9yICAiLioiCiAgICAgICAgcHJvZHVjdCAiLioiCiAgICB9Cn0KYmxhY2tsaXN0X2V4Y2VwdGlvbnMgewogICAgZGV2aWNlIHsKICAgICAgICB2ZW5kb3IgICJER0MiCiAgICAgICAgcHJvZHVjdCAiLioiCiAgICB9Cn0K
     systemd:
       units:
         - name: multipathd.service
@@ -134,15 +134,24 @@ EOF
     ```ini
     defaults {
         user_friendly_names yes
-        find_multipaths yes
+        find_multipaths no
         polling_interval 5
     }
     blacklist {
+        device {
+            vendor  ".*"
+            product ".*"
+        }
+    }
+    blacklist_exceptions {
+        device {
+            vendor  "DGC"
+            product ".*"
+        }
     }
     ```
 
-    !!! warning "POC-Only Configuration"
-        This minimal config uses `find_multipaths yes` with an empty `blacklist {}`, which lets `multipathd` auto-detect devices with multiple paths. It works for a POC where the only multipathed devices are Unity LUNs, but contradicts the [Multipathing](multipathing.md) best practice of `find_multipaths no` with explicit `blacklist` / `blacklist_exceptions` / `devices` blocks. For production, obtain Dell's recommended `multipath.conf` for Unity XT — it will include a proper `device {}` block with vendor-tuned failover parameters.
+    This matches the [Multipathing](multipathing.md) pattern (`find_multipaths no` + blacklist all + whitelist Unity). For production, also add Dell's recommended `devices { device { ... } }` block with path failover parameters from the Unity OpenShift host connectivity guide.
 
 #### Wait for Rollout
 

@@ -2,7 +2,7 @@
 
 [Red Hat OpenShift Monitoring Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/monitoring/index)
 
-OpenShift ships with a pre-configured monitoring stack based on Prometheus, Alertmanager, and Grafana (read-only dashboards in the web console). The stack is installed automatically — this page covers how to verify it, enable user workload monitoring, and configure alert routing.
+OpenShift ships with a pre-configured monitoring stack based on Prometheus and Alertmanager. Read-only dashboards are available under **Observe → Dashboards** in the web console (the platform no longer ships a Grafana UI). The stack is installed automatically — this page covers how to verify it, enable user workload monitoring, and configure alert routing.
 
 ## Verify the Built-In Monitoring Stack
 
@@ -121,8 +121,8 @@ stringData:
       repeat_interval: 12h
       receiver: default
       routes:
-        - match:
-            severity: critical
+        - matchers:
+            - severity = critical
           receiver: webhook-critical
     receivers:
       - name: default
@@ -186,7 +186,7 @@ oc apply -f cluster-monitoring-config.yaml
 
 ## Create a Custom Alert (Optional)
 
-Demonstrate custom alerting by creating a `PrometheusRule` that fires when a namespace has no running pods:
+Demonstrate custom alerting by creating a `PrometheusRule` that fires when a node's CPU utilisation stays above 90% for 10 minutes:
 
 ```yaml
 apiVersion: monitoring.coreos.com/v1

@@ -35,34 +35,41 @@ The default must-gather captures:
 
 Operators ship their own must-gather images that collect deeper diagnostics for their components. Use `--image` to run them:
 
+!!! tip "Pin the image version to your installed operator"
+    Prefer a version tag that matches the installed operator (for example `v4.17`) instead of `:latest`. Resolve the image from the cluster when possible:
+
+    ```bash
+    oc get csv -A -o custom-columns=NAME:.metadata.name,IMAGE:.spec.relatedImages[*].image | grep must-gather
+    ```
+
 ### OpenShift Virtualization
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:latest
+oc adm must-gather --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v4.17
 ```
 
 ### OpenShift Data Foundation
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/odf4/ocs-must-gather-rhel9:latest
+oc adm must-gather --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v4.17
 ```
 
 ### OpenShift Logging
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/logging/cluster-logging-rhel9-operator:latest -- /usr/bin/gather
+oc adm must-gather --image=registry.redhat.io/openshift-logging/cluster-logging-rhel9-operator:v6.6 -- /usr/bin/gather
 ```
 
 ### Advanced Cluster Management
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/rhacm2/acm-must-gather-rhel9:latest
+oc adm must-gather --image=registry.redhat.io/rhacm2/acm-must-gather-rhel9:v2.12
 ```
 
 ### Network Observability
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/network-observability/network-observability-must-gather-rhel9:latest
+oc adm must-gather --image=registry.redhat.io/network-observability/network-observability-must-gather-rhel9:v1.8
 ```
 
 ### Multiple Operators at Once
@@ -71,8 +78,8 @@ Combine multiple images in a single run:
 
 ```bash
 oc adm must-gather \
-  --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:latest \
-  --image=registry.redhat.io/odf4/ocs-must-gather-rhel9:latest
+  --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v4.17 \
+  --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v4.17
 ```
 
 ## Scoped Collection
@@ -105,14 +112,15 @@ tar czf must-gather-$(date +%Y%m%d-%H%M%S).tar.gz must-gather.local.*/
 
 1. Open or find your support case at [access.redhat.com](https://access.redhat.com/support/cases/)
 2. Attach the `.tar.gz` archive to the case
-3. If the file is too large (>250 MB), use the Red Hat SFTP server:
+3. If the file is too large (>250 MB), use the Red Hat SFTP dropbox documented in your support case. Typical flow:
 
   ```bash
-  sftp must-gather@sftp.access.redhat.com
+  sftp <case-number>@sftp.access.redhat.com
+  # password is provided in the case comment / SFTP instructions from Support
   put must-gather-*.tar.gz
   ```
 
-  Reference the file name in your support case comments.
+  Reference the file name in your support case comments. Do not use a generic `must-gather@` account unless Support has directed you to.
 
 ## Troubleshooting must-gather
 

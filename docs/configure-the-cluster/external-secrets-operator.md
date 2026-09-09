@@ -60,7 +60,7 @@ The operator does not deploy the external-secrets pods automatically. Create an 
 1. Go to Ecosystem -> Installed Operators -> External Secrets Operator
 2. Click on the "ExternalSecretsConfig" tab
 3. Click "Create ExternalSecretsConfig"
-4. Leave all the defaults and click Create
+4. Leave defaults, then switch to YAML view and ensure an egress NetworkPolicy is present if your cluster uses default-deny policies (see the YAML example below) — click Create
 
 Or via YAML:
 

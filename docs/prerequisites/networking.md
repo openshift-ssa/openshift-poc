@@ -45,6 +45,9 @@ Do not reuse node addresses for VIPs or DNS. In the `10.0.0.0/28` examples used 
 | Workers 1–3                  | `10.0.0.10`–`10.0.0.12` |
 | Additional worker            | `10.0.0.13`             |
 
+!!! warning "Example /28 is capacity-tight"
+    A `/28` has only 14 usable host addresses. The table above uses most of them for gateway, DNS, VIPs, install host, and a 6-node cluster. Treat `10.0.0.0/28` as an **illustrative** layout — use a larger subnet (for example `/24`) for real POCs that may add workers or hub/spoke nodes.
+
 !!! tip
     Document all static IP assignments in a spreadsheet or table before starting installation. The Assisted Installer will require this information for each host.
 
@@ -77,6 +80,8 @@ In production environments with OpenShift Virtualization, the recommended archit
 | VLAN 100      | VM workload traffic | 9000 | Underlay network for VM-to-external access |
 | VLAN 200      | Storage network     | 9000 | Dedicated path to storage array            |
 | VLAN 300      | Live migration      | 9000 | Dedicated path for VM live migrations      |
+
+After install, create the VLAN interfaces with NMState — see [Configure Networking — Live Migration Network VLAN](../configure-the-cluster/networking.md#live-migration-network-vlan-openshift-virtualization).
 
 This separation provides:
 
@@ -111,6 +116,22 @@ The table above is **node-to-node**. Also open these paths from clients, the ins
 | 123      | UDP      | All nodes               | NTP servers       | Time sync                                |
 | 443, 623 | TCP/UDP  | Install host            | BMC / iLO / iDRAC | Virtual media and power control          |
 | 8080     | TCP      | BMC / nodes             | Install host      | Agent-based ISO HTTP serve (if used)     |
+
+### Storage protocol ports (when using external arrays)
+
+Open these between cluster nodes and the storage array as required by your vendor and protocol. Not all apply to every POC:
+
+| Port | Protocol | Typical use |
+|------|----------|-------------|
+| 3260 | TCP | iSCSI |
+| 4420 | TCP | NVMe/TCP |
+| 2049 | TCP/UDP | NFS |
+| 111 | TCP/UDP | NFS rpcbind (if required by your array) |
+
+Fibre Channel does not use Ethernet ports — configure zoning on the FC fabric instead.
+
+!!! note "IPsec ports"
+    Ports 500/UDP and 4500/UDP in the node-to-node table apply only when you enable OVN-Kubernetes IPsec. Skip them if IPsec is not in scope.
 
 ## Outbound Access
 

@@ -2,10 +2,10 @@
 
 [Post-installation configuration](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/postinstallation_configuration/index)
 
-After the cluster is installed, complete the following to prepare it for workloads. These 4 items are essentially required before doing anything else. 
+After the cluster is installed, complete storage and registry configuration before running workloads. Networking day-2 steps depend on your topology:
 
-1. **[NMState Operator](./nmstate.md)** — Required for advanced networking (bonds, VLANs, OVS bridges)
-2. **[Configure Networking](./networking.md)** — NNCPs, OVS bridges, CUDNs, and underlay networking
+1. **[NMState Operator](./nmstate.md)** — Required when you need bonds, VLANs, or OVS bridges after install (skip if install-time static networking / single NIC is enough)
+2. **[Configure Networking](./networking.md)** — NNCPs, OVS bridges, CUDNs, and underlay networking (when using NMState)
 3. **[Storage](./storage/index.md)** — Install your CSI driver and create StorageClasses
 4. **[Registry](./registry.md)** — Configure persistent storage for the internal image registry
 
@@ -18,6 +18,7 @@ After the cluster is installed, complete the following to prepare it for workloa
 - [OADP (Backup & Restore)](./oadp.md) — Backup and restore for applications and virtual machines
 
 ### Observability
+- [Monitoring and Alerting](./monitoring.md) — Built-in Prometheus stack, user workload monitoring, and Alertmanager
 - [Logging](./logging.md) — Log collection and storage with Loki and OpenShift Logging
 - [Network Observability](./network-observability.md) — eBPF flow collection, topology, and Network Traffic console
 - [MultiCluster Observability](./multicluster-observability.md) — Centralized monitoring across managed clusters (fleet management only)

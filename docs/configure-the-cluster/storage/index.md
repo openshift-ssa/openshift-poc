@@ -16,11 +16,11 @@ If you are planning on running virtual machines using OpenShift Virtualization, 
 
 Confirm with your storage vendor which access modes are supported:
 
-| Access Mode | Description                      | Common Use                        |
-| ----------- | -------------------------------- | --------------------------------- |
-| RWO         | Read-Write Once (single node)    | Databases, monitoring             |
-| RWX         | Read-Write Many (multiple nodes) | Registry, shared application data |
-| ROX         | Read-Only Many (multiple nodes)  | Static content, shared configs    |
+| Access Mode | Description                      | Common Use                                          |
+| ----------- | -------------------------------- | --------------------------------------------------- |
+| RWO         | Read-Write Once (single node)    | Databases, monitoring                               |
+| RWX         | Read-Write Many (multiple nodes) | Registry, shared app data, **Virtualization** (live migration / failover) |
+| ROX         | Read-Only Many (multiple nodes)  | Static content, shared configs                      |
 
 ## Vendor Compatibility
 

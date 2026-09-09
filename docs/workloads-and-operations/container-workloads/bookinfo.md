@@ -64,11 +64,11 @@ This multi-version setup is what makes Bookinfo useful for traffic management de
 
   ```bash
   oc apply -n bookinfo \
-    -f https://raw.githubusercontent.com/istio/istio/master/samples/bookinfo/platform/kube/bookinfo.yaml
+    -f https://raw.githubusercontent.com/istio/istio/1.24.0/samples/bookinfo/platform/kube/bookinfo.yaml
   ```
 
   !!! note
-      This pulls from the `master` branch of the upstream Istio repo. If the URL fails, check whether Istio has renamed the branch to `main`, or download the manifests from a [tagged release](https://github.com/istio/istio/releases) instead.
+      The URL pins Istio release tag `1.24.0`. If that tag is removed or your mesh version needs a different sample, pick a matching [Istio release](https://github.com/istio/istio/releases) or use the Service Mesh documentation sample for your installed version.
 
 4. Wait for all pods to be running:
 

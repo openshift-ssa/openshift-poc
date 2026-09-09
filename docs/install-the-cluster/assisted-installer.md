@@ -130,7 +130,7 @@ Wait for it...
 ## Validate the Install
 
 ```bash
-oc login --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443 -u kubeadmin
+oc login --server=https://api.{{ cluster_name }}.{{ base_domain }}:6443 -u kubeadmin -p {{ password }}
 oc get nodes
 oc get clusterversion
 oc get clusteroperators

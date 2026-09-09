@@ -2,7 +2,10 @@
 
 ## Collecting Bootstrap Logs
 
-If the installation times out during the bootstrap phase, gather diagnostic logs before the bootstrap node is destroyed:
+!!! note "When this applies"
+    `openshift-install gather bootstrap` is for **installer-provisioned (IPI)** installs that create a temporary bootstrap VM (for example [vSphere IPI](./other-installation-methods/vmware-install.md)). For Assisted Installer or Agent-Based Installer, use the installer/agent wait-for logs and [must-gather](../workloads-and-operations/day-2-operations/must-gather.md) instead — there is no separate bootstrap host to gather from after install.
+
+If an IPI installation times out during the bootstrap phase, gather diagnostic logs before the bootstrap node is destroyed:
 
 ```bash
 openshift-install gather bootstrap --dir=install \

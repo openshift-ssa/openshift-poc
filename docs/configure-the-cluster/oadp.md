@@ -166,9 +166,10 @@ OADP requires an S3-compatible object storage bucket for backup data. If you hav
 ```bash
 oc get dpa -n openshift-adp
 oc get backupstoragelocation -n openshift-adp
+oc get volumesnapshotclass
 ```
 
-The BackupStorageLocation `PHASE` should show `Available`.
+The BackupStorageLocation `PHASE` should show `Available`. A `VolumeSnapshotClass` must exist for your CSI driver before CSI snapshot-based VM backups will succeed.
 
 ```bash
 oc get pods -n openshift-adp
