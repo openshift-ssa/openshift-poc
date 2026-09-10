@@ -414,7 +414,14 @@ The InfraEnv defines the discovery environment for spoke cluster hosts. ACM uses
   metadata:
     name: {{ spoke_cluster_name }}
     namespace: {{ spoke_cluster_name }}
+    annotations:
+      infraenv.agent-install.openshift.io/enable-ironic-agent: 'true'
+    labels:
+      agentclusterinstalls.extensions.hive.openshift.io/location: {{ dc_location_name }}
+      networkType: static
   spec:
+    agentLabels:
+      agentclusterinstalls.extensions.hive.openshift.io/location: {{ dc_location_name }}
     cpuArchitecture: x86_64
     imageType: full-iso # (1)!
     ipxeScriptType: DiscoveryImageAlways
@@ -456,7 +463,7 @@ When the discovery ISO boots on a host, the agent inside needs a working network
 !!! warning
     You must create one `NMStateConfig` for **every host** that will be registered as a BareMetalHost. If a host does not have a matching `NMStateConfig`, it will boot the discovery ISO but have no network connectivity and will never register as an Agent.
 
-Create all `NMStateConfig` resources **before** creating the BareMetalHosts.
+Create all `NMStateConfig` resources **before** creating the BareMetalHosts. Use existing NMStateConfig [documentation](../../configure-the-cluster/networking.md)
 
 !!! tip "Auto-generate from Redfish"
     Instead of manually collecting MAC addresses from each server, you can query the BMC via Redfish to discover interfaces and generate NMStateConfig YAML automatically. See [Redfish Network Discovery](./redfish-nmstate-discovery.md).
@@ -468,11 +475,11 @@ metadata:
   name: {{ hostname }}
   namespace: {{ spoke_cluster_name }}
   labels:
-    infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+    infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
 spec:
   interfaces:
-    - name: eno1
-      macAddress: {{ boot_mac_address }}
+    - name: eno1 # Use the actual interface names!
+      macAddress: {{ mac_address }}
   config:
     interfaces:
       - name: eno1
@@ -556,7 +563,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         inspect.metal3.io/disabled: ""
         bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
-        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
     spec:
       online: true
       bootMACAddress: {{ boot_mac_address }}
@@ -597,7 +604,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         inspect.metal3.io/disabled: ""
         bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
-        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
     spec:
       online: true
       bootMACAddress: {{ boot_mac_address }}
@@ -623,7 +630,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         inspect.metal3.io/disabled: ""
         bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
-        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
     spec:
       online: true
       bootMACAddress: {{ boot_mac_address }}
@@ -649,7 +656,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         inspect.metal3.io/disabled: ""
         bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
-        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+        infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
     spec:
       online: true
       bootMACAddress: {{ boot_mac_address }}
