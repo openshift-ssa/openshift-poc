@@ -582,6 +582,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
     !!! warning "`bootMACAddress` — Use the Data NIC, Not the BMC"
         The `bootMACAddress` must be the MAC of the **data/production NIC** on the host (e.g. `eno1`) — the interface that will carry cluster traffic and receive an IP via DHCP or `NMStateConfig`. Do **not** use the BMC/iDRAC management port MAC. The BMC has its own dedicated MAC on the management network. Using the wrong MAC is a common cause of hosts never getting an IP after booting the discovery ISO.
 
+        **Bonded / VLAN environments:** If your `NMStateConfig` uses an LACP bond with a VLAN (e.g. `bond0.148`), use the MAC of the **first physical bond member** (e.g. `eno12399np0`), not the bond or VLAN interface. Bonds and VLANs are derived interfaces that don't exist until the NMStateConfig is applied after the discovery ISO boots — the server only knows its physical NICs at early boot. This same MAC must also appear in the `NMStateConfig` `spec.interfaces` mapping so the assisted installer can match the config to the host.
+
     !!! warning "Dell-Specific Requirements"
         - **iDRAC firmware** — virtual media via Redfish needs a reasonably current iDRAC. On iDRAC 9, use **4.40.00.00 or newer**; older firmware has flaky or missing virtual-media Redfish support. iDRAC 8 works but is more limited.
         - **Enterprise/Datacenter license** — virtual media requires it. The Express license does not expose the virtual media endpoint.
@@ -676,7 +678,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
     | `inspect.metal3.io/disabled`     | Annotation that skips Ironic hardware inspection. Required for ACM/InfraEnv host inventory so hosts register as agents instead of staying in `inspecting`. |
     | `bmac.agent-install.openshift.io/hostname` | Sets the hostname on the Agent that registers from this BareMetalHost. Without it, the agent may get a random or DHCP-assigned hostname.                   |
     | `bmc.address`                    | The `redfish-virtualmedia://` scheme avoids the provisioning-network requirement. The system ID at the end is vendor-specific (see tabs above).            |
-    | `bootMACAddress`                 | MAC of the **data/production NIC** (e.g. `eno1`) — the interface used for cluster traffic. This is **not** the BMC/iDRAC management port MAC. Using the wrong MAC is a common cause of hosts never getting an IP after booting the discovery ISO. |
+    | `bootMACAddress`                 | MAC of the **data/production NIC** (e.g. `eno1`) — the interface used for cluster traffic. This is **not** the BMC/iDRAC management port MAC. For bonded/VLAN setups, use the first physical bond member's MAC. Using the wrong MAC is a common cause of hosts never getting an IP after booting the discovery ISO. |
     | `disableCertificateVerification` | Usually required since BMCs ship with self-signed certs. Remove it if you have installed valid certificates.                                              |
     | `bootMode`                       | `UEFI` (default), `legacy`, or `UEFISecureBoot`.                                                                                                         |
     | `rootDeviceHints`                | Optional but recommended so Ironic installs to the correct disk. Can also match on `model`, `serialNumber`, `wwn`, `minSizeGigabytes`, etc.               |
