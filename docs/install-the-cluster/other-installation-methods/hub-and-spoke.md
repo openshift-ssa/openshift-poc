@@ -876,3 +876,41 @@ Once all agents are approved and showing `known` status, create the cluster reso
 | Install stalls at `installing`               | Host stuck downloading or writing to disk                          | Check per-host progress with `oc get agents` custom-columns; look for disk or network errors                  |
 | Install fails with certificate errors        | BMC cert verification failing                                      | Ensure `disableCertificateVerification: true` is set on the BareMetalHost                                     |
 | Spoke cluster not showing in ACM             | ManagedCluster not created or klusterlet not deployed              | Check `oc get managedcluster`; the ClusterDeployment should auto-create it                                    |
+
+#### Deleting BareMetalHosts
+
+Delete a single BMH:
+
+```bash
+oc delete bmh {{ hostname }} -n {{ spoke_cluster_name }}
+```
+
+Delete all BMHs in a spoke namespace:
+
+```bash
+oc delete bmh --all -n {{ spoke_cluster_name }}
+```
+
+#### Tearing Down a Spoke Cluster
+
+If you're tearing down a spoke cluster entirely, delete in this order to avoid orphaned resources:
+
+```bash
+# 1. Delete the cluster (ClusterDeployment triggers uninstall)
+oc delete clusterdeployment {{ spoke_cluster_name }} -n {{ spoke_cluster_name }}
+
+# 2. Wait for agents to unbind, then delete BMHs
+oc delete bmh --all -n {{ spoke_cluster_name }}
+
+# 3. Delete the InfraEnv
+oc delete infraenv {{ spoke_cluster_name }} -n {{ spoke_cluster_name }}
+
+# 4. Clean up secrets and namespace
+oc delete namespace {{ spoke_cluster_name }}
+```
+
+!!! warning "Do Not Remove Finalizers"
+    Do not remove finalizers from BMH objects to force deletion — this can orphan Ironic state and leave the host in a bad state.
+
+!!! tip "BMH Stuck in `Deleting`"
+    If a BMH sticks in `Deleting`, it is usually Ironic's cleaning process retrying (up to 3 times, ~5 min each). If it never completes, set `automatedCleaningMode: disabled` on the BMH and re-delete. Since this guide sets `automatedCleaningMode: disabled` on all BMHs, you should not hit this issue.
