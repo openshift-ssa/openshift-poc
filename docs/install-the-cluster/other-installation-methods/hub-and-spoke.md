@@ -309,6 +309,12 @@ spec:
     resources:
       requests:
         storage: 20Gi
+  imageStorage:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 50Gi
 ```
 
 ```bash
