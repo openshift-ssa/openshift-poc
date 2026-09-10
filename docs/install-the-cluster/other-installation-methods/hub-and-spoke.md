@@ -417,13 +417,26 @@ The InfraEnv defines the discovery environment for spoke cluster hosts. ACM uses
   spec:
     cpuArchitecture: x86_64
     ipxeScriptType: DiscoveryImageAlways
+    additionalNTPSources:
+      - {{ ntp_server_1 }}
+      - {{ ntp_server_2 }}
     nmStateConfigLabelSelector:
       matchLabels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     pullSecretRef:
       name: pullsecret-{{ spoke_cluster_name }}
     sshAuthorizedKey: {{ public_key }}
+    # additionalTrustBundle: |
+    #   -----BEGIN CERTIFICATE-----
+    #   < your proxy or internal CA certificate in PEM format >
+    #   -----END CERTIFICATE-----
   ```
+
+  !!! note "NTP"
+      Use the customer's NTP servers. `pool.ntp.org` only works if nodes have outbound internet, which most on-prem POCs do not.
+
+  !!! warning "TLS-Intercepting (MITM) Proxy"
+      If your environment uses a TLS-intercepting proxy, you **must** uncomment and populate the `additionalTrustBundle` field with your proxy's root or intermediate CA certificate in PEM format. Without it, the discovery agent cannot pull images from Red Hat registries and will fail silently. See [Networking — TLS-Intercepting (MITM) Proxy](../../prerequisites/networking.md#tls-intercepting-mitm-proxy) for how to obtain the certificate.
 
   ```bash
   oc apply -f infraenv.yaml
