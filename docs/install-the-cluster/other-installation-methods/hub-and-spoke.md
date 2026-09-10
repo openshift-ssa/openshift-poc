@@ -416,6 +416,7 @@ The InfraEnv defines the discovery environment for spoke cluster hosts. ACM uses
     namespace: {{ spoke_cluster_name }}
   spec:
     cpuArchitecture: x86_64
+    imageType: full-iso # (1)!
     ipxeScriptType: DiscoveryImageAlways
     additionalNTPSources:
       - {{ ntp_server_1 }}
@@ -431,6 +432,8 @@ The InfraEnv defines the discovery environment for spoke cluster hosts. ACM uses
     #   < your proxy or internal CA certificate in PEM format >
     #   -----END CERTIFICATE-----
   ```
+
+  1. `full-iso` (~1 GB) includes the RHCOS rootfs so hosts boot without downloading anything over the network — use this for disconnected or bandwidth-constrained environments. `minimal-iso` (~100 MB) downloads the rootfs at boot time and is the default if omitted.
 
   !!! note "NTP"
       Use the customer's NTP servers. `pool.ntp.org` only works if nodes have outbound internet, which most on-prem POCs do not.
