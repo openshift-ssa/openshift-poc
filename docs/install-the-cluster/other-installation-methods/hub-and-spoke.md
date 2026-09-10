@@ -455,6 +455,9 @@ When the discovery ISO boots on a host, the agent inside needs a working network
 
 Create all `NMStateConfig` resources **before** creating the BareMetalHosts.
 
+!!! tip "Auto-generate from Redfish"
+    Instead of manually collecting MAC addresses from each server, you can query the BMC via Redfish to discover interfaces and generate NMStateConfig YAML automatically. See [Redfish Network Discovery](./redfish-nmstate-discovery.md).
+
 ```yaml
 apiVersion: agent-install.openshift.io/v1beta1
 kind: NMStateConfig

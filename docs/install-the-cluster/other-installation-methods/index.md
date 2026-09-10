@@ -17,3 +17,7 @@ Nested clusters with hosted control planes running as pods. See [OpenShift on Op
 ## Disconnected Environments
 
 For environments where cluster nodes cannot reach the internet. Set up a mirror registry or pull-through cache, then configure OpenShift to use it. See [Disconnected](./disconnected.md).
+
+## Utilities
+
+- **[Redfish Network Discovery](./redfish-nmstate-discovery.md)** — Query BMC interfaces via the Redfish API to auto-generate `NMStateConfig` resources with the correct MAC addresses. Useful for Hub and Spoke static IP deployments.
