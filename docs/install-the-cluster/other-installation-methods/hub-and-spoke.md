@@ -442,6 +442,8 @@ The InfraEnv defines the discovery environment for spoke cluster hosts. ACM uses
   oc apply -f infraenv.yaml
   ```
 
+## Adding BareMetalHost to the host inventory
+
 ### Static IP Configuration
 
 When the discovery ISO boots on a host, the agent inside needs a working network connection to call home to the hub and register. Without DHCP on the data network, the agent has no IP and cannot reach the hub — the host will boot but never appear as an Agent.
@@ -488,7 +490,10 @@ spec:
 ```
 
 !!! note
-    The `interfaces[].macAddress` at the bottom maps the NMState config to the correct physical NIC. This must be the same MAC used in the BareMetalHost `bootMACAddress` field. The interface name (`eno1`) must match the actual NIC name on the host. If you are unsure, boot one host with a live ISO and check `ip link`.
+    The `interfaces[].macAddress` at the bottom maps the NMState config to the correct physical NIC. This must be the same MAC used in the BareMetalHost `bootMACAddress` field. The interface name (`eno1`) must match the actual NIC name on the host.
+
+!!! tip "Finding NIC Names and MAC Addresses"
+    If you are unsure of the NIC names or MAC addresses on your hosts, boot one with the [RHCOS Live ISO](https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/{{ ocp_version }}/latest/) and run `ip link` from the console. You don't need to install anything — the live environment gives you all the hardware details you need.
 
 !!! tip
     This is only the **discovery stage** networking — enough for the agent to phone home and register. The final cluster networking (bonds, VLANs, production static IPs) is configured separately in the cluster install manifests.
