@@ -287,6 +287,43 @@ spec:
 oc apply -f provisioning.yaml
 ```
 
+### Create the AgentServiceConfig
+
+The `AgentServiceConfig` CR enables the Assisted Service (part of multicluster engine) which handles bare metal cluster provisioning. Without it, the assisted-service pods won't deploy and InfraEnv creation will fail.
+
+```yaml
+apiVersion: agent-install.openshift.io/v1beta1
+kind: AgentServiceConfig
+metadata:
+  name: agent
+spec:
+  databaseStorage:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 10Gi
+  filesystemStorage:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 20Gi
+```
+
+```bash
+oc apply -f agentserviceconfig.yaml
+```
+
+Wait for the assisted-service pods to start:
+
+```bash
+oc get pods -n multicluster-engine -l app=assisted-service
+```
+
+!!! note
+    In a connected environment, the Assisted Service automatically pulls the correct RHCOS images for each OpenShift version. In disconnected environments, you must also specify `spec.osImages` with references to locally mirrored ISO and rootFS images, and `spec.mirrorRegistryRef` pointing to a ConfigMap with your mirror registry configuration.
+
 ### Import an Existing Cluster
 
 To import an existing cluster (one not provisioned by ACM) into the hub:
