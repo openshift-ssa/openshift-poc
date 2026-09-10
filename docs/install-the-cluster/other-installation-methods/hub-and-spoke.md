@@ -543,6 +543,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       namespace: {{ spoke_cluster_name }}
       annotations:
         inspect.metal3.io/disabled: ""
+        bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     spec:
@@ -583,6 +584,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       namespace: {{ spoke_cluster_name }}
       annotations:
         inspect.metal3.io/disabled: ""
+        bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     spec:
@@ -608,6 +610,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       namespace: {{ spoke_cluster_name }}
       annotations:
         inspect.metal3.io/disabled: ""
+        bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     spec:
@@ -633,6 +636,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       namespace: {{ spoke_cluster_name }}
       annotations:
         inspect.metal3.io/disabled: ""
+        bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
     spec:
@@ -652,6 +656,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
     | Field                            | Description                                                                                                                                               |
     | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
     | `inspect.metal3.io/disabled`     | Annotation that skips Ironic hardware inspection. Required for ACM/InfraEnv host inventory so hosts register as agents instead of staying in `inspecting`. |
+    | `bmac.agent-install.openshift.io/hostname` | Sets the hostname on the Agent that registers from this BareMetalHost. Without it, the agent may get a random or DHCP-assigned hostname.                   |
     | `bmc.address`                    | The `redfish-virtualmedia://` scheme avoids the provisioning-network requirement. The system ID at the end is vendor-specific (see tabs above).            |
     | `bootMACAddress`                 | MAC of the **data/production NIC** (e.g. `eno1`) — the interface used for cluster traffic. This is **not** the BMC/iDRAC management port MAC. Using the wrong MAC is a common cause of hosts never getting an IP after booting the discovery ISO. |
     | `disableCertificateVerification` | Usually required since BMCs ship with self-signed certs. Remove it if you have installed valid certificates.                                              |
