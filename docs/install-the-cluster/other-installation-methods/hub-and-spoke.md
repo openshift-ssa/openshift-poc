@@ -549,7 +549,10 @@ oc apply -f {{ hostname }}-bmc-secret.yaml
 
 #### 2. Create the BareMetalHost
 
-The `bmc.address` format is vendor-specific — use the correct scheme and system ID for your hardware:
+The `bmc.address` format is vendor-specific — use the correct scheme and system ID for your hardware.
+
+!!! note
+    The namespace for the InfraEnv and BareMetalHost must be the same.
 
 === "Dell iDRAC"
 
@@ -566,7 +569,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
     spec:
       online: true
-      bootMACAddress: {{ boot_mac_address }}
+      bootMACAddress: {{ boot_mac_address }} # (1)!
       bmc:
         address: idrac-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1
         credentialsName: {{ hostname }}-bmc-secret
@@ -576,6 +579,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         deviceName: /dev/sda
       automatedCleaningMode: disabled
     ```
+
+    1. Must be the MAC of a **physical NIC** (e.g. `eno1`), not the BMC/iDRAC management port. For bonded/VLAN setups, use the first physical bond member's MAC.
 
     !!! warning "Dell-Specific Requirements"
         - **iDRAC firmware** — virtual media via Redfish needs a reasonably current iDRAC. On iDRAC 9, use **4.40.00.00 or newer**; older firmware has flaky or missing virtual-media Redfish support. iDRAC 8 works but is more limited.
@@ -602,7 +607,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
     spec:
       online: true
-      bootMACAddress: {{ boot_mac_address }}
+      bootMACAddress: {{ boot_mac_address }} # (1)!
       bmc:
         address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
         credentialsName: {{ hostname }}-bmc-secret
@@ -612,6 +617,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         deviceName: /dev/sda
       automatedCleaningMode: disabled
     ```
+
+    1. Must be the MAC of a **physical NIC** (e.g. `eno1`), not the BMC/iDRAC management port. For bonded/VLAN setups, use the first physical bond member's MAC.
 
 === "Lenovo XCC"
 
@@ -628,7 +635,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
     spec:
       online: true
-      bootMACAddress: {{ boot_mac_address }}
+      bootMACAddress: {{ boot_mac_address }} # (1)!
       bmc:
         address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
         credentialsName: {{ hostname }}-bmc-secret
@@ -638,6 +645,8 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         deviceName: /dev/sda
       automatedCleaningMode: disabled
     ```
+
+    1. Must be the MAC of a **physical NIC** (e.g. `eno1`), not the BMC/iDRAC management port. For bonded/VLAN setups, use the first physical bond member's MAC.
 
 === "Supermicro"
 
@@ -654,7 +663,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
     spec:
       online: true
-      bootMACAddress: {{ boot_mac_address }}
+      bootMACAddress: {{ boot_mac_address }} # (1)!
       bmc:
         address: redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1
         credentialsName: {{ hostname }}-bmc-secret
@@ -665,7 +674,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       automatedCleaningMode: disabled
     ```
 
-* The namespace for the InfraEnv and BareMetalHost must be the same
+    1. Must be the MAC of a **physical NIC** (e.g. `eno1`), not the BMC/iDRAC management port. For bonded/VLAN setups, use the first physical bond member's MAC.
 
 !!! warning "`bootMACAddress` — Use the Data NIC, Not the BMC"
     The `bootMACAddress` must be the MAC of the **data/production NIC** on the host (e.g. `eno1`) — the interface that will carry cluster traffic and receive an IP via DHCP or `NMStateConfig`. Do **not** use the BMC/iDRAC management port MAC. The BMC has its own dedicated MAC on the management network. Using the wrong MAC is a common cause of hosts never getting an IP after booting the discovery ISO.
