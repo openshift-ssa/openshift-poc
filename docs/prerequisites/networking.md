@@ -94,17 +94,20 @@ The post-installation [Networking](../configure-the-cluster/networking.md) page 
 
 ## Required Firewall Ports
 
-| Port        | Protocol | Source        | Destination   | Purpose                 |
-| ----------- | -------- | ------------- | ------------- | ----------------------- |
-| 6443        | TCP      | All           | Control Plane | Kubernetes API          |
-| 22623       | TCP      | Nodes         | Control Plane | Machine Config Server   |
-| 2379-2380   | TCP      | Control Plane | Control Plane | etcd                    |
-| 10250       | TCP      | All nodes     | All nodes     | Kubelet                 |
-| 6081        | UDP      | All nodes     | All nodes     | Geneve (OVN-Kubernetes) |
-| 9000-9999   | TCP      | All nodes     | All nodes     | Node services           |
-| 500         | UDP      | All nodes     | All nodes     | IPsec IKE               |
-| 4500        | UDP      | All nodes     | All nodes     | IPsec NAT-T             |
-| 30000-32767 | TCP/UDP  | All nodes     | All nodes     | NodePort services       |
+| Port        | Protocol | Source        | Destination   | Purpose                                  |
+| ----------- | -------- | ------------- | ------------- | ---------------------------------------- |
+| 6443        | TCP      | All           | Control Plane | Kubernetes API                           |
+| 22623-22624 | TCP      | Nodes         | Control Plane | Machine Config Server (TLS and insecure) |
+| 2379-2380   | TCP      | Control Plane | Control Plane | etcd                                     |
+| 10250-10259 | TCP      | All nodes     | All nodes     | Kubelet                                  |
+| 6081        | UDP      | All nodes     | All nodes     | Geneve (OVN-Kubernetes)                  |
+| 9000-9999   | TCP/UDP  | All nodes     | All nodes     | Node services                            |
+| 500         | UDP      | All nodes     | All nodes     | IPsec IKE                                |
+| 4500        | UDP      | All nodes     | All nodes     | IPsec NAT-T                              |
+| 30000-32767 | TCP/UDP  | All nodes     | All nodes     | NodePort services                        |
+| ICMP        | —        | All nodes     | All nodes     | Network reachability tests               |
+| 1936        | TCP      | All nodes     | All nodes     | Ingress health check metrics             |
+| ESP         | —        | All nodes     | All nodes     | IPsec Encapsulating Security Payload     |
 
 The table above is **node-to-node**. Also open these paths from clients, the install host, and infrastructure services:
 

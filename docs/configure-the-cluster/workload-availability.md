@@ -357,9 +357,12 @@ spec:
 
 | Profile                     | Description                                                                                       |
 | --------------------------- | ------------------------------------------------------------------------------------------------- |
-| `KubeVirtRelieveAndMigrate` | Load-aware rebalancing for both virtual machines and container workloads using CPU/memory and PSI |
+| `KubeVirtRelieveAndMigrate` | Load-aware rebalancing for both virtual machines and container workloads using CPU/memory and PSI. Requires PSI metrics on all worker nodes — see [Enable PSI](#enable-psi) below. |
 | `TopologyAndDuplicates`     | Balances topology domain constraints and spreads duplicates                                       |
 | `LongLifecycle`             | Evicts long-running and overutilized pods; do not combine with `KubeVirtRelieveAndMigrate`        |
+
+!!! note
+    Only the profiles most relevant to POC workloads are shown. See the [full list of available profiles](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/nodes/controlling-pod-placement-onto-nodes-scheduling#descheduler-profiles) in the official documentation.
 
 `KubeVirtRelieveAndMigrate` is the recommended profile for mixed clusters. It manages both workload types:
 
@@ -406,7 +409,7 @@ The following describes the complete sequence when a node running a virtual mach
 
 5. **Volume and pod cleanup** — Kubernetes deletes the `VolumeAttachment` resources and the pods on the failed node. For VMs using RWX PVCs, this allows the volumes to be mounted on another node immediately.
 
-6. **VM rescheduling** — The `virt-controller` detects the `VirtualMachineInstance` is gone and, if the `VirtualMachine` has `spec.runStrategy: Always` or `spec.running: true`, creates a new `VirtualMachineInstance` on a healthy node.
+6. **VM rescheduling** — The `virt-controller` detects the `VirtualMachineInstance` is gone and, if the `VirtualMachine` has `spec.runStrategy: Always`, creates a new `VirtualMachineInstance` on a healthy node.
 
 7. **VM starts on new node** — The new pod starts, storage is attached, and the VM boots. The guest OS starts fresh (this is not a live migration — it is a cold restart).
 
@@ -424,14 +427,16 @@ Reducing the failover time below 120 seconds (e.g., to 30 seconds) is theoretica
 
 | Parameter                                 | Default | Aggressive | Where                        |
 | ----------------------------------------- | ------- | ---------- | ---------------------------- |
-| `node-monitor-grace-period`               | 40s     | 10s        | kube-controller-manager      |
 | NHC `unhealthyConditions.duration`        | 30s     | 5s         | NodeHealthCheck CR           |
 | SNR `safeTimeToAssumeNodeRebootedSeconds` | 180s    | 30s        | SelfNodeRemediationConfig CR |
 | kubelet `nodeStatusUpdateFrequency`       | 10s     | 5s         | KubeletConfig CR             |
 
+!!! warning "`node-monitor-grace-period` is not directly tunable"
+    The `node-monitor-grace-period` (default 40s) controls how long the kube-controller-manager waits before marking a node `Unknown`. [Modifying this parameter manually is not supported](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/scalability_and_performance/scaling-worker-latency-profiles) — incorrect settings adversely affect cluster stability. The only supported way to change it is through **Worker Latency Profiles**, and no profile reduces it below 40s. Faster detection should rely on NHC duration and SNR remediation timers instead.
+
 ### Complications
 
-**False positives** — Lowering the `node-monitor-grace-period` and NHC duration means that transient network blips, brief CPU starvation, or garbage collection pauses can trigger unnecessary remediations. A node that would have recovered in 15 seconds may instead be rebooted, causing more disruption than the original issue.
+**False positives** — Lowering NHC duration means that transient network blips, brief CPU starvation, or garbage collection pauses can trigger unnecessary remediations. A node that would have recovered in 15 seconds may instead be rebooted, causing more disruption than the original issue.
 
 **Control plane load** — More frequent kubelet heartbeats (`nodeStatusUpdateFrequency`) increase API server load. On large clusters, this compounds quickly.
 

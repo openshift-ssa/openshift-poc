@@ -128,7 +128,7 @@ oc get pods -A | grep -v Running | grep -v Completed
 If you deployed workloads from the [Container Workloads](../container-workloads/index.md) or [Virtual Machine Workloads](../virtual-machine-workloads/index.md) sections, confirm they are still serving traffic. Example if Hello World is installed:
 
 ```bash
-curl -sk https://$(oc get route hello-world -n hello-world -o jsonpath='{.spec.host}')
+curl http://$(oc get route hello-world -n hello-world -o jsonpath='{.spec.host}')
 ```
 
 VMs with `evictionStrategy: LiveMigrate` will live-migrate off nodes before they are drained for reboot. Watch for migration events:
@@ -167,12 +167,12 @@ Once the upgrade completes:
 
 5. Check for firing alerts (not just rule definitions):
 
-  ```bash
-  oc -n openshift-monitoring exec -c prometheus prometheus-k8s-0 -- \
-    curl -s 'http://localhost:9090/api/v1/alerts' | jq '.data.alerts[] | select(.state=="firing") | .labels.alertname'
-  ```
+  Review **Observe → Alerting** in the web console, or use `oc port-forward` to query the Prometheus API locally:
 
-  Or review **Observe → Alerting** in the web console.
+  ```bash
+  oc port-forward -n openshift-monitoring prometheus-k8s-0 9090:9090 &
+  curl -s 'http://localhost:9090/api/v1/alerts' | jq '.data.alerts[] | select(.state=="firing") | .labels.alertname'
+  ```
 
 ## Troubleshooting
 

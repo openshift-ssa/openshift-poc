@@ -6,7 +6,7 @@ An OpenShift cluster consists of two types of nodes working together:
 
 **Control Plane Nodes** (minimum 3 for high availability)
 
-- Run the Kubernetes API server, etcd, scheduler, and controller manager
+- Run the Kubernetes API server, etcd, scheduler, controller manager, and OpenShift-specific services (OpenShift API server, OpenShift controller manager, OAuth server)
 - Manage cluster state, scheduling decisions, and API requests
 - Should not run general workloads in production (but are schedulable in compact 3-node clusters)
 
@@ -39,16 +39,16 @@ graph TD
 
 ### Key Components
 
-| Component               | Runs On       | Purpose                                                |
-| ----------------------- | ------------- | ------------------------------------------------------ |
-| API Server              | Control Plane | REST API for all cluster operations                    |
-| etcd                    | Control Plane | Distributed key-value store for cluster state          |
-| Scheduler               | Control Plane | Assigns pods to nodes based on resource availability   |
-| Controller Manager      | Control Plane | Runs controllers that regulate cluster state           |
-| Kubelet                 | All Nodes     | Agent that ensures containers are running on each node |
-| OVN-Kubernetes          | All Nodes     | Software-defined networking for pod communication      |
-| CRI-O                   | All Nodes     | Container runtime                                      |
-| Machine Config Operator | Control Plane | Manages node OS configuration via MachineConfig CRs    |
+| Component               | Runs On       | Purpose                                                                 |
+| ----------------------- | ------------- | ----------------------------------------------------------------------- |
+| API Server              | Control Plane | REST API for all cluster operations                                     |
+| etcd                    | Control Plane | Distributed key-value store for cluster state                           |
+| Scheduler               | Control Plane | Assigns pods to nodes based on resource availability                    |
+| Controller Manager      | Control Plane | Runs controllers that regulate cluster state                            |
+| Kubelet                 | All Nodes     | Agent that ensures containers are running on each node                  |
+| OVN-Kubernetes          | All Nodes     | Software-defined networking for pod communication                       |
+| CRI-O                   | All Nodes     | Container runtime                                                       |
+| Machine Config Operator | All Nodes     | Operator on control plane; daemon on all nodes applies OS configuration |
 
 ### Networking
 
@@ -66,7 +66,7 @@ External traffic enters the cluster through the Ingress VIP, which routes to the
 
 OpenShift separates storage concerns:
 
-- **etcd** — Local NVMe/SSD on control plane nodes (low latency required)
+- **etcd** — Backed by low-latency storage on control plane nodes (NVMe or SSD recommended)
 - **Persistent Volumes** — Provided by a CSI driver from your storage vendor
 - **Ephemeral storage** — Node-local for container scratch space
 

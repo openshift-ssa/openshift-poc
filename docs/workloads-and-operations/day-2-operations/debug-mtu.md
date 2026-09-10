@@ -20,27 +20,31 @@ Symptoms that point to MTU problems rather than routing or firewall issues:
 OpenShift uses an overlay network (OVN-Kubernetes) which encapsulates pod traffic. Each layer adds overhead:
 
 ```
-┌─────────────────────────────────────────────┐
-│ Application payload                          │
-├─────────────────────────────────────────────┤
-│ Inner IP + TCP headers (40 bytes)           │
-├─────────────────────────────────────────────┤
-│ Overlay encapsulation (Geneve = 50 bytes)   │
-├─────────────────────────────────────────────┤
-│ Outer IP + UDP headers (28 bytes)           │
-├─────────────────────────────────────────────┤
-│ Physical NIC MTU                            │
-└─────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│ Application payload                                   │
+├──────────────────────────────────────────────────────┤
+│ Inner IP + TCP headers (40 bytes)                    │
+├──────────────────────────────────────────────────────┤
+│ Geneve encapsulation (~100 bytes total)              │
+│  ├ Outer IP header (20 bytes)                        │
+│  ├ Outer UDP header (8 bytes)                        │
+│  ├ Geneve base header (8 bytes)                      │
+│  └ Geneve options + extensions + padding (64 bytes)  │
+├──────────────────────────────────────────────────────┤
+│ Physical NIC MTU                                     │
+└──────────────────────────────────────────────────────┘
 ```
 
-| Layer                  | Typical MTU      | Notes                                |
-| ---------------------- | ---------------- | ------------------------------------ |
-| Physical NIC           | 1500 or 9000     | Set at the switch/NIC level          |
-| Cluster network (pods) | 1400 or 8900     | Physical MTU minus overlay overhead  |
-| Geneve overhead        | 50 bytes         | OVN-Kubernetes default encapsulation |
-| Service network        | Inherits pod MTU | ClusterIP traffic stays in overlay   |
+The total Geneve encapsulation overhead is **~100 bytes**, which includes the outer IP header, outer UDP header, Geneve base header, Geneve options/extensions, and alignment padding. OpenShift reserves exactly 100 bytes for this overhead.
 
-If the physical MTU is 1500, the pod MTU must be 1400 (1500 − 100 for Geneve + outer headers). If any hop between the pod and the destination has a lower MTU and does not fragment or return ICMP "Fragmentation Needed," packets are silently dropped.
+| Layer                       | Typical MTU      | Notes                                |
+| --------------------------- | ---------------- | ------------------------------------ |
+| Physical NIC                | 1500 or 9000     | Set at the switch/NIC level          |
+| Cluster network (pods)      | 1400 or 8900     | Physical MTU minus 100 bytes overlay |
+| Geneve encapsulation total  | ~100 bytes       | OVN-Kubernetes default encapsulation |
+| Service network             | Inherits pod MTU | ClusterIP traffic stays in overlay   |
+
+If the physical MTU is 1500, the pod MTU must be 1400 (1500 − 100 for Geneve encapsulation). If any hop between the pod and the destination has a lower MTU and does not fragment or return ICMP "Fragmentation Needed," packets are silently dropped.
 
 ## Step 1: Check the Cluster MTU Configuration
 
@@ -177,6 +181,9 @@ spec:
     ovnKubernetesConfig:
       mtu: 1400
 ```
+
+!!! danger "Do Not Patch MTU Directly on a Running Cluster"
+    The YAML above is shown for reference only. On an already-installed cluster, **do not** directly patch the `mtu` field — doing so can cause a cluster-wide network outage. Post-install MTU changes require the official migration procedure using `spec.migration` fields to safely roll out the new MTU across all nodes. See the [Official MTU migration procedure](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/networking/changing-cluster-network-mtu) for the correct steps.
 
 !!! warning
     Changing the cluster MTU requires a rolling reboot of all nodes. Plan for maintenance downtime.

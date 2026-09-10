@@ -90,7 +90,7 @@ Label the node as a storage node **only if you are installing OpenShift Data Fou
             name: thin-pool-1
             sizePercent: 90
             overprovisionRatio: 10
-            chunkSizeCalculationPolicy: Static
+            chunkSizeCalculationPolicy: Host
             metadataSizeCalculationPolicy: Host
   ```
 
@@ -700,7 +700,7 @@ With `inspect.metal3.io/disabled` set, each host transitions through: `registeri
 After the BareMetalHost is `available`, the Bare Metal Operator attaches the InfraEnv discovery ISO and powers the host on:
 
 1. **Power on** — The Bare Metal Operator sends a power-on command via the BMC (iDRAC, iLO, XCC, etc.).
-2. **Hardware POST** — The server runs its Power-On Self-Test. Depending on the hardware, this alone can take **5–15 minutes**.
+2. **Hardware POST** — The server runs its Power-On Self-Test. Depending on the hardware, this alone can take **5–15 minutes**. To reduce this, [disable the POST memory test](../../prerequisites/infrastructure.md#disable-post-memory-test) on POC hardware.
 3. **Virtual media boot** — The server boots the discovery ISO mounted by the BMC (not PXE / IPA inspection).
 4. **Agent startup** — The assisted installer agent starts and applies any matching `NMStateConfig`.
 5. **Call home** — The agent registers with the hub; `oc get agents` shows the new host.

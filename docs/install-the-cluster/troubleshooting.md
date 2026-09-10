@@ -68,7 +68,7 @@ This usually happens when you are using a web proxy and the certificate being pr
 ### NTP Validation Fails
 
 - Verify port 123/UDP is open to NTP servers
-- Check `additionalNtpSources` in `agent-config.yaml`
+- Check `additionalNTPSources` in `agent-config.yaml`
 
 ### Image Pull Failures (Disconnected)
 

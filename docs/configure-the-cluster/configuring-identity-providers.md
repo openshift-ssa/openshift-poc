@@ -255,8 +255,11 @@ metadata:
   namespace: ldap-sync
 spec:
   schedule: "*/30 * * * *"
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
+      backoffLimit: 0
+      ttlSecondsAfterFinished: 1800
       template:
         spec:
           serviceAccountName: ldap-group-syncer

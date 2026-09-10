@@ -110,7 +110,7 @@ metadata:
   name: appliance
   namespace: ova-appliance
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       domain:
@@ -193,16 +193,6 @@ Navigate to **Virtualization** → **VirtualMachines** → select the `ova-appli
 ### Expose a Single Port via Service and Route
 
 If the appliance serves HTTP/HTTPS (e.g. a management UI on port 443):
-
-```bash
-oc create service clusterip appliance-ui \
-  --tcp=443:443 \
-  -n ova-appliance
-
-oc annotate service appliance-ui \
-  "kubevirt.io/domain=appliance" \
-  -n ova-appliance
-```
 
 ```yaml
 apiVersion: v1

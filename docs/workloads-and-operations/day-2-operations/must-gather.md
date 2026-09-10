@@ -45,13 +45,13 @@ Operators ship their own must-gather images that collect deeper diagnostics for 
 ### OpenShift Virtualization
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v4.17
+oc adm must-gather --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v{{ ocp_version }}
 ```
 
 ### OpenShift Data Foundation
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v4.17
+oc adm must-gather --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v{{ ocp_version }}
 ```
 
 ### OpenShift Logging
@@ -63,7 +63,7 @@ oc adm must-gather --image=registry.redhat.io/openshift-logging/cluster-logging-
 ### Advanced Cluster Management
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/rhacm2/acm-must-gather-rhel9:v2.12
+oc adm must-gather --image=registry.redhat.io/rhacm2/acm-must-gather-rhel9:v2.17
 ```
 
 ### Network Observability
@@ -78,8 +78,8 @@ Combine multiple images in a single run:
 
 ```bash
 oc adm must-gather \
-  --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v4.17 \
-  --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v4.17
+  --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v{{ ocp_version }} \
+  --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v{{ ocp_version }}
 ```
 
 ## Scoped Collection

@@ -8,7 +8,7 @@ OpenShift Logging provides centralized log collection, storage, and querying for
 | ---------------------------------- | ------------------------------------------ | ----------------------------------------------------------- |
 | Loki Operator                      | `openshift-operators-redhat`               | Manages the LokiStack log store (receives, indexes, stores) |
 | Red Hat OpenShift Logging Operator | `openshift-logging`                        | Manages log collection and forwarding (Vector collector)    |
-| Cluster Observability Operator     | `openshift-cluster-observability-operator` | Adds Logs tab to the web console (optional)                 |
+| Cluster Observability Operator     | `openshift-operators`                      | Adds Logs tab to the web console (optional)                 |
 
 !!! info
     The Loki Operator and the Red Hat OpenShift Logging Operator must use the same major and minor version (e.g., both on `stable-6.6`).
@@ -345,7 +345,15 @@ The log collector requires a service account with specific cluster roles to read
 
 ## Create the ClusterLogForwarder
 
-1. Create the ClusterLogForwarder to define how logs are collected and forwarded to the LokiStack:
+1. Create the `openshift-service-ca.crt` ConfigMap for TLS. The service CA injection annotation tells OpenShift to automatically populate this ConfigMap with the cluster's service-serving CA bundle, which the log collector needs to trust the LokiStack gateway's TLS certificate:
+
+    ```bash
+    oc create configmap openshift-service-ca.crt -n openshift-logging
+    oc annotate configmap openshift-service-ca.crt -n openshift-logging \
+      service.beta.openshift.io/inject-cabundle=true
+    ```
+
+2. Create the ClusterLogForwarder to define how logs are collected and forwarded to the LokiStack:
 
     ```yaml
     apiVersion: observability.openshift.io/v1
@@ -386,7 +394,7 @@ The log collector requires a service account with specific cluster roles to read
 !!! warning "TLS CA Block is Required"
     The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
 
-2. To also collect audit logs, add `audit` to `inputRefs` and re-apply:
+3. To also collect audit logs, add `audit` to `inputRefs` and re-apply:
 
     ```yaml
     pipelines:

@@ -38,7 +38,10 @@ For SNO, all three DNS records point to the single node's IP address. No VIPs ar
 
 ### Reverse DNS (PTR Records)
 
-Node A records (for example `cp01.{{ cluster_name }}.{{ base_domain }}`) and reverse DNS (PTR) are **recommended**, not required for installation. Without PTR records, nodes may register with incorrect hostnames during provisioning.
+Node A records (for example `cp01.{{ cluster_name }}.{{ base_domain }}`) and reverse DNS (PTR) are **recommended**, not required for IPI/Assisted Installer installations. However, without PTR records, nodes may register with MAC-based or generic hostnames during provisioning (e.g., `localhost` or `dhcp-192-168-1-10`), which makes troubleshooting and log correlation significantly harder.
+
+!!! warning "PTR Records Are Required for UPI"
+    For User Provisioned Infrastructure (UPI) installations, PTR records **are required**. The installer validates reverse DNS for all node IPs during a UPI install.
 
 ```bash
 dig +noall +answer -x {{ node_ip }}

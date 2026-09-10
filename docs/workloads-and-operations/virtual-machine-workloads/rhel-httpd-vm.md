@@ -30,7 +30,7 @@ Choose one of the two options below.
       name: rhel-httpd
       namespace: rhel-httpd
     spec:
-      running: true
+      runStrategy: Always
       template:
         spec:
           domain:

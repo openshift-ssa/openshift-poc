@@ -129,7 +129,7 @@ kind: AgentConfig
 metadata:
   name: poc
 rendezvousIP: 10.0.0.7        # This should be an IP of one of your nodes, preferably the first master node below. 
-additionalNtpSources:
+additionalNTPSources:
   - {{ ntp_server_1 }}
   - {{ ntp_server_2 }}
 hosts:
@@ -193,7 +193,7 @@ Repeat the host entry for each control plane and worker node, updating hostname,
 !!! note
     Notice the inconsistent labels and spellings in the OpenShift configs: 
     - `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza. 
-    - `additionalNtpSources` is used in agent-config, but `additionalNTPServers` in install-config.
+    - `additionalNTPSources` is used in agent-config, but `additionalNTPServers` in install-config.
 
 ### Active-Backup Bond (No VLAN)
 

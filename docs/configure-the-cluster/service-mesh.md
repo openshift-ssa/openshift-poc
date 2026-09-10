@@ -7,6 +7,9 @@
 
 OpenShift Service Mesh 3.x provides Istio ambient mode — a sidecar-less architecture that uses node-level Layer 4 (L4) proxies (ZTunnel) and optional Layer 7 (L7) waypoint proxies. This reduces resource overhead and operational complexity compared to traditional sidecar injection.
 
+!!! note "Ambient Mode GA Version"
+    Ambient mode reached General Availability (GA) in OpenShift Service Mesh 3.2. Earlier 3.x versions (3.0, 3.1) provided ambient mode as Developer Preview or Tech Preview only. Ensure you are running Service Mesh 3.2 or later for production use of ambient mode.
+
 ## Prerequisites
 
 - OpenShift Container Platform

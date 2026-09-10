@@ -2,6 +2,9 @@
 
 If you are looking at OpenShift Platform Plus (OPP) and are targeting ODF to be your storage provider, here's how to install it. This assumes your worker nodes have an additional data disk, as documented in the prerequisites. 
 
+!!! warning "Minimum Node Requirement"
+    ODF internal mode requires a minimum of 3 nodes with available data disks for Ceph replication. A 2-node cluster cannot run ODF internal mode.
+
 ## Install Local Storage Operator
 
 1. Go to Ecosystem -> Software Catalog -> filter for "Local Storage" -> click the tile
@@ -49,7 +52,7 @@ oc get storageclass
 oc get volumesnapshotclass
 ```
 
-Expect the StorageCluster to show a healthy phase, Ceph pods `Running`, and StorageClasses such as `ocs-storagecluster-ceph-rbd` (block) and `ocs-storagecluster-cephfs` (filesystem). ODF uses Ceph on local disks — `dm-multipath` is not required for ODF itself.
+Expect the StorageCluster to show a healthy phase, Ceph pods `Running`, and StorageClasses such as `ocs-storagecluster-ceph-rbd` (block) and `ocs-storagecluster-cephfs` (filesystem). If you selected "Set default StorageClass for virtualization" in step 9, you will also see `ocs-storagecluster-ceph-rbd-virtualization` — this StorageClass carries the `storageclass.kubevirt.io/is-default-virt-class: "true"` annotation and is used by OpenShift Virtualization as its default storage class. ODF uses Ceph on local disks — `dm-multipath` is not required for ODF itself.
 
 For OpenShift Virtualization, confirm a StorageClass is annotated as the default virt class (`storageclass.kubevirt.io/is-default-virt-class: "true"`) if you selected that option in the wizard.
 

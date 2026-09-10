@@ -27,7 +27,7 @@ sudo reboot
 OCP_VERSION={{ ocp_version }}
 wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-${OCP_VERSION}/openshift-install-linux.tar.gz" -P /tmp
 sudo tar -xvzf /tmp/openshift-install-linux.tar.gz -C /usr/local/bin
-wget "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable-${OCP_VERSION}/openshift-client-linux.tar.gz" -P /tmp
+wget "https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable-${OCP_VERSION}/openshift-client-linux.tar.gz" -P /tmp
 sudo tar -xvzf /tmp/openshift-client-linux.tar.gz -C /usr/local/bin
 rm -f /tmp/openshift-install-linux.tar.gz /tmp/openshift-client-linux.tar.gz
 sudo dnf install -y nmstate git podman wget jq skopeo nmap-ncat

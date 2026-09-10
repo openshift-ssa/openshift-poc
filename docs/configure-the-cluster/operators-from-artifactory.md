@@ -50,7 +50,7 @@ If you used a tool like `oc-mirror` to copy public operators (e.g., from `regist
 
 You must tell OpenShift to redirect those requests to Artifactory by applying an **ImageDigestMirrorSet**.
 
-If you used `oc-mirror`, it will have automatically generated this YAML file for you in its output directory (usually named `imageContentSourcePolicy.yaml` or `imageDigestMirrorSet.yaml`). Apply it:
+If you used `oc-mirror`, it will have automatically generated this YAML file for you in its output directory (usually named `imageDigestMirrorSet.yaml`). Older versions of `oc-mirror` may generate the deprecated `imageContentSourcePolicy.yaml` instead — if so, the file still works but consider upgrading `oc-mirror` to get the current `ImageDigestMirrorSet` API. Apply it:
 
 ```bash
 oc apply -f <path-to-mirror-set-yaml>

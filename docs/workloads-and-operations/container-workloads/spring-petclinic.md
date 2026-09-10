@@ -20,6 +20,12 @@ The [Spring Pet Clinic](https://github.com/spring-projects/spring-petclinic) is 
 
   This builds the application from source using the OpenShift Java builder image.
 
+  !!! note "Image Stream Availability"
+      The `openjdk-21-ubi8` tag requires OpenShift 4.15 or later. If your cluster is older, the tag may not exist. Verify available tags with:
+      ```bash
+      oc get is java -n openshift -o jsonpath='{.spec.tags[*].name}'
+      ```
+
 3. Watch the build progress:
 
   ```bash

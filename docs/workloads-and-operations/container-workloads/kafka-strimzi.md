@@ -212,5 +212,6 @@ oc get kafka my-cluster -n kafka -o jsonpath='{.status.listeners[?(@.name=="exte
 ```bash
 oc delete kafka my-cluster -n kafka
 oc delete subscription strimzi-kafka-operator -n openshift-operators
+oc delete csv -n openshift-operators -l operators.coreos.com/strimzi-kafka-operator.openshift-operators
 oc delete project kafka
 ```

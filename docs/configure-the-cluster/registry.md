@@ -1,6 +1,17 @@
 # Configure Registry
 
-The OpenShift internal image registry is deployed by default with ephemeral storage. Images stored in the registry are lost if the registry pod is rescheduled. Configure it to use a Persistent Volume Claim (PVC).
+[Red Hat Documentation — Configuring the registry for bare metal](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/registry/index#configuring-registry-storage-baremetal)
+
+On bare metal and vSphere, the OpenShift Image Registry Operator is deployed with `managementState: Removed` because the installer does not automatically provision storage. You must first set it to `Managed`, then configure persistent storage.
+
+## Set the Registry to Managed
+
+Before configuring storage, change the management state from `Removed` to `Managed`:
+
+```bash
+oc patch configs.imageregistry.operator.openshift.io cluster --type merge \
+  --patch '{"spec":{"managementState":"Managed"}}'
+```
 
 ## Configure the Registry with Persistent Storage
 
@@ -24,7 +35,14 @@ The OpenShift internal image registry is deployed by default with ephemeral stor
   ```
 
 !!! warning "HA Filesystem Storage"
-    RWX file storage is required for `replicas: 2` (the default RollingUpdate strategy). If you only have ReadWriteOnce (RWO) block or filesystem storage, set `replicas: 1` and `rolloutStrategy: Recreate` in the Config below.
+    RWX file storage is required for `replicas: 2` (the default RollingUpdate strategy). If you only have ReadWriteOnce (RWO) block or filesystem storage, set `replicas: 1` and `rolloutStrategy: Recreate`:
+
+    ```bash
+    oc patch config.imageregistry.operator.openshift.io/cluster --type=merge \
+      -p '{"spec":{"rolloutStrategy":"Recreate","replicas":1}}'
+    ```
+
+    Then change the PVC `accessModes` to `ReadWriteOnce` and update the Config CR `replicas` to `1` in the YAML below.
 
 3. From the WebUI, go to Home -> API Explorer
 4. Filter for "Config", make sure to click on the one in Group of "imageregistry.operator.openshift.io"

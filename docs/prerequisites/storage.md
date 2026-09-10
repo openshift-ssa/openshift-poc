@@ -138,6 +138,9 @@ The following practices help meet those numbers:
 
 Verify disk performance:
 
+!!! note
+    This image requires authentication. Run `podman login registry.redhat.io` first if you haven't already.
+
 ```bash
 podman run --privileged --rm -v /var/lib/etcd:/var/lib/etcd:Z \
   registry.redhat.io/ubi9/ubi-minimal:latest \

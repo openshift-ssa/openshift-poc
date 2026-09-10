@@ -59,7 +59,7 @@ The terminal comes pre-loaded with common CLI tools including `oc`, `kubectl`, `
 To change the default idle timeout, edit the `DevWorkspace` operator configuration:
 
 ```yaml
-apiVersion: workspace.devfile.io/v1alpha1
+apiVersion: controller.devfile.io/v1alpha1
 kind: DevWorkspaceOperatorConfig
 metadata:
   name: devworkspace-operator-config

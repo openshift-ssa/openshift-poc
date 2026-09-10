@@ -11,7 +11,10 @@ Provision compute resources that meet or exceed the minimum requirements for eac
 
 ## Required Hardware
 
-Consider these minimum values — the more the better. 
+Consider these recommended POC values — the more the better. 
+
+!!! note "Official Minimums"
+    The official OpenShift minimums are 4 vCPU / 16 GB (control plane) and 2 vCPU / 8 GB (worker), but POC workloads — especially OpenShift Virtualization — need significantly more.
 
 ### Single Cluster Installation
 
@@ -450,6 +453,8 @@ Ensure the following on all nodes:
 ### Disable POST Memory Test
 
 Servers with large amounts of RAM (512 GB+) can spend 5–10 minutes running full memory diagnostics during every boot. For a POC where clusters are built and torn down frequently, disabling the POST memory test cuts each reboot cycle significantly with no reliability trade-off.
+
+For a detailed runbook covering Dell, HPE, Cisco, and Lenovo — including when to disable, automation with Ansible, and a handback checklist — see [Faster Bare-Metal Boots in OpenShift PoCs](https://thomasphall.github.io/posts/poc-faster-bare-metal-boot-disable-memory-check/).
 
 #### Dell iDRAC
 
