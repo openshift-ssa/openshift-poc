@@ -429,6 +429,53 @@ The InfraEnv defines the discovery environment for spoke cluster hosts. ACM uses
   oc apply -f infraenv.yaml
   ```
 
+### Static IP Configuration (Optional)
+
+If the spoke cluster nodes require static IPs (no DHCP), create `NMStateConfig` resources **before** creating the BareMetalHosts. The InfraEnv injects these into the discovery ISO automatically via the label selector.
+
+```yaml
+apiVersion: agent-install.openshift.io/v1beta1
+kind: NMStateConfig
+metadata:
+  name: {{ hostname }}
+  namespace: {{ spoke_cluster_name }}
+  labels:
+    infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
+spec:
+  config:
+    interfaces:
+      - name: eno1
+        type: ethernet
+        state: up
+        ipv4:
+          enabled: true
+          address:
+            - ip: {{ host_ip }}
+              prefix-length: {{ prefix_length }}
+          dhcp: false
+    dns-resolver:
+      config:
+        server:
+          - {{ dns_server }}
+    routes:
+      config:
+        - destination: 0.0.0.0/0
+          next-hop-address: {{ gateway }}
+          next-hop-interface: eno1
+  interfaces:
+    - name: eno1
+      macAddress: {{ boot_mac_address }}
+```
+
+!!! note
+    The `interfaces[].macAddress` at the bottom maps the NMState config to the correct physical NIC. The interface name (`eno1`) must match the actual NIC name on the host. If you are unsure, boot one host with DHCP first and check `ip link`.
+
+Create one `NMStateConfig` per host, then apply them all before proceeding:
+
+```bash
+oc apply -f {{ hostname }}-nmstate.yaml
+```
+
 ### Add Host Inventory via BMC
 
 Once the InfraEnv is created, register bare metal hosts. ACM will automatically boot each host with the discovery ISO via Redfish virtual media — no manual ISO download or mounting is required.
@@ -662,47 +709,6 @@ Before creating the cluster, verify all agents are discovered and approve them. 
 
   !!! tip
       If you don't set roles manually, the installer will auto-assign them, but it's better to be explicit — especially if your control plane nodes differ from your workers in hardware specs.
-
-### Static IP Configuration (Optional)
-
-If the spoke cluster nodes require static IPs (no DHCP), create `NMStateConfig` resources **before** the hosts boot. The InfraEnv injects these into the discovery ISO automatically.
-
-```yaml
-apiVersion: agent-install.openshift.io/v1beta1
-kind: NMStateConfig
-metadata:
-  name: {{ hostname }}
-  namespace: {{ spoke_cluster_name }}
-  labels:
-    infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
-spec:
-  config:
-    interfaces:
-      - name: eno1
-        type: ethernet
-        state: up
-        ipv4:
-          enabled: true
-          address:
-            - ip: {{ host_ip }}
-              prefix-length: {{ prefix_length }}
-          dhcp: false
-    dns-resolver:
-      config:
-        server:
-          - {{ dns_server }}
-    routes:
-      config:
-        - destination: 0.0.0.0/0
-          next-hop-address: {{ gateway }}
-          next-hop-interface: eno1
-  interfaces:
-    - name: eno1
-      macAddress: {{ boot_mac_address }}
-```
-
-!!! note
-    The `interfaces[].macAddress` at the bottom maps the NMState config to the correct physical NIC. The interface name (`eno1`) must match the actual NIC name on the host. If you are unsure, boot one host with DHCP first and check `ip link`.
 
 ### Create the Cluster
 
