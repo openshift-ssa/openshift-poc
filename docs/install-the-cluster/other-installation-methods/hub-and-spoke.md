@@ -442,9 +442,16 @@ The InfraEnv defines the discovery environment for spoke cluster hosts. ACM uses
   oc apply -f infraenv.yaml
   ```
 
-### Static IP Configuration (Optional)
+### Static IP Configuration
 
-If the spoke cluster nodes require static IPs (no DHCP), create `NMStateConfig` resources **before** creating the BareMetalHosts. The InfraEnv injects these into the discovery ISO automatically via the label selector.
+When the discovery ISO boots on a host, the agent inside needs a working network connection to call home to the hub and register. Without DHCP on the data network, the agent has no IP and cannot reach the hub — the host will boot but never appear as an Agent.
+
+`NMStateConfig` resources provide this static network configuration. The InfraEnv picks up all `NMStateConfig` resources that match its label selector and bakes them into the discovery ISO. When a host boots, the agent matches the config to the host by MAC address and configures the NIC before phoning home.
+
+!!! warning
+    You must create one `NMStateConfig` for **every host** that will be registered as a BareMetalHost. If a host does not have a matching `NMStateConfig`, it will boot the discovery ISO but have no network connectivity and will never register as an Agent.
+
+Create all `NMStateConfig` resources **before** creating the BareMetalHosts.
 
 ```yaml
 apiVersion: agent-install.openshift.io/v1beta1
@@ -481,9 +488,12 @@ spec:
 ```
 
 !!! note
-    The `interfaces[].macAddress` at the bottom maps the NMState config to the correct physical NIC. The interface name (`eno1`) must match the actual NIC name on the host. If you are unsure, boot one host with DHCP first and check `ip link`.
+    The `interfaces[].macAddress` at the bottom maps the NMState config to the correct physical NIC. This must be the same MAC used in the BareMetalHost `bootMACAddress` field. The interface name (`eno1`) must match the actual NIC name on the host. If you are unsure, boot one host with a live ISO and check `ip link`.
 
-Create one `NMStateConfig` per host, then apply them all before proceeding:
+!!! tip
+    This is only the **discovery stage** networking — enough for the agent to phone home and register. The final cluster networking (bonds, VLANs, production static IPs) is configured separately in the cluster install manifests.
+
+Repeat for every host, updating `name`, `host_ip`, and `macAddress` for each. Then apply them all:
 
 ```bash
 oc apply -f {{ hostname }}-nmstate.yaml
