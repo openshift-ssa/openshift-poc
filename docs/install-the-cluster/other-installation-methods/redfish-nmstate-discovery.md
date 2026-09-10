@@ -157,6 +157,9 @@ metadata:
   labels:
     infraenvs.agent-install.openshift.io: ${SPOKE_CLUSTER}
 spec:
+  interfaces:
+    - name: ${SELECTED_ID}
+      macAddress: "${SELECTED_MAC}"
   config:
     interfaces:
       - name: ${SELECTED_ID}
@@ -177,9 +180,6 @@ spec:
         - destination: 0.0.0.0/0
           next-hop-address: ${GATEWAY}
           next-hop-interface: ${SELECTED_ID}
-  interfaces:
-    - name: ${SELECTED_ID}
-      macAddress: "${SELECTED_MAC}"
 EOF
 ```
 

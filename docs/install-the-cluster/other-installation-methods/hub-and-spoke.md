@@ -470,6 +470,9 @@ metadata:
   labels:
     infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }}
 spec:
+  interfaces:
+    - name: eno1
+      macAddress: {{ boot_mac_address }}
   config:
     interfaces:
       - name: eno1
@@ -490,9 +493,6 @@ spec:
         - destination: 0.0.0.0/0
           next-hop-address: {{ gateway }}
           next-hop-interface: eno1
-  interfaces:
-    - name: eno1
-      macAddress: {{ boot_mac_address }}
 ```
 
 !!! note
