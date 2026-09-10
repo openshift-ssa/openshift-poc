@@ -537,6 +537,9 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
 
     * The namespace for the InfraEnv and BareMetalHost must be the same
 
+    !!! warning "`bootMACAddress` — Use the Data NIC, Not the BMC"
+        The `bootMACAddress` must be the MAC of the **data/production NIC** on the host (e.g. `eno1`) — the interface that will carry cluster traffic and receive an IP via DHCP or `NMStateConfig`. Do **not** use the BMC/iDRAC management port MAC. The BMC has its own dedicated MAC on the management network. Using the wrong MAC is a common cause of hosts never getting an IP after booting the discovery ISO.
+
     !!! warning "Dell-Specific Requirements"
         - **iDRAC firmware** — virtual media via Redfish needs a reasonably current iDRAC. On iDRAC 9, use **4.40.00.00 or newer**; older firmware has flaky or missing virtual-media Redfish support. iDRAC 8 works but is more limited.
         - **Enterprise/Datacenter license** — virtual media requires it. The Express license does not expose the virtual media endpoint.
@@ -627,7 +630,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
     | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
     | `inspect.metal3.io/disabled`     | Annotation that skips Ironic hardware inspection. Required for ACM/InfraEnv host inventory so hosts register as agents instead of staying in `inspecting`. |
     | `bmc.address`                    | The `redfish-virtualmedia://` scheme avoids the provisioning-network requirement. The system ID at the end is vendor-specific (see tabs above).            |
-    | `bootMACAddress`                 | MAC of the NIC the host boots from — **not** the BMC's MAC address.                                                                                      |
+    | `bootMACAddress`                 | MAC of the **data/production NIC** (e.g. `eno1`) — the interface used for cluster traffic. This is **not** the BMC/iDRAC management port MAC. Using the wrong MAC is a common cause of hosts never getting an IP after booting the discovery ISO. |
     | `disableCertificateVerification` | Usually required since BMCs ship with self-signed certs. Remove it if you have installed valid certificates.                                              |
     | `bootMode`                       | `UEFI` (default), `legacy`, or `UEFISecureBoot`.                                                                                                         |
     | `rootDeviceHints`                | Optional but recommended so Ironic installs to the correct disk. Can also match on `model`, `serialNumber`, `wwn`, `minSizeGigabytes`, etc.               |
