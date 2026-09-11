@@ -168,7 +168,8 @@ Create a dedicated bucket and secret named `loki-s3` in `netobserv-loki`. This s
      --from-literal=bucketnames="netobserv-loki-bucket" \
      --from-literal=endpoint="https://s3.openshift-storage.svc:443" \
      --from-literal=access_key_id="$ACCESS_KEY" \
-     --from-literal=access_key_secret="$SECRET_KEY"
+     --from-literal=access_key_secret="$SECRET_KEY" \
+     --from-literal=forcepathstyle="true"
    ```
 
 ### Using S3 Compatible Storage (NetApp StorageGRID, etc.)

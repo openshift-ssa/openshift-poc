@@ -64,6 +64,13 @@ A single bond or NIC carrying all cluster traffic — management, storage, and V
 | ----- | ----------- | ------- | ---- |
 | bond0 | All traffic | 802.3ad | 1500 |
 
+!!! warning "MTU consistency with storage"
+    If the storage array/VLAN is configured for jumbo frames (MTU 9000), the host interface/VLAN carrying storage traffic must also be 9000 end-to-end. Do not recommend MTU 1500 for all traffic and MTU 9000 for storage as simultaneous defaults. Choose one:
+
+    **(a)** Run storage on the same bond at MTU 1500 and do not enable jumbo on the array, or
+
+    **(b)** If the array/VLAN is 9000, configure a dedicated storage interface/VLAN at 9000.
+
 ### Production Multi-Bond Architecture
 
 In production environments with OpenShift Virtualization, the recommended architecture separates traffic across two bonds:
@@ -158,9 +165,13 @@ The following external endpoints must be reachable from all cluster nodes (unles
 
 | Destination        | Port | Purpose                               |
 | ------------------ | ---- | ------------------------------------- |
-| api.openshift.com  | 443  | Cluster tokens and update checks      |
-| console.redhat.com | 443  | Assisted Installer, telemetry         |
-| sso.redhat.com     | 443  | Authentication for console.redhat.com |
+| api.openshift.com                                    | 443  | Cluster tokens and update checks                                                      |
+| console.redhat.com                                   | 443  | Assisted Installer, telemetry                                                         |
+| sso.redhat.com                                       | 443  | Authentication for console.redhat.com                                                 |
+| `*.apps.{{ cluster_name }}.{{ base_domain }}`        | 443  | Cluster access, authentication, and Operator health checks (oauth, console, ingress-canary) |
+
+!!! note "If wildcard firewall rules are not allowed"
+    If a wildcard is not allowed, explicitly allow `oauth-openshift.apps.{{ cluster_name }}.{{ base_domain }}`, `canary-openshift-ingress-canary.apps.{{ cluster_name }}.{{ base_domain }}`, and `console-openshift-console.apps.{{ cluster_name }}.{{ base_domain }}`.
 
 **Installation and Release Artifacts**
 
@@ -195,11 +206,17 @@ curl -s -o /dev/null -w "%{http_code}" https://mirror.openshift.com
 
 ### Machine Network
 
-All cluster nodes must reside on the same Layer 2 network or have Layer 3 routing between them. With static IPs, each node's network configuration is provided during the Assisted Installer setup.
+For cluster-managed networking (Assisted/Agent-based default, keepalived VIPs), all control plane nodes and the API/Ingress VIPs must be on the same contiguous subnet (same L2 broadcast domain). Spanning multiple subnets requires user-managed networking plus an external load balancer. Node-to-node L3 routing alone cannot fail over the API or Ingress VIP. With static IPs, each node's network configuration is provided during the Assisted Installer setup.
 
 ### NTP
 
 All cluster nodes must have synchronized time. Provide an NTP server that is reachable from the cluster hosts.
+
+!!! warning "Static-IP environments require explicit NTP configuration"
+    With static IPs and no DHCP, DHCP NTP options are not available. Just having a reachable NTP server is not enough — nodes must be explicitly configured to use it:
+
+    - **Assisted Installer**: set `additional_ntp_source` or `ntp_sources` in the API
+    - **Agent-based**: set `additionalNTPSources` in `agent-config.yaml`
 
 ### Proxy Configuration
 
@@ -227,7 +244,7 @@ Example `noProxy` value:
 | `.svc`            | In-cluster service DNS                 |
 
 !!! warning
-    Do not include the API or Ingress VIPs in the `noProxy` list with a wildcard. Use explicit CIDRs or domains. The installer will automatically add the API and Ingress VIPs to the no-proxy configuration.
+    Do not include the API or Ingress VIPs in the `noProxy` list with a wildcard. The installer copies `networking.machineNetwork`, `networking.clusterNetwork`, and `networking.serviceNetwork` CIDRs into `status.noProxy`. If API/Ingress VIPs and node IPs are within `machineNetwork`, they are covered. If a user-managed load balancer or node IPs sit outside that CIDR, add those addresses/CIDRs (and the cluster base domain) to `noProxy` yourself.
 
 ### TLS-Intercepting (MITM) Proxy
 

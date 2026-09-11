@@ -22,18 +22,16 @@ oc get secret/pull-secret -n openshift-config --template='{{index .data ".docker
 ```
 {% endraw %}
 
-3. Edit the `pull-secret.json` to include your Artifactory registry:
+3. Add your Artifactory credentials to the existing pull secret (this safely merges without overwriting existing registry credentials):
 
-```json
-{
-  "auths": {
-    "your-artifactory-domain.com": {
-      "auth": "<base64-encoded-credentials>",
-      "email": "admin@example.com"
-    }
-  }
-}
+```bash
+oc registry login --registry="your-artifactory-domain.com" \
+  --auth-basic="username:password" \
+  --to=pull-secret.json
 ```
+
+!!! warning
+    Do not manually replace the contents of `pull-secret.json` with only your Artifactory credentials. The file must retain existing entries for `registry.redhat.io`, `quay.io`, and other registries, or cluster image pulls will break.
 
 4. Apply the updated secret back to the cluster:
 
@@ -42,7 +40,7 @@ oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson
 ```
 
 !!! warning
-    Updating the global pull secret will trigger a rolling reboot of your worker nodes as the new configuration is applied.
+    Pull-secret updates are applied to nodes by the Machine Config Operator without a drain or reboot. Kubelet picks up the new credentials automatically. The rollout may take a few minutes on larger clusters.
 
 ## Step 2: Handle Image Redirection (If Mirrored)
 
@@ -55,6 +53,9 @@ If you used `oc-mirror`, it will have automatically generated this YAML file for
 ```bash
 oc apply -f <path-to-mirror-set-yaml>
 ```
+
+!!! warning
+    Applying an `ImageDigestMirrorSet` or `ImageTagMirrorSet` changes `/etc/containers/registries.conf`, which causes the Machine Config Operator to drain and uncordon each node. Plan a maintenance window for this change. Prefer `ImageDigestMirrorSet` (from `oc-mirror` output); `ImageContentSourcePolicy` is deprecated.
 
 ## Step 3: Create the CatalogSource
 

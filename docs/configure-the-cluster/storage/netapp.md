@@ -285,8 +285,8 @@ oc apply -f trident-orchestrator.yaml
 - **enableForceDetach** — allows Trident to force-detach volumes from non-responsive nodes so they can be reattached elsewhere
 - **enableConcurrency** — enables parallel processing of volume operations for improved throughput
 
-!!! warning "enableConcurrency is Tech Preview"
-    `enableConcurrency` is a Tech Preview / feature-gated flag in Trident and is not GA-hardened. It is suitable for POC environments but should be evaluated carefully before use in production.
+!!! info "enableConcurrency (Trident 26.06+)"
+    Controller concurrency is GA in Trident 26.06 for `ontap-nas`, `ontap-san`, `ontap-nas-economy`, and `ontap-san-economy` drivers. It remains disabled by default — enable it for improved parallel volume operations. The `asa-r2` driver still has concurrency as Tech Preview.
 
 Verify Trident is running:
 
@@ -612,16 +612,11 @@ oc apply -f storageprofile.yaml
 ```
 
 !!! tip
-    Set `filesystemOverhead` to at least 10% to avoid potential space issues during VM operations. The extra space has no real cost since NetApp is thin-provisioned.
+    Set `filesystemOverhead` to at least 10% to avoid potential space issues during VM operations. The extra space has no real cost since NetApp is thin-provisioned. This must be set on the HyperConverged CR (not the StorageProfile — `filesystemOverhead` is not a valid StorageProfile field):
 
-    ```yaml
-    spec:
-      claimPropertySets:
-        - accessModes:
-            - ReadWriteMany
-          volumeMode: Block
-      filesystemOverhead:
-        global: "0.1"
+    ```bash
+    oc patch hyperconvergeds.v1beta1.hco.kubevirt.io kubevirt-hyperconverged -n openshift-cnv --type merge \
+      -p '{"spec":{"filesystemOverhead":{"global":"0.1"}}}'
     ```
 
 ## Set as Default StorageClass

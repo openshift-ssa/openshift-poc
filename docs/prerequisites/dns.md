@@ -10,6 +10,9 @@ OpenShift requires specific DNS records for the API and ingress services. All re
 | api-int.{{ cluster_name }}.{{ base_domain }} | API VIP or node IP (SNO)     |
 | *.apps.{{ cluster_name }}.{{ base_domain }}  | Ingress VIP or node IP (SNO) |
 
+!!! warning
+    Create the wildcard record as `*.apps.<cluster>.<domain>` only. Do **not** create a wildcard at `*.<cluster>.<domain>` — this collides with `api` and `api-int` records, and the Assisted Installer will refuse to proceed.
+
 Validate the DNS using dig:
 
 ```bash
@@ -41,7 +44,7 @@ For SNO, all three DNS records point to the single node's IP address. No VIPs ar
 Node A records (for example `cp01.{{ cluster_name }}.{{ base_domain }}`) and reverse DNS (PTR) are **recommended**, not required for IPI/Assisted Installer installations. However, without PTR records, nodes may register with MAC-based or generic hostnames during provisioning (e.g., `localhost` or `dhcp-192-168-1-10`), which makes troubleshooting and log correlation significantly harder.
 
 !!! warning "PTR Records Are Required for UPI"
-    For User Provisioned Infrastructure (UPI) installations, PTR records **are required**. The installer validates reverse DNS for all node IPs during a UPI install.
+    For User Provisioned Infrastructure (UPI) installations, PTR records **are required**. Configure and verify PTR records yourself before install (using `dig -x <ip>`) for the API VIP (`api` and `api-int`), bootstrap (if used), and every node IP. Missing reverse DNS causes localhost/MAC hostnames and CSR problems. No PTR record is required for `*.apps.<cluster>.<domain>`.
 
 ```bash
 dig +noall +answer -x {{ node_ip }}

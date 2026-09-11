@@ -95,46 +95,49 @@ The default Alertmanager receives alerts but does not send notifications anywher
 
 ### View the Current Alertmanager Config
 
+{% raw %}
 ```bash
 oc -n openshift-monitoring get secret alertmanager-main \
   -o jsonpath='{.data.alertmanager\.yaml}' | base64 -d
 ```
+{% endraw %}
 
 ### Configure a Receiver
 
-Create an Alertmanager config with a receiver. This example sends critical alerts to a webhook:
+Extract the current Alertmanager config, edit it, and replace the secret:
+
+{% raw %}
+```bash
+oc -n openshift-monitoring get secret alertmanager-main --template='{{ index .data "alertmanager.yaml" }}' | base64 --decode > alertmanager.yaml
+# Edit alertmanager.yaml to add/modify receivers and routes
+oc -n openshift-monitoring create secret generic alertmanager-main --from-file=alertmanager.yaml --dry-run=client -o=yaml | oc -n openshift-monitoring replace secret --filename=-
+```
+{% endraw %}
+
+For example, to send critical alerts to a webhook, edit `alertmanager.yaml` to contain:
 
 ```yaml
-apiVersion: v1
-kind: Secret
-metadata:
-  name: alertmanager-main
-  namespace: openshift-monitoring
-stringData:
-  alertmanager.yaml: |
-    global:
-      resolve_timeout: 5m
-    route:
-      group_by: ['namespace', 'alertname']
-      group_wait: 30s
-      group_interval: 5m
-      repeat_interval: 12h
-      receiver: default
-      routes:
-        - matchers:
-            - severity = critical
-          receiver: webhook-critical
-    receivers:
-      - name: default
-      - name: webhook-critical
-        webhook_configs:
-          - url: '{{ webhook_url }}'
-            send_resolved: true
+global:
+  resolve_timeout: 5m
+route:
+  group_by: ['namespace', 'alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 12h
+  receiver: default
+  routes:
+    - matchers:
+        - severity = critical
+      receiver: webhook-critical
+receivers:
+  - name: default
+  - name: webhook-critical
+    webhook_configs:
+      - url: '{{ webhook_url }}'
+        send_resolved: true
 ```
 
-```bash
-oc apply -f alertmanager-config.yaml
-```
+Then apply with the replace workflow shown above.
 
 ### Other Receiver Types
 
@@ -188,12 +191,15 @@ oc apply -f cluster-monitoring-config.yaml
 
 Demonstrate custom alerting by creating a `PrometheusRule` that fires when a node's CPU utilisation stays above 90% for 10 minutes:
 
+!!! note
+    Custom alerting rules belong in a user-defined namespace, not in `openshift-monitoring`. Enable user workload monitoring first (`enableUserWorkload: true` in the `cluster-monitoring-config` ConfigMap), then create your `PrometheusRule` in a user namespace. The user-workload Prometheus instance automatically picks up rules from any namespace with a `ServiceMonitor` or `PrometheusRule`.
+
 ```yaml
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: poc-example-alerts
-  namespace: openshift-monitoring
+  namespace: poc-monitoring
 spec:
   groups:
     - name: poc.rules
@@ -209,13 +215,14 @@ spec:
 ```
 
 ```bash
+oc create namespace poc-monitoring
 oc apply -f poc-alerts.yaml
 ```
 
 Verify the rule is loaded:
 
 ```bash
-oc get prometheusrule poc-example-alerts -n openshift-monitoring
+oc get prometheusrule poc-example-alerts -n poc-monitoring
 ```
 
 Check in the web console under **Observe** → **Alerting** → **Alerting Rules** to see the new rule.

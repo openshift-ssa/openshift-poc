@@ -272,8 +272,9 @@ Runs periodically and evicts pods that violate scheduling rules so the default s
 
 1. Go to Ecosystem -> Software Catalog -> filter for "Kube Descheduler" -> click the tile
 2. Click Install
-3. Leave all the defaults and click Install
-4. Wait for the Operator to install
+3. Select the `openshift-kube-descheduler-operator` namespace (create it first with the `openshift.io/cluster-monitoring: "true"` label if it does not exist)
+4. Leave the remaining defaults and click Install
+5. Wait for the Operator to install
 
 ### Install via YAML
 
@@ -282,6 +283,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: openshift-kube-descheduler-operator
+  labels:
+    openshift.io/cluster-monitoring: "true"
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup

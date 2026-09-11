@@ -34,6 +34,9 @@
 
 3. Apply:
 
+  !!! warning
+      Applying a MachineConfig that changes file content, systemd units, or other non-SSH configuration will cause the Machine Config Operator to drain and reboot every node in the target pool. Ensure the cluster has sufficient capacity. To defer the reboot, pause the pool first: `oc patch mcp worker --type merge -p '{"spec":{"paused":true}}'`. Unpause after: `oc patch mcp worker --type merge -p '{"spec":{"paused":false}}'`.
+
   ```bash
   oc apply -f 99-worker-example.yaml
   ```

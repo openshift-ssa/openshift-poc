@@ -21,7 +21,7 @@ You should have completed the [prerequisites](../../prerequisites/index.md) and 
 The vCenter account used by the installer requires a broad set of privileges. Red Hat recommends using the full privilege set rather than a minimal custom role.
 
 !!! warning
-    Red Hat does not support custom roles with restricted privilege sets. The full list below is tested and required both during and after installation. Reducing privileges after installation can cause unexpected cluster behavior.
+    A dedicated custom role is supported as long as it includes the full required-privilege list for both installation and ongoing operations. What is unsupported is omitting required privileges from the role, not the use of a custom role itself. The full list below is tested and required both during and after installation. Reducing privileges after installation can cause unexpected cluster behavior.
 
 ### vSphere vCenter
 
@@ -154,55 +154,55 @@ The installer needs to communicate with the vCenter API over TLS. You must add t
 
 1. Download the root CA certificates from vCenter:
 
-    Navigate to `https://{{ vcenter_fqdn }}` and click **Download trusted root CA certificates** in the vSphere Web Services SDK section. This downloads a `download.zip` file.
+  Navigate to `https://{{ vcenter_fqdn }}` and click **Download trusted root CA certificates** in the vSphere Web Services SDK section. This downloads a `download.zip` file.
 
 2. Extract the certificates:
 
-    ```bash
-    unzip download.zip -d vcenter-certs
-    ```
+  ```bash
+  unzip download.zip -d vcenter-certs
+  ```
 
 3. Copy the Linux certificates to the system trust:
 
-    ```bash
-    sudo cp vcenter-certs/certs/lin/* /etc/pki/ca-trust/source/anchors/
-    ```
+  ```bash
+  sudo cp vcenter-certs/certs/lin/* /etc/pki/ca-trust/source/anchors/
+  ```
 
 4. Update the system trust:
 
-    ```bash
-    sudo update-ca-trust extract
-    ```
+  ```bash
+  sudo update-ca-trust extract
+  ```
 
 5. Verify connectivity:
 
-    ```bash
-    curl -s https://{{ vcenter_fqdn }} > /dev/null && echo "TLS OK" || echo "TLS FAILED"
-    ```
+  ```bash
+  curl -s https://{{ vcenter_fqdn }} > /dev/null && echo "TLS OK" || echo "TLS FAILED"
+  ```
 
 ## Download the Installer
 
 6. Download `openshift-install` from the [Red Hat Console](https://console.redhat.com/openshift/downloads):
 
-    ```bash
-    tar xvf openshift-install-linux.tar.gz
-    chmod +x openshift-install
-    sudo mv openshift-install /usr/local/bin/
-    ```
+  ```bash
+  tar xvf openshift-install-linux.tar.gz
+  chmod +x openshift-install
+  sudo mv openshift-install /usr/local/bin/
+  ```
 
 7. Verify:
 
-    ```bash
-    openshift-install version
-    ```
+  ```bash
+  openshift-install version
+  ```
 
 ## Create the Installation Directory
 
 8. Create a working directory for the installation artifacts:
 
-    ```bash
-    mkdir ~/ocp-vsphere && cd ~/ocp-vsphere
-    ```
+  ```bash
+  mkdir ~/ocp-vsphere && cd ~/ocp-vsphere
+  ```
 
 ## Generate install-config.yaml
 
@@ -212,42 +212,32 @@ You can generate the `install-config.yaml` interactively or create it manually.
 
 9. Run the installer and follow the prompts:
 
-    ```bash
-    openshift-install create install-config --dir ~/ocp-vsphere
-    ```
+  ```bash
+  openshift-install create install-config --dir ~/ocp-vsphere
+  ```
 
-    The installer will prompt for:
-    - SSH public key
-    - Platform (`vsphere`)
-    - vCenter server, username, and password
-    - Datacenter, cluster, datastore, and network
-    - API and Ingress VIPs
-    - Base domain and cluster name
-    - Pull secret
+  The installer will prompt for:
+  - SSH public key
+  - Platform (`vsphere`)
+  - vCenter server, username, and password
+  - Datacenter, cluster, datastore, and network
+  - API and Ingress VIPs
+  - Base domain and cluster name
+  - Pull secret
 
 ### Manual Method
 
 10. Create `~/ocp-vsphere/install-config.yaml` with the following content:
 
-    ```yaml
-    apiVersion: v1
-    baseDomain: {{ base_domain }}
-    metadata:
-      name: {{ cluster_name }}
-    sshKey: '{{ public_key }}'
-    pullSecret: '{{ pull_secret }}'
-    compute:
-      - name: worker
-        platform:
-          vsphere:
-            cpus: 8
-            coresPerSocket: 4
-            memoryMB: 32768
-            osDisk:
-              diskSizeGB: 120
-        replicas: 3
-    controlPlane:
-      name: master
+  ```yaml
+  apiVersion: v1
+  baseDomain: {{ base_domain }}
+  metadata:
+    name: {{ cluster_name }}
+  sshKey: '{{ public_key }}'
+  pullSecret: '{{ pull_secret }}'
+  compute:
+    - name: worker
       platform:
         vsphere:
           cpus: 8
@@ -256,40 +246,50 @@ You can generate the `install-config.yaml` interactively or create it manually.
           osDisk:
             diskSizeGB: 120
       replicas: 3
-    networking:
-      networkType: OVNKubernetes
-      clusterNetwork:
-        - cidr: 10.128.0.0/14
-          hostPrefix: 23
-      serviceNetwork:
-        - 172.30.0.0/16
-      machineNetwork:
-        - cidr: 10.0.0.0/28
+  controlPlane:
+    name: master
     platform:
       vsphere:
-        apiVIPs:
-          - {{ api_vip }}
-        ingressVIPs:
-          - {{ ingress_vip }}
-        vcenters:
-          - server: {{ vcenter_fqdn }}
-            user: {{ vcenter_username }}
-            password: {{ vcenter_password }}
-            datacenters:
-              - {{ datacenter_name }}
-        failureDomains:
-          - name: {{ failure_domain_name }}
-            region: {{ region_name }}
-            zone: {{ zone_name }}
-            server: {{ vcenter_fqdn }}
-            topology:
-              datacenter: {{ datacenter_name }}
-              computeCluster: "/{{ datacenter_name }}/host/{{ vsphere_cluster_name }}"
-              datastore: "/{{ datacenter_name }}/datastore/{{ datastore_name }}"
-              networks:
-                - {{ vm_network_name }}
-              resourcePool: "/{{ datacenter_name }}/host/{{ vsphere_cluster_name }}/Resources"
-    ```
+        cpus: 8
+        coresPerSocket: 4
+        memoryMB: 32768
+        osDisk:
+          diskSizeGB: 120
+    replicas: 3
+  networking:
+    networkType: OVNKubernetes
+    clusterNetwork:
+      - cidr: 10.128.0.0/14
+        hostPrefix: 23
+    serviceNetwork:
+      - 172.30.0.0/16
+    machineNetwork:
+      - cidr: 10.0.0.0/28
+  platform:
+    vsphere:
+      apiVIPs:
+        - {{ api_vip }}
+      ingressVIPs:
+        - {{ ingress_vip }}
+      vcenters:
+        - server: {{ vcenter_fqdn }}
+          user: {{ vcenter_username }}
+          password: {{ vcenter_password }}
+          datacenters:
+            - {{ datacenter_name }}
+      failureDomains:
+        - name: {{ failure_domain_name }}
+          region: {{ region_name }}
+          zone: {{ zone_name }}
+          server: {{ vcenter_fqdn }}
+          topology:
+            datacenter: {{ datacenter_name }}
+            computeCluster: "/{{ datacenter_name }}/host/{{ vsphere_cluster_name }}"
+            datastore: "/{{ datacenter_name }}/datastore/{{ datastore_name }}"
+            networks:
+              - {{ vm_network_name }}
+            resourcePool: "/{{ datacenter_name }}/host/{{ vsphere_cluster_name }}/Resources"
+  ```
 
 !!! warning "Back up install-config.yaml"
     The installation process consumes and deletes `install-config.yaml`. Always make a backup before running the installer:
@@ -304,63 +304,63 @@ For environments without DHCP (which is our assumption), configure static IPs us
 
 11. Add the `hosts` section under `platform.vsphere` in your `install-config.yaml`:
 
-    ```yaml
-    platform:
-      vsphere:
-        # ... (vcenters, failureDomains, VIPs from above)
-        hosts:
-          - role: bootstrap
-            networkDevice:
-              ipAddrs:
-                - 10.0.0.14/28
-              gateway: 10.0.0.1
-              nameservers:
-                - {{ nameserver_ip }}
-          - role: control-plane
-            networkDevice:
-              ipAddrs:
-                - 10.0.0.6/28
-              gateway: 10.0.0.1
-              nameservers:
-                - {{ nameserver_ip }}
-          - role: control-plane
-            networkDevice:
-              ipAddrs:
-                - 10.0.0.7/28
-              gateway: 10.0.0.1
-              nameservers:
-                - {{ nameserver_ip }}
-          - role: control-plane
-            networkDevice:
-              ipAddrs:
-                - 10.0.0.8/28
-              gateway: 10.0.0.1
-              nameservers:
-                - {{ nameserver_ip }}
-          - role: compute
-            networkDevice:
-              ipAddrs:
-                - 10.0.0.9/28
-              gateway: 10.0.0.1
-              nameservers:
-                - {{ nameserver_ip }}
-          - role: compute
-            networkDevice:
-              ipAddrs:
-                - 10.0.0.10/28
-              gateway: 10.0.0.1
-              nameservers:
-                - {{ nameserver_ip }}
-          - role: compute
-            networkDevice:
-              ipAddrs:
-                - 10.0.0.11/28
-              gateway: 10.0.0.1
-              nameservers:
-                - {{ nameserver_ip }}
-    ```
+  ```yaml
+  platform:
+    vsphere:
+      # ... (vcenters, failureDomains, VIPs from above)
+      hosts:
+        - role: bootstrap
+          networkDevice:
+            ipAddrs:
+              - 10.0.0.14/28
+            gateway: 10.0.0.1
+            nameservers:
+              - {{ nameserver_ip }}
+        - role: control-plane
+          networkDevice:
+            ipAddrs:
+              - 10.0.0.6/28
+            gateway: 10.0.0.1
+            nameservers:
+              - {{ nameserver_ip }}
+        - role: control-plane
+          networkDevice:
+            ipAddrs:
+              - 10.0.0.7/28
+            gateway: 10.0.0.1
+            nameservers:
+              - {{ nameserver_ip }}
+        - role: control-plane
+          networkDevice:
+            ipAddrs:
+              - 10.0.0.8/28
+            gateway: 10.0.0.1
+            nameservers:
+              - {{ nameserver_ip }}
+        - role: compute
+          networkDevice:
+            ipAddrs:
+              - 10.0.0.9/28
+            gateway: 10.0.0.1
+            nameservers:
+              - {{ nameserver_ip }}
+        - role: compute
+          networkDevice:
+            ipAddrs:
+              - 10.0.0.10/28
+            gateway: 10.0.0.1
+            nameservers:
+              - {{ nameserver_ip }}
+        - role: compute
+          networkDevice:
+            ipAddrs:
+              - 10.0.0.11/28
+            gateway: 10.0.0.1
+            nameservers:
+              - {{ nameserver_ip }}
+  ```
 
-    Valid `role` values are `bootstrap`, `control-plane`, and `compute`. The number of entries must match the total node count (1 bootstrap + 3 control plane + 3 workers = 7).
+  Valid `role` values are `bootstrap`, `control-plane`, and `compute`. The number of entries must match the total node count (1 bootstrap + 3 control plane + 3 workers = 7).
 
 ## Proxy Configuration (Optional)
 
@@ -368,16 +368,16 @@ If your environment uses a proxy, add the proxy settings to `install-config.yaml
 
 12. Add the proxy and trust bundle:
 
-    ```yaml
-    proxy:
-      httpProxy: http://{{ proxy_host }}:{{ proxy_port }}
-      httpsProxy: http://{{ proxy_host }}:{{ proxy_port }}
-      noProxy: "{{ base_domain }},{{ machine_network_cidr }},{{ vcenter_fqdn }},10.128.0.0/14,172.30.0.0/16"
-    additionalTrustBundle: |
-      -----BEGIN CERTIFICATE-----
-      {{ ca_certificate }}
-      -----END CERTIFICATE-----
-    ```
+  ```yaml
+  proxy:
+    httpProxy: http://{{ proxy_host }}:{{ proxy_port }}
+    httpsProxy: http://{{ proxy_host }}:{{ proxy_port }}
+    noProxy: "{{ base_domain }},{{ machine_network_cidr }},{{ vcenter_fqdn }},10.128.0.0/14,172.30.0.0/16"
+  additionalTrustBundle: |
+    -----BEGIN CERTIFICATE-----
+    {{ ca_certificate }}
+    -----END CERTIFICATE-----
+  ```
 
 !!! note
     Always include the vCenter FQDN and machine network in `noProxy` to prevent the installer from trying to proxy vSphere API calls.
@@ -386,15 +386,15 @@ If your environment uses a proxy, add the proxy settings to `install-config.yaml
 
 13. Back up your `install-config.yaml`:
 
-    ```bash
-    cp ~/ocp-vsphere/install-config.yaml ~/ocp-vsphere/install-config.yaml.bak
-    ```
+  ```bash
+  cp ~/ocp-vsphere/install-config.yaml ~/ocp-vsphere/install-config.yaml.bak
+  ```
 
 14. Start the installation:
 
-    ```bash
-    openshift-install create cluster --dir ~/ocp-vsphere --log-level=info
-    ```
+  ```bash
+  openshift-install create cluster --dir ~/ocp-vsphere --log-level=info
+  ```
 
 !!! info "What happens during installation"
     The installer:
@@ -411,77 +411,77 @@ If your environment uses a proxy, add the proxy settings to `install-config.yaml
 
 15. If the installation times out, you can resume monitoring:
 
-    ```bash
-    openshift-install wait-for install-complete --dir ~/ocp-vsphere --log-level=info
-    ```
+  ```bash
+  openshift-install wait-for install-complete --dir ~/ocp-vsphere --log-level=info
+  ```
 
 ## Access the Cluster
 
 16. Upon successful completion, the installer outputs the `kubeadmin` credentials and the console URL:
 
-    ```
-    INFO Install complete!
-    INFO To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/home/user/ocp-vsphere/auth/kubeconfig'
-    INFO Access the OpenShift web-console here: https://console-openshift-console.apps.{{ cluster_name }}.{{ base_domain }}
-    INFO Login to the console with user: "kubeadmin", and password: "XXXXX-XXXXX-XXXXX-XXXXX"
-    ```
+  ```
+  INFO Install complete!
+  INFO To access the cluster as the system:admin user when using 'oc', run 'export KUBECONFIG=/home/user/ocp-vsphere/auth/kubeconfig'
+  INFO Access the OpenShift web-console here: https://console-openshift-console.apps.{{ cluster_name }}.{{ base_domain }}
+  INFO Login to the console with user: "kubeadmin", and password: "XXXXX-XXXXX-XXXXX-XXXXX"
+  ```
 
 17. Export the kubeconfig:
 
-    ```bash
-    export KUBECONFIG=~/ocp-vsphere/auth/kubeconfig
-    ```
+  ```bash
+  export KUBECONFIG=~/ocp-vsphere/auth/kubeconfig
+  ```
 
 18. Verify cluster health:
 
-    ```bash
-    oc get nodes
-    oc get clusterversion
-    oc get co
-    ```
+  ```bash
+  oc get nodes
+  oc get clusterversion
+  oc get co
+  ```
 
-    All nodes should show `Ready` and all cluster operators should show `Available=True`.
+  All nodes should show `Ready` and all cluster operators should show `Available=True`.
 
 ## Validate vSphere Integration
 
 19. Confirm that the vSphere CSI driver is operational:
 
-    ```bash
-    oc get pods -n openshift-cluster-csi-drivers -l app=vsphere-csi-driver
-    oc get storageclass
-    ```
+  ```bash
+  oc get pods -n openshift-cluster-csi-drivers -l app=vsphere-csi-driver
+  oc get storageclass
+  ```
 
-    You should see a `thin-csi` StorageClass provided by the vSphere CSI driver.
+  You should see a `thin-csi` StorageClass provided by the vSphere CSI driver.
 
 20. Test dynamic provisioning:
 
-    ```yaml
-    apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: test-vsphere-pvc
-      namespace: default
-    spec:
-      accessModes:
-        - ReadWriteOnce
-      resources:
-        requests:
-          storage: 1Gi
-      storageClassName: thin-csi
-    ```
+  ```yaml
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: test-vsphere-pvc
+    namespace: default
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: thin-csi
+  ```
 
-    ```bash
-    oc apply -f test-pvc.yaml
-    oc get pvc test-vsphere-pvc -w
-    ```
+  ```bash
+  oc apply -f test-pvc.yaml
+  oc get pvc test-vsphere-pvc -w
+  ```
 
-    The PVC should transition to `Bound` within a minute.
+  The PVC should transition to `Bound` within a minute.
 
 21. Clean up the test PVC:
 
-    ```bash
-    oc delete pvc test-vsphere-pvc
-    ```
+  ```bash
+  oc delete pvc test-vsphere-pvc
+  ```
 
 For common installation issues, see [Troubleshooting](../troubleshooting.md).
 

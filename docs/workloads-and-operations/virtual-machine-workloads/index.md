@@ -98,13 +98,14 @@ oc get events -n example-vms --field-selector involvedObject.name=example-rhel9 
 You can create the same style of VM with `virtctl` using a cluster DataSource:
 
 ```bash
+echo 'Pass123!' > /tmp/vm-password
 virtctl create vm \
   --name example-rhel9 \
   --instancetype u1.medium \
   --preference rhel.9 \
   --volume-import type:ds,src:openshift-virtualization-os-images/rhel9 \
-  --cloud-init-user cloud-user \
-  --cloud-init-password Pass123! \
+  --user cloud-user \
+  --password-file /tmp/vm-password \
   | oc apply -n example-vms -f -
 ```
 

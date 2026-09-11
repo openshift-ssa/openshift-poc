@@ -19,22 +19,27 @@ Hosted Control Planes (formerly HyperShift) runs OpenShift control planes as wor
 - DNS for the hosted cluster API and ingress (see [DNS Requirements](#dns-requirements))
 - Capacity on the management cluster: about **5.5 vCPU and 19 GiB RAM per hosted control plane**, plus worker capacity for the guest cluster
 
-## Enable Hosted Control Planes
+## Verify Hosted Control Planes
 
-1. Enable the HyperShift component in MCE:
+In OCP 4.22 with MCE, the HyperShift component is enabled by default. Verify it is running:
+
+1. Check the HyperShift operator pods and the managed cluster addon:
+
+  ```bash
+  oc get pods -n hypershift
+  oc get managedclusteraddons -n local-cluster hypershift-addon
+  ```
+
+  You should see the `operator` pod in `Running` state and the addon with `Available=True`.
+
+2. **(Troubleshooting)** If the HyperShift operator is not running, re-enable the component in MCE:
 
   ```bash
   oc patch mce multiclusterengine --type=merge \
     -p '{"spec":{"overrides":{"components":[{"name":"hypershift","enabled":true}]}}}'
   ```
 
-2. Verify the HyperShift operator is running:
-
-  ```bash
-  oc get pods -n hypershift
-  ```
-
-  You should see the `operator` pod in `Running` state.
+  Wait a few minutes and re-check with step 1.
 
 ## Install the hcp CLI
 
@@ -95,11 +100,14 @@ hcp create cluster agent \
   --base-domain=ocp.basedomain.com \
   --pull-secret=/path/to/pull-secret.json \
   --ssh-key=/path/to/ssh-key.pub \
-  --agent-namespace=hardware-inventory \
+  --agent-namespace=clusters-hosted-cluster-01 \
   --api-server-address=api.hosted-cluster-01.ocp.basedomain.com \
   --release-image=quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64 \
   --node-pool-replicas=3
 ```
+
+!!! note
+    The `--agent-namespace` must be the HCP namespace (`clusters-<name>`). Agents must reside in the same namespace as the hosted control plane so the cluster can adopt them.
 
 !!! note
     Configure the DNS records in [DNS Requirements](#dns-requirements) before creating the cluster. The `--api-server-address` value must resolve before API server certificates are generated.
@@ -123,19 +131,52 @@ hcp create cluster agent \
 
 ## DNS Requirements
 
-Create DNS records for the hosted cluster:
+Create DNS records for the hosted cluster. The required records depend on the platform:
 
-| Record                                        | Value                                          |
-| --------------------------------------------- | ---------------------------------------------- |
-| `api.hosted-cluster-kv.ocp.basedomain.com`    | Load balancer or IP for the API server service |
-| `*.apps.hosted-cluster-kv.ocp.basedomain.com` | Load balancer or IP for the ingress service    |
+### Agent platform
 
-Retrieve the service addresses:
+For Agent-based hosted clusters, both API and ingress need dedicated DNS records:
+
+| Record                                           | Value                                                    |
+| ------------------------------------------------ | -------------------------------------------------------- |
+| `api.hosted-cluster-01.ocp.basedomain.com`       | Load balancer or IP for the `kube-apiserver` Service     |
+| `*.apps.hosted-cluster-01.ocp.basedomain.com`    | Load balancer or IP for the hosted cluster ingress       |
+
+Retrieve the API server address:
+
+```bash
+oc get svc -n clusters-hosted-cluster-01 kube-apiserver -o jsonpath='{.status.loadBalancer.ingress[0]}'
+```
+
+### KubeVirt platform
+
+For KubeVirt hosted clusters, the API server runs as a Service in the HCP namespace, but **apps ingress uses a nested subdomain** under the management cluster's wildcard domain:
+
+```
+*.apps.<hosted_cluster_name>.apps.<mgmt_cluster_domain>
+```
+
+For example, if the management cluster domain is `mgmt.ocp.basedomain.com` and the hosted cluster is `hosted-cluster-kv`, apps routes resolve as `*.apps.hosted-cluster-kv.apps.mgmt.ocp.basedomain.com` — traffic routes through the management cluster's default ingress.
+
+| Record                                        | Value                                                |
+| --------------------------------------------- | ---------------------------------------------------- |
+| `api.hosted-cluster-kv.ocp.basedomain.com`    | Load balancer or IP for the `kube-apiserver` Service |
+
+Retrieve the API server address:
 
 ```bash
 oc get svc -n clusters-hosted-cluster-kv kube-apiserver -o jsonpath='{.status.loadBalancer.ingress[0]}'
-oc get svc -n clusters-hosted-cluster-kv router-default -o jsonpath='{.status.loadBalancer.ingress[0]}'
 ```
+
+To support the nested apps subdomain, enable wildcard routes on the management cluster's default IngressController:
+
+```bash
+oc patch ingresscontroller default -n openshift-ingress-operator \
+  --type=merge -p '{"spec":{"routeAdmission":{"wildcardPolicy":"WildcardsAllowed"}}}'
+```
+
+!!! note
+    No separate ingress Service or DNS record is needed for KubeVirt apps traffic — it flows through the management cluster's existing wildcard DNS and ingress router.
 
 ## Scaling NodePools
 
@@ -160,6 +201,14 @@ spec:
     image: quay.io/openshift-release-dev/ocp-release:{{ ocp_release }}-x86_64
   platform:
     type: KubeVirt
+    kubevirt:
+      compute:
+        cores: 2
+        memory: 8Gi
+      rootVolume:
+        persistent:
+          size: 32Gi
+        type: Persistent
 ```
 
 ```bash
@@ -168,11 +217,26 @@ oc apply -f nodepool-gpu.yaml
 
 ## Destroy a Hosted Cluster
 
+### KubeVirt platform
+
 ```bash
 hcp destroy cluster kubevirt --name=hosted-cluster-kv
 ```
 
-This removes the control plane pods and associated resources from the management cluster. Worker nodes need to be decommissioned separately depending on the platform.
+This removes the control plane pods, guest VMs, and all associated resources from the management cluster. No separate worker cleanup is needed — `hcp destroy` handles everything for KubeVirt hosted clusters.
+
+### Agent platform
+
+```bash
+hcp destroy cluster agent --name=hosted-cluster-01
+```
+
+This removes the control plane pods and associated resources. For Agent-based clusters, you must also clean up agents and BareMetalHost resources separately:
+
+```bash
+oc delete agents -n clusters-hosted-cluster-01 --all
+oc delete bmh -n clusters-hosted-cluster-01 --all
+```
 
 ## Documentation
 

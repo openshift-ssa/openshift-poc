@@ -784,10 +784,22 @@ Apply the updated cluster resources (including the `UpdateService` CR from `plat
 ```bash
 oc apply -f oc-mirror-workspace/working-dir/cluster-resources/
 oc get updateservice -A
+```
+
+Once the `UpdateService` is `Ready`, patch `clusterversion` to point at the local policy engine graph so `oc adm upgrade` can discover versions without reaching `api.openshift.com`:
+
+```bash
+POLICY_ENGINE_GRAPH_URI="$(oc -n openshift-update-service get -o jsonpath='{.status.policyEngineURI}/api/upgrades_info/v1/graph{"\n"}' updateservice update-service-oc-mirror)"
+oc patch clusterversion version -p "{\"spec\":{\"upstream\":\"${POLICY_ENGINE_GRAPH_URI}\"}}" --type merge
+```
+
+Then check for available upgrades:
+
+```bash
 oc adm upgrade
 ```
 
-The `UpdateService` provides the Cincinnati graph so `oc adm upgrade` can list and select versions without reaching `api.openshift.com`. Bump `minVersion`/`maxVersion` in `imageset-config.yaml` to `{{ new_ocp_release }}` before the mirror run.
+Bump `minVersion`/`maxVersion` in `imageset-config.yaml` to `{{ new_ocp_release }}` before the mirror run.
 
 #### Pull-Through Cache
 
@@ -797,10 +809,11 @@ The cache fetches the new release image on demand. Simply initiate the upgrade:
 oc adm upgrade
 ```
 
-If the cluster cannot reach the update graph service, specify the release image directly:
+If the cluster cannot reach the update graph service, specify the release image directly. OCP 4.22+ requires a sha256 digest rather than a tag:
 
 ```bash
-oc adm upgrade --to-image={{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release:{{ new_ocp_release }}-x86_64 \
+DIGEST=$(oc adm release info {{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release:{{ new_ocp_release }}-x86_64 --output=jsonpath='{.digest}')
+oc adm upgrade --to-image={{ artifactory_host }}/quay-remote/openshift-release-dev/ocp-release@${DIGEST} \
   --allow-explicit-upgrade
 ```
 

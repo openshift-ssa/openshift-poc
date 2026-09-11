@@ -34,13 +34,14 @@ Choose an initial size based on your cluster. You can resize after deployment ba
 
 | Size             | Data Transfer | Queries/sec | Total CPU | Total Memory | Total Disk |
 | ---------------- | ------------- | ----------- | --------- | ------------ | ---------- |
+| `1x.pico`        | 50 GB/day     | ~1-5 QPS    | 7 vCPUs   | 17 Gi        | Varies     |
 | `1x.demo`        | Demo only     | Demo only   | Minimal   | Minimal      | 40 Gi      |
 | `1x.extra-small` | 100 GB/day    | 1-25 QPS    | 14 vCPUs  | 31 Gi        | 430 Gi     |
 | `1x.small`       | 500 GB/day    | 25-50 QPS   | 34 vCPUs  | 67 Gi        | 430 Gi     |
 | `1x.medium`      | 2 TB/day      | 25-75 QPS   | 54 vCPUs  | 139 Gi       | 590 Gi     |
 
 !!! tip
-    For a POC environment, `1x.extra-small` or `1x.small` is typically sufficient.
+    Use `1x.pico` for SNO or compact POC hubs, `1x.extra-small` for small worker clusters, `1x.demo` only when HA is not required.
 
 ## Install the Loki Operator
 
@@ -149,7 +150,8 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
      --from-literal=bucketnames="loki-bucket" \
      --from-literal=endpoint="https://s3.openshift-storage.svc:443" \
      --from-literal=access_key_id="$ACCESS_KEY" \
-     --from-literal=access_key_secret="$SECRET_KEY"
+     --from-literal=access_key_secret="$SECRET_KEY" \
+     --from-literal=forcepathstyle="true"
    ```
 
 !!! note "TLS for in-cluster NooBaa"
@@ -266,39 +268,39 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
 
 1. Create the operator group and subscription:
 
-    ```yaml
-    apiVersion: operators.coreos.com/v1
-    kind: OperatorGroup
-    metadata:
-      name: cluster-logging
-      namespace: openshift-logging
-    spec:
-      upgradeStrategy: Default
-    ---
-    apiVersion: operators.coreos.com/v1alpha1
-    kind: Subscription
-    metadata:
-      name: cluster-logging
-      namespace: openshift-logging
-    spec:
-      channel: stable-6.6
-      installPlanApproval: Automatic
-      name: cluster-logging
-      source: redhat-operators
-      sourceNamespace: openshift-marketplace
-    ```
+  ```yaml
+  apiVersion: operators.coreos.com/v1
+  kind: OperatorGroup
+  metadata:
+    name: cluster-logging
+    namespace: openshift-logging
+  spec:
+    upgradeStrategy: Default
+  ---
+  apiVersion: operators.coreos.com/v1alpha1
+  kind: Subscription
+  metadata:
+    name: cluster-logging
+    namespace: openshift-logging
+  spec:
+    channel: stable-6.6
+    installPlanApproval: Automatic
+    name: cluster-logging
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+  ```
 
-    ```bash
-    oc apply -f logging-operator.yaml
-    ```
+  ```bash
+  oc apply -f logging-operator.yaml
+  ```
 
 2. Wait for the operator:
 
-    ```bash
-    oc get csv -n openshift-logging -w
-    ```
+  ```bash
+  oc get csv -n openshift-logging -w
+  ```
 
-    The `PHASE` should show `Succeeded`.
+  The `PHASE` should show `Succeeded`.
 
 ## Create the Collector Service Account and RBAC
 
@@ -306,140 +308,132 @@ The log collector requires a service account with specific cluster roles to read
 
 1. Create the service account:
 
-    ```bash
-    oc create sa logging-collector -n openshift-logging
-    ```
+  ```bash
+  oc create sa logging-collector -n openshift-logging
+  ```
 
 2. Assign the required cluster roles:
 
-    ```bash
-    oc adm policy add-cluster-role-to-user logging-collector-logs-writer \
-      -z logging-collector -n openshift-logging
+  ```bash
+  oc adm policy add-cluster-role-to-user logging-collector-logs-writer \
+    -z logging-collector -n openshift-logging
 
-    oc adm policy add-cluster-role-to-user collect-application-logs \
-      -z logging-collector -n openshift-logging
+  oc adm policy add-cluster-role-to-user collect-application-logs \
+    -z logging-collector -n openshift-logging
 
-    oc adm policy add-cluster-role-to-user collect-infrastructure-logs \
-      -z logging-collector -n openshift-logging
-    ```
+  oc adm policy add-cluster-role-to-user collect-infrastructure-logs \
+    -z logging-collector -n openshift-logging
+  ```
 
-    Cluster Roles
+  Cluster Roles
 
-    | Role                            | Purpose                              |
-    | ------------------------------- | ------------------------------------ |
-    | `logging-collector-logs-writer` | Allows writing logs to the LokiStack |
-    | `collect-application-logs`      | Allows reading application logs      |
-    | `collect-infrastructure-logs`   | Allows reading infrastructure logs   |
-    | `collect-audit-logs`            | Allows reading audit logs (optional) |
+  | Role                            | Purpose                              |
+  | ------------------------------- | ------------------------------------ |
+  | `logging-collector-logs-writer` | Allows writing logs to the LokiStack |
+  | `collect-application-logs`      | Allows reading application logs      |
+  | `collect-infrastructure-logs`   | Allows reading infrastructure logs   |
+  | `collect-audit-logs`            | Allows reading audit logs (optional) |
 
-    To also collect audit logs:
+  To also collect audit logs:
 
 
-    ```bash
-    oc adm policy add-cluster-role-to-user collect-audit-logs \
-      -z logging-collector -n openshift-logging
-    ```
+  ```bash
+  oc adm policy add-cluster-role-to-user collect-audit-logs \
+    -z logging-collector -n openshift-logging
+  ```
 
 !!! warning
     You must create the service account and grant the ClusterRoleBindings before creating the ClusterLogForwarder. Adding an input type to the CR without the required RBAC binding destroys the entire log collector DaemonSet.
 
 ## Create the ClusterLogForwarder
 
-1. Create the `openshift-service-ca.crt` ConfigMap for TLS. The service CA injection annotation tells OpenShift to automatically populate this ConfigMap with the cluster's service-serving CA bundle, which the log collector needs to trust the LokiStack gateway's TLS certificate:
+1. Create the ClusterLogForwarder to define how logs are collected and forwarded to the LokiStack. The `openshift-service-ca.crt` ConfigMap is automatically created and populated by OpenShift's service CA injection — no manual creation is needed:
 
-    ```bash
-    oc create configmap openshift-service-ca.crt -n openshift-logging
-    oc annotate configmap openshift-service-ca.crt -n openshift-logging \
-      service.beta.openshift.io/inject-cabundle=true
-    ```
+  ```yaml
+  apiVersion: observability.openshift.io/v1
+  kind: ClusterLogForwarder
+  metadata:
+    name: instance
+    namespace: openshift-logging
+  spec:
+    serviceAccount:
+      name: logging-collector
+    outputs:
+      - name: lokistack-out
+        type: lokiStack
+        lokiStack:
+          target:
+            name: logging-loki
+            namespace: openshift-logging
+          authentication:
+            token:
+              from: serviceAccount
+        tls:
+          ca:
+            key: service-ca.crt
+            configMapName: openshift-service-ca.crt
+    pipelines:
+      - name: infra-app-logs
+        inputRefs:
+          - application
+          - infrastructure
+        outputRefs:
+          - lokistack-out
+  ```
 
-2. Create the ClusterLogForwarder to define how logs are collected and forwarded to the LokiStack:
-
-    ```yaml
-    apiVersion: observability.openshift.io/v1
-    kind: ClusterLogForwarder
-    metadata:
-      name: instance
-      namespace: openshift-logging
-    spec:
-      serviceAccount:
-        name: logging-collector
-      outputs:
-        - name: lokistack-out
-          type: lokiStack
-          lokiStack:
-            target:
-              name: logging-loki
-              namespace: openshift-logging
-            authentication:
-              token:
-                from: serviceAccount
-          tls:
-            ca:
-              key: service-ca.crt
-              configMapName: openshift-service-ca.crt
-      pipelines:
-        - name: infra-app-logs
-          inputRefs:
-            - application
-            - infrastructure
-          outputRefs:
-            - lokistack-out
-    ```
-
-    ```bash
-    oc apply -f clusterlogforwarder.yaml
-    ```
+  ```bash
+  oc apply -f clusterlogforwarder.yaml
+  ```
 
 !!! warning "TLS CA Block is Required"
     The `tls.ca` block is required when forwarding logs to a LokiStack in the same cluster. The LokiStack gateway uses a TLS certificate signed by the cluster's service-serving CA. Without this block, collector pods fail with `certificate verify failed: self-signed certificate in certificate chain`.
 
 3. To also collect audit logs, add `audit` to `inputRefs` and re-apply:
 
-    ```yaml
-    pipelines:
-      - name: all-logs
-        inputRefs:
-          - application
-          - infrastructure
-          - audit
-        outputRefs:
-          - lokistack-out
-    ```
+  ```yaml
+  pipelines:
+    - name: all-logs
+      inputRefs:
+        - application
+        - infrastructure
+        - audit
+      outputRefs:
+        - lokistack-out
+  ```
 
-    ```bash
-    oc apply -f clusterlogforwarder.yaml
-    ```
+  ```bash
+  oc apply -f clusterlogforwarder.yaml
+  ```
 
 ## Verify
 
 1. Check that collector pods are running on all nodes:
 
-    ```bash
-    oc get pods -n openshift-logging -l component=collector
-    ```
+  ```bash
+  oc get pods -n openshift-logging -l component=collector
+  ```
 
-    You should see one collector pod per node in `Running` state.
+  You should see one collector pod per node in `Running` state.
 
 2. Check the LokiStack components:
 
-    ```bash
-    oc get pods -n openshift-logging -l app.kubernetes.io/instance=logging-loki
-    ```
+  ```bash
+  oc get pods -n openshift-logging -l app.kubernetes.io/instance=logging-loki
+  ```
 
 3. Verify the ClusterLogForwarder status:
 
-    ```bash
-    oc get clusterlogforwarder instance -n openshift-logging -o yaml | grep -A 5 conditions
-    ```
+  ```bash
+  oc get clusterlogforwarder instance -n openshift-logging -o yaml | grep -A 5 conditions
+  ```
 
-    The status should show `Ready: True`.
+  The status should show `Ready: True`.
 
 4. Test log ingestion by viewing recent logs:
 
-    ```bash
-    oc logs -l component=collector -n openshift-logging --tail=20
-    ```
+  ```bash
+  oc logs -l component=collector -n openshift-logging --tail=20
+  ```
 
 ## Install Cluster Observability Operator (Optional)
 
@@ -456,46 +450,46 @@ The Cluster Observability Operator (COO) adds a **Logs** tab under **Observe** i
 
 1. Create the subscription:
 
-    ```yaml
-    apiVersion: operators.coreos.com/v1alpha1
-    kind: Subscription
-    metadata:
-      name: cluster-observability-operator
-      namespace: openshift-operators
-    spec:
-      channel: stable
-      installPlanApproval: Automatic
-      name: cluster-observability-operator
-      source: redhat-operators
-      sourceNamespace: openshift-marketplace
-    ```
+  ```yaml
+  apiVersion: operators.coreos.com/v1alpha1
+  kind: Subscription
+  metadata:
+    name: cluster-observability-operator
+    namespace: openshift-operators
+  spec:
+    channel: stable
+    installPlanApproval: Automatic
+    name: cluster-observability-operator
+    source: redhat-operators
+    sourceNamespace: openshift-marketplace
+  ```
 
-    ```bash
-    oc apply -f coo-operator.yaml
-    ```
+  ```bash
+  oc apply -f coo-operator.yaml
+  ```
 
 2. Create the UIPlugin to enable the Logs tab:
 
-    ```yaml
-    apiVersion: observability.openshift.io/v1alpha1
-    kind: UIPlugin
-    metadata:
-      name: logging
-    spec:
-      type: Logging
-      logging:
-        lokiStack:
-          name: logging-loki
-    ```
+  ```yaml
+  apiVersion: observability.openshift.io/v1alpha1
+  kind: UIPlugin
+  metadata:
+    name: logging
+  spec:
+    type: Logging
+    logging:
+      lokiStack:
+        name: logging-loki
+  ```
 
-    ```bash
-    oc apply -f uiplugin-logging.yaml
-    ```
+  ```bash
+  oc apply -f uiplugin-logging.yaml
+  ```
 
 3. Verify the Logs tab is available:
 
-    - Navigate to **Observe -> Logs** in the web console
-    - You should be able to query application and infrastructure logs
+  - Navigate to **Observe -> Logs** in the web console
+  - You should be able to query application and infrastructure logs
 
 ## Log Access Control
 

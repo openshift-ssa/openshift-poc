@@ -126,6 +126,7 @@ OADP requires an S3-compatible object storage bucket for backup data. If you hav
           - csi
           - aws
         resourceTimeout: 10m
+        defaultSnapshotMoveData: true
       nodeAgent:
         enable: true
         uploaderType: kopia
@@ -170,6 +171,15 @@ oc get volumesnapshotclass
 ```
 
 The BackupStorageLocation `PHASE` should show `Available`. A `VolumeSnapshotClass` must exist for your CSI driver before CSI snapshot-based VM backups will succeed.
+
+Label the VolumeSnapshotClass so Velero selects it for CSI backups:
+
+```bash
+oc label volumesnapshotclass/<your-snapclass-name> velero.io/csi-volumesnapshot-class=true
+```
+
+!!! note
+    OADP CSI backups require the `velero.io/csi-volumesnapshot-class=true` label on the VolumeSnapshotClass. Without this label, Velero will not select the class and snapshot-based backups will fail.
 
 ```bash
 oc get pods -n openshift-adp

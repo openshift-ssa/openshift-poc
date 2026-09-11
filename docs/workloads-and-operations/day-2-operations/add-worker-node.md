@@ -142,7 +142,7 @@ oc adm node-image create --dir=/path/to/config --registry-config=~/pull-secret.t
 !!! note
     The pull secret is required for the `create` command to fetch a release image that matches the target cluster version. You can also set the `REGISTRY_AUTH_FILE` environment variable instead of using `--registry-config`.
 
-Verify that a `node.<name>.iso` file was generated in the working directory (or the directory specified by `--dir`):
+Verify that a `node.<arch>.iso` file (e.g. `node.x86_64.iso`) was generated in the working directory (or the directory specified by `--dir`):
 
 ```bash
 ls *.iso
@@ -205,6 +205,9 @@ oc get nodes
 ```
 
 The new node should appear with `STATUS=Ready` and `ROLES=worker`.
+
+!!! important
+    Nodes added via `oc adm node-image create` do not automatically create `Machine` or `BareMetalHost` resources. These nodes will not be managed by the Machine API for scaling or remediation. For IPI bare-metal clusters, consider creating a `BareMetalHost` instead.
 
 ## Troubleshooting
 

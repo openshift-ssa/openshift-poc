@@ -90,6 +90,7 @@ nav:
           - VMware vSphere IPI: install-the-cluster/other-installation-methods/vmware-install.md
           - OpenShift on OpenShift: install-the-cluster/other-installation-methods/openshift-on-openshift.md
           - Disconnected: install-the-cluster/other-installation-methods/disconnected.md
+          - Redfish Network Discovery: install-the-cluster/other-installation-methods/redfish-nmstate-discovery.md
   - Configure the Cluster:
       - configure-the-cluster/index.md
       - NMState Operator: configure-the-cluster/nmstate.md

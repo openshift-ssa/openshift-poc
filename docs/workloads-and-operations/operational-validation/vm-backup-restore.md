@@ -40,12 +40,13 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 8. Click on the "Disks" tab
 9. Click "Add disk"
 10. Configure the data disk:
-    - Name: `data-disk`
-    - Source: Blank
-    - Size: 5 GiB
-    - Type: Disk
-    - StorageClass: your default StorageClass
-    - Access Mode: ReadWriteMany (RWX)
+
+  - Name: `data-disk`
+  - Source: Blank
+  - Size: 5 GiB
+  - Type: Disk
+  - StorageClass: your default StorageClass
+  - Access Mode: ReadWriteMany (RWX)
 11. Click Add
 
 ### Start the VM
@@ -56,7 +57,8 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
 ## Write Test Data
 
 14. Open the VM console from the WebUI:
-    - Virtualization -> VirtualMachines -> click `backup-test-vm` -> Console tab
+
+  - Virtualization -> VirtualMachines -> click `backup-test-vm` -> Console tab
 15. Log in as `cloud-user` / `Pass123!`
 16. Format and mount the data disk, then write test data:
 
@@ -89,12 +91,12 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
   spec:
     includedNamespaces:
       - vm-backup-test
-    storageLocation: dpa-1
+    snapshotMoveData: true
     ttl: 720h0m0s
   ```
 
-!!! note "storageLocation Name"
-    The `storageLocation: dpa-1` value follows OADP's auto-naming convention: `<dpa-name>-1`. If you named your `DataProtectionApplication` something other than `dpa`, adjust accordingly (e.g., `my-dpa-1`). Verify with: `oc get backupstoragelocations -n openshift-adp`
+!!! note "Backup Storage Location"
+    The `storageLocation` field is omitted because the DPA's `backupLocations` entry is set as `default: true`. Velero automatically uses the default BackupStorageLocation. Verify with: `oc get backupstoragelocations -n openshift-adp`
 
 !!! note
     This backs up **all** resources in the `vm-backup-test` namespace. Namespace-scoped backup ensures the VirtualMachine, its DataVolumes, PVCs, and associated secrets are all captured together.
@@ -197,7 +199,15 @@ This guide demonstrates using OADP to back up a virtual machine, make a destruct
   oc get vm backup-test-vm -n vm-backup-test
   ```
 
-29. Start the restored VM:
+29. Start the restored VM if needed:
+
+  If the VM was backed up with `runStrategy: Always`, it will auto-start after restore. Wait for the VMI to become Ready:
+
+  ```bash
+  oc get vmi -n vm-backup-test -w
+  ```
+
+  Only use `virtctl start` if the restored VM is in a Stopped state:
 
   ```bash
   virtctl start backup-test-vm -n vm-backup-test

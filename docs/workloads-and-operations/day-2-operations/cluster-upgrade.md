@@ -10,6 +10,23 @@ This procedure walks through upgrading an OpenShift cluster to a new z-stream (e
 - Cluster health verified (all ClusterOperators available, no degraded conditions)
 - If disconnected: the target release image must be mirrored — see [Disconnected](../../install-the-cluster/other-installation-methods/disconnected.md)
 - Workloads with proper `PodDisruptionBudgets` for zero-downtime validation
+- Verify all OLM Operators are compatible with the target release. Use the [Red Hat Operator Update Information Checker](https://access.redhat.com/labs/ocpouic/) or check each CSV for `olm.skipRange` / `spec.minKubeVersion` constraints.
+- Pause MachineHealthCheck resources to prevent premature node remediation during the upgrade:
+
+  ```bash
+  oc -n openshift-machine-api annotate mhc <mhc_name> cluster.x-k8s.io/paused=""
+  ```
+
+  Unpause after the upgrade completes by removing the annotation. If Node Health Check / Self Node Remediation operators are installed, disable or raise their timeouts for the upgrade window.
+
+- Take an etcd backup before updating:
+
+  ```bash
+  oc debug node/<control-plane-node> -- chroot /host /usr/local/bin/cluster-backup.sh /home/core/etcd-backup
+  ```
+
+  !!! warning
+      etcd restore is a last resort for disaster recovery, not a supported version rollback mechanism.
 
 ## Pre-Upgrade Health Check
 
@@ -50,6 +67,14 @@ To upgrade to a new minor version (e.g., 4.22 → 4.23), you must first switch t
 ```bash
 oc adm upgrade channel stable-4.23
 ```
+
+!!! note "EUS and Control Plane Only Upgrades"
+    OCP 4.22 is an Extended Update Support (EUS) release. Additional channels exist for EUS-to-EUS upgrades:
+
+    - `eus-4.22` and `eus-4.24` channels enable a **Control Plane Only** update path (4.22 → 4.24). The control plane serializes through 4.22 → 4.23 → 4.24, but workers reboot only once (at the 4.24 target).
+    - Keep `stable-4.23` for a standard 4.22 → 4.23 minor upgrade.
+
+    See [Performing an EUS-to-EUS update](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/updating_clusters/updating-eus-to-eus) for the full procedure.
 
 Then check available updates again:
 

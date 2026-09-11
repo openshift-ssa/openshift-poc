@@ -48,16 +48,28 @@ Operators ship their own must-gather images that collect deeper diagnostics for 
 oc adm must-gather --image=registry.redhat.io/container-native-virtualization/cnv-must-gather-rhel9:v{{ ocp_version }}
 ```
 
+!!! note "Image tag should match the installed operator version"
+    The `:v{{ ocp_version }}` tag is a convenience placeholder. Use the version from the operator's CSV relatedImages for an exact match:
+    ```bash
+    oc get csv -n openshift-cnv -o jsonpath='{.items[0].spec.relatedImages[*].image}' | tr ' ' '\n' | grep must-gather
+    ```
+
 ### OpenShift Data Foundation
 
 ```bash
 oc adm must-gather --image=registry.redhat.io/odf4/odf-must-gather-rhel9:v{{ ocp_version }}
 ```
 
+!!! note "Image tag should match the installed operator version"
+    The `:v{{ ocp_version }}` tag is a convenience placeholder. The tag should match the installed ODF version, not necessarily the OCP version:
+    ```bash
+    oc get csv -n openshift-storage -o jsonpath='{.items[0].spec.version}'
+    ```
+
 ### OpenShift Logging
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/openshift-logging/cluster-logging-rhel9-operator:v6.6 -- /usr/bin/gather
+oc adm must-gather --image=$(oc -n openshift-logging get deployment.apps/cluster-logging-operator -o jsonpath='{.spec.template.spec.containers[?(@.name == "cluster-logging-operator")].image}')
 ```
 
 ### Advanced Cluster Management
@@ -69,7 +81,7 @@ oc adm must-gather --image=registry.redhat.io/rhacm2/acm-must-gather-rhel9:v2.17
 ### Network Observability
 
 ```bash
-oc adm must-gather --image=registry.redhat.io/network-observability/network-observability-must-gather-rhel9:v1.8
+oc adm must-gather --image-stream=openshift/must-gather --image=quay.io/netobserv/must-gather
 ```
 
 ### Multiple Operators at Once
@@ -89,7 +101,7 @@ oc adm must-gather \
 Limit collection to a single namespace:
 
 ```bash
-oc adm must-gather -- /usr/bin/gather --namespace={{ namespace }}
+oc adm must-gather --dest-dir=<dir> -- oc adm inspect ns/{{ namespace }}
 ```
 
 ### Since a Specific Time
@@ -97,7 +109,7 @@ oc adm must-gather -- /usr/bin/gather --namespace={{ namespace }}
 Collect logs only from the last N minutes:
 
 ```bash
-oc adm must-gather -- /usr/bin/gather --since=30m
+oc adm must-gather --since=30m
 ```
 
 ## Create the Archive

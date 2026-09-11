@@ -112,6 +112,9 @@ graph TD
 
 The hub is a Single Node OpenShift (SNO) installation that runs the management plane:
 
+!!! important
+    ACM on a Single Node OpenShift hub requires `spec.availabilityConfig: Basic` in the MultiClusterHub CR. The default `High` availability (replicaCount 2) will not schedule on a single node.
+
 - **Red Hat Advanced Cluster Management (ACM)** — Provisions, upgrades, and manages the lifecycle of spoke clusters
 - **OpenShift GitOps (ArgoCD)** — Pushes configuration and applications to spoke clusters via Git
 - **MultiCluster Observability** — Aggregates metrics and health data from all spoke clusters

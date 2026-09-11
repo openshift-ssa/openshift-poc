@@ -84,6 +84,7 @@ virtctl image-upload dv appliance-rootdisk \
   --image-path=appliance-disk.qcow2 \
   --storage-class=<your-storage-class> \
   --access-mode=ReadWriteMany \
+  --volume-mode=Block \
   --namespace=ova-appliance \
   --insecure
 ```

@@ -74,6 +74,7 @@ Choose one of the two options below.
             storage:
               accessModes:
                 - ReadWriteMany
+              volumeMode: Block
               resources:
                 requests:
                   storage: 30Gi
@@ -88,13 +89,14 @@ Choose one of the two options below.
     Create the VM using `virtctl` with cloud-init credentials. This does **not** install httpd automatically — install and start it manually after the VM boots (see step 3).
 
     ```bash
+    echo 'Pass123!' > /tmp/vm-password
     virtctl create vm \
       --name rhel-httpd \
       --instancetype u1.medium \
       --preference rhel.9 \
       --volume-import type:ds,src:openshift-virtualization-os-images/rhel9 \
-      --cloud-init-user cloud-user \
-      --cloud-init-password Pass123! \
+      --user cloud-user \
+      --password-file /tmp/vm-password \
       | oc apply -n rhel-httpd -f -
     ```
 

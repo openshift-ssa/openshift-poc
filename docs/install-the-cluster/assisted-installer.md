@@ -57,8 +57,11 @@ Don't preinstall any operators. Storage, NMState, and other day-2 operators need
 
 - Click on the "Add hosts" button at the top of the page
 - For "Provisioning type":
-    - **Full ISO** — required on restricted or disconnected networks. The discovery image contains everything the host needs to register.
-    - **Minimal ISO** — smaller download, but the host **must** have outbound access to pull remaining artifacts. Do not use Minimal on air-gapped or tightly firewalled networks.
+    - **Full ISO** — self-contained boot image that includes the rootfs. No additional downloads are needed during boot. The host still requires network access to the Assisted Service (`console.redhat.com` for SaaS).
+    - **Minimal ISO** — smaller download that requires the host to pull the rootfs over the network during boot.
+
+    !!! note
+        Neither ISO type enables a fully air-gapped installation when using the SaaS Assisted Installer at `console.redhat.com`. For disconnected or air-gapped environments, use the [Agent-based Installer](agent-based.md) or deploy an on-prem Assisted Service.
 - Add the SSH public key
 - If you have a specific [proxy](../prerequisites/networking.md#proxy-configuration) configuration, use the "Show proxy settings" checkbox to enable the view and enter the information.
 - If you have a [MITM proxy](../prerequisites/networking.md#how-to-determine-if-you-have-a-mitm-proxy) which reencrypts traffic, click the "Configure cluster-wide trusted certificates" and add the MITM root/intermediate cert.

@@ -14,7 +14,9 @@ Provision compute resources that meet or exceed the minimum requirements for eac
 Consider these recommended POC values — the more the better. 
 
 !!! note "Official Minimums"
-    The official OpenShift minimums are 4 vCPU / 16 GB (control plane) and 2 vCPU / 8 GB (worker), but POC workloads — especially OpenShift Virtualization — need significantly more.
+    The official OpenShift minimums are 4 vCPU / 16 GB / 100 GB (control plane) and 2 vCPU / 8 GB / 100 GB (compute), but POC workloads — especially OpenShift Virtualization — need significantly more.
+
+    For Agent-based HA installations, the recommended minimum is 8 vCPU / 16 GB / 120 GB per node.
 
 ### Single Cluster Installation
 
@@ -420,23 +422,37 @@ curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/ -u {{ bmc_username }}:{{ bmc_p
 
 The BMC address format varies by vendor:
 
-| Vendor     | Address Format                                                             |
-| ---------- | -------------------------------------------------------------------------- |
-| HPE iLO    | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1`                 |
-| Dell iDRAC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1` |
-| Cisco CIMC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/{{ system_id }}`   |
+| Vendor     | Address Format                                                              |
+| ---------- | --------------------------------------------------------------------------- |
+| HPE iLO    | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/1`                  |
+| Dell iDRAC | `idrac-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1`    |
+| Cisco CIMC | `redfish-virtualmedia://{{ bmc_ip }}/redfish/v1/Systems/{{ system_id }}`    |
 
-Verify power state:
+!!! warning "Dell iDRAC Protocol"
+    The `redfish-virtualmedia://` protocol is designed for HPE iLO and does not work on Dell iDRAC. Always use `idrac-virtualmedia://` for Dell servers.
 
-```bash
-curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/1 -u {{ bmc_username }}:{{ bmc_password }} | jq '.PowerState'
-```
+Verify power state and virtual media by vendor:
 
-Verify virtual media is available:
+=== "Dell iDRAC"
 
-```bash
-curl -sk https://{{ bmc_ip }}/redfish/v1/Managers/1/VirtualMedia -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
-```
+    ```bash
+    curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/System.Embedded.1 -u {{ bmc_username }}:{{ bmc_password }} | jq '.PowerState'
+    curl -sk https://{{ bmc_ip }}/redfish/v1/Managers/iDRAC.Embedded.1/VirtualMedia -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
+    ```
+
+=== "HPE iLO"
+
+    ```bash
+    curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/1 -u {{ bmc_username }}:{{ bmc_password }} | jq '.PowerState'
+    curl -sk https://{{ bmc_ip }}/redfish/v1/Managers/1/VirtualMedia -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
+    ```
+
+!!! tip "Discover System IDs"
+    List available systems first to find the correct system path for your hardware:
+
+    ```bash
+    curl -sk https://{{ bmc_ip }}/redfish/v1/Systems -u {{ bmc_username }}:{{ bmc_password }} | jq '.Members'
+    ```
 
 !!! tip
     If any of these commands fail, check that the BMC IP is reachable from the installation host, the credentials are correct, and HTTPS (port 443) is open between the installation host and the BMC network.
@@ -448,6 +464,7 @@ Ensure the following on all nodes:
 - Boot mode set to UEFI
 - Secure Boot supported (optional but recommended)
 - Boot order set to local disk (the ISO is mounted via virtual media)
+- Before mounting the discovery/agent ISO, clear stale OS UEFI boot table entries (leftover entries from previous installations can cause the node to boot the wrong target). Use a one-time virtual-media/CD boot override for the first boot, then set boot order back to local disk after installation completes.
 - Hardware clock set to UTC
 
 ### Disable POST Memory Test
@@ -511,6 +528,12 @@ curl -sk -X PATCH \
 #### Declarative via HostFirmwareSettings (Metal³ / Ironic)
 
 If the bare metal nodes are managed by Metal³/Ironic (BareMetalHost operator), skip per-BMC scripting and drive it declaratively through `HostFirmwareSettings`:
+
+!!! warning "Assisted/Agent-Based Installs"
+    Nodes provisioned via the Assisted Installer or Agent-based method are typically registered as `ExternallyProvisioned` in Metal³. In this state, `HostFirmwareSettings` edits will **not** be applied because Ironic does not manage the firmware lifecycle for externally provisioned hosts. Apply BIOS changes via `racadm` (Dell) or Redfish API **before** imaging the nodes.
+
+!!! info "Reading Allowed Firmware Values"
+    For IPI-provisioned hosts, read allowed attribute values from the `FirmwareSchema` CR referenced by `status.schema.name` and `status.schema.namespace` on the `HostFirmwareSettings` resource — not from `status.schema` itself, which only contains the reference.
 
 ```yaml
 apiVersion: metal3.io/v1alpha1

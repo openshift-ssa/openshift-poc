@@ -294,7 +294,9 @@ Builds a dedicated storage bond with jumbo frames and a tagged VLAN for storage 
 
 #### Live Migration Network VLAN (OpenShift Virtualization)
 
-Reuse the same bond/trunk pattern for a dedicated live-migration VLAN (for example VLAN 300 on `bond1` from [Prerequisites — Networking](../prerequisites/networking.md#production-multi-bond-architecture)). Apply an NNCP that creates the VLAN interface on workers, then point the HyperConverged live migration network at that underlay — see [Virtualization prerequisites](./virtualization.md) and the [live migration network docs](https://docs.redhat.com/en/documentation/red_hat_openshift_virtualization/latest/html/virtual_machines/live-migration#virt-configuring-a-live-migration-network).
+Reuse the same bond/trunk pattern for a dedicated live-migration VLAN (for example VLAN 300 on `bond1` from [Prerequisites — Networking](../prerequisites/networking.md#production-multi-bond-architecture)). Three resources are needed: an NNCP that creates the VLAN interface on workers, a NetworkAttachmentDefinition (NAD) that bridges into the VLAN, and a HyperConverged patch that points live migration at the NAD. The `liveMigrationConfig.network` field requires a NAD reference (`namespace/name`) — a host VLAN interface name is not a valid value. See [Virtualization prerequisites](./virtualization.md) and the [live migration network docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/virtualization/live-migration#virt-configuring-a-live-migration-network).
+
+**Step 1 — Create the VLAN interface (NNCP):**
 
 ```yaml
 apiVersion: nmstate.io/v1
@@ -324,6 +326,36 @@ spec:
 ```
 
 This assumes `bond1` already exists as a trunk (see examples above). Use a dedicated VLAN ID that matches your switch configuration — do not share the management VLAN.
+
+**Step 2 — Create a NetworkAttachmentDefinition for live migration:**
+
+```yaml
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: live-migration-nad
+  namespace: openshift-cnv
+spec:
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "live-migration",
+      "type": "bridge",
+      "bridge": "br-livemigration",
+      "ipam": {}
+    }
+```
+
+```bash
+oc apply -f live-migration-nad.yaml
+```
+
+**Step 3 — Point HyperConverged at the NAD:**
+
+```bash
+oc patch hyperconvergeds.v1beta1.hco.kubevirt.io kubevirt-hyperconverged -n openshift-cnv --type merge \
+  -p '{"spec":{"liveMigrationConfig":{"network":"openshift-cnv/live-migration-nad"}}}'
+```
 
 ### OVS Bridge Trunk
 

@@ -1,9 +1,9 @@
 # Rotate SSH Keys
 
-[Machine Config Operator Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/machine_configuration/machine-configs-configure#machineconfig-modify-journald_machine-configs-configure)
+[Machine Config Operator Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/machine_configuration/index) | [KCS: Updating SSH keys](https://access.redhat.com/solutions/3868301)
 
 !!! note
-    After applying the MachineConfig, the Machine Config Operator will roll out the change to each node, causing a rolling reboot. Ensure your cluster has sufficient capacity to handle node drains during this process.
+    SSH authorized-key updates are applied by the Machine Config Operator without draining or rebooting nodes. Monitor with `oc get mcp` until `UPDATED=True`.
 
 ## Steps
 
@@ -48,7 +48,7 @@
 
 5. Repeat for Worker Nodes using `99-worker-ssh` instead of `99-master-ssh`
 
-6. Once all nodes have rebooted and are Ready, verify SSH access with the new key:
+6. Once all nodes show `UPDATED=True` in `oc get mcp`, verify SSH access with the new key:
 
   ```bash
   ssh -i ~/.ssh/ocp core@{{ node_ip }}

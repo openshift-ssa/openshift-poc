@@ -35,6 +35,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: openshift-cnv
+  labels:
+    openshift.io/cluster-monitoring: "true"
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
@@ -81,7 +83,7 @@ oc apply -f hyperconverged.yaml
 
 ```bash
 oc get csv -n openshift-cnv
-oc get hyperconverged -n openshift-cnv
+oc get hyperconvergeds.v1beta1.hco.kubevirt.io -n openshift-cnv
 oc get pods -n openshift-cnv
 ```
 
@@ -91,7 +93,7 @@ oc get pods -n openshift-cnv
 networkData: |
   version: 2
   ethernets:
-    eth1:
+    eth0:  # eth0 is the default masquerade pod network, Use eth1 only when a second NIC (bridge/CUDN) is attached
       dhcp4: no
       addresses:
         - 10.37.0.50/24

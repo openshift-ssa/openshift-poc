@@ -51,9 +51,6 @@ platform:
         - 10.0.0.3
     ingressVIPs:
         - 10.0.0.4
-    additionalNTPServers:
-      - {{ ntp_server_1 }}
-      - {{ ntp_server_2 }}
 pullSecret: '{{ pull_secret }}'
 sshKey: '{{ public_key }}'
 ```
@@ -128,7 +125,7 @@ apiVersion: v1beta1
 kind: AgentConfig
 metadata:
   name: poc
-rendezvousIP: 10.0.0.7        # This should be an IP of one of your nodes, preferably the first master node below. 
+rendezvousIP: 10.0.0.7        # Must be the IP of a control-plane (master) host — typically the first master listed below.
 additionalNTPSources:
   - {{ ntp_server_1 }}
   - {{ ntp_server_2 }}
@@ -136,7 +133,7 @@ hosts:
   - hostname: ocp-poc-cp-01
     role: master
     rootDeviceHints:
-      deviceName: "/dev/sda"
+      deviceName: "/dev/disk/by-path/<pci-path>"   # Kernel names like /dev/sda are not stable across reboots on machines with multiple disks. Discover the stable path with: ls -l /dev/disk/by-path/
     interfaces:
       - name: eno1
         macAddress: A1:B2:3C:4D:1E:11
@@ -192,8 +189,7 @@ Repeat the host entry for each control plane and worker node, updating hostname,
 
 !!! note
     Notice the inconsistent labels and spellings in the OpenShift configs: 
-    - `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza. 
-    - `additionalNTPSources` is used in agent-config, but `additionalNTPServers` in install-config.
+    - `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza.
 
 ### Active-Backup Bond (No VLAN)
 
@@ -280,6 +276,15 @@ mkdir -p openshift
 !!! note
     Do not use a `cluster-manifests/` directory for this. That name is installer **output** from `openshift-install agent create cluster-manifests` (ZTP), not a user drop-in folder.
 
+## DNS Prerequisite
+
+!!! important "DNS Prerequisite"
+    Before generating the ISO, ensure DNS A records exist for:
+
+    - `api.{{ cluster_name }}.{{ base_domain }}` → API VIP (e.g., `10.0.0.3`)
+    - `api-int.{{ cluster_name }}.{{ base_domain }}` → API VIP (e.g., `10.0.0.3`)
+    - `*.apps.{{ cluster_name }}.{{ base_domain }}` → Ingress VIP (e.g., `10.0.0.4`)
+
 ## Generate the ISO
 
 Create a script `create-iso.sh` in your working directory:
@@ -321,6 +326,9 @@ wget http://{{ installation_host }}:8080/agent.x86_64.iso
 ```
 
 ## Boot
+
+!!! warning "Port Requirement"
+    All cluster hosts must be able to reach the rendezvous host (first master) on **TCP port 8090** during the discovery and bootstrap phases. This port runs the Assisted Service API where hosts register, report hardware, and receive installation instructions. It can be closed after `install-complete`.
 
 Mount the ISO on each node via BMC virtual media (Redfish, iLO, iDRAC) and boot. 
 

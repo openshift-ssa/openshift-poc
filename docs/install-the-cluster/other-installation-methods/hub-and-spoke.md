@@ -76,7 +76,7 @@ Label the node as a storage node **only if you are installing OpenShift Data Fou
   kind: LVMCluster
   metadata:
     name: local-storage-lvm-cluster
-    namespace: openshift-storage
+    namespace: openshift-lvm-storage
   spec:
     storage:
       deviceClasses:
@@ -151,7 +151,7 @@ oc label node {{ node_name }} cluster.ocs.openshift.io/openshift-storage=
 ### Verify Storage
 
 ```bash
-oc get lvmcluster -n openshift-storage
+oc get lvmcluster -n openshift-lvm-storage
 oc get storagecluster -n openshift-storage
 oc get storageclass
 oc get pods -n openshift-storage
@@ -225,7 +225,7 @@ spec:
 ```
 
 !!! warning "Verify the ACM Channel"
-    The `release-2.17` channel above is an example and must match your OCP version. Before applying, verify the default channel: `oc get packagemanifest advanced-cluster-management -o jsonpath='{.status.defaultChannel}'`
+    The `release-2.17` channel above corresponds to the ACM release stream, not your OCP version. Before applying, verify the default ACM channel: `oc get packagemanifest advanced-cluster-management -o jsonpath='{.status.defaultChannel}'`
 
 ```bash
 oc apply -f acm-operator.yaml
@@ -247,7 +247,8 @@ kind: MultiClusterHub
 metadata:
   name: multiclusterhub
   namespace: open-cluster-management
-spec: {}
+spec:
+  availabilityConfig: Basic
 ```
 
 ```bash
@@ -266,12 +267,32 @@ The status should show `Running`.
 
 ```bash
 oc get pods -n open-cluster-management
-oc get route multicloud-console -n open-cluster-management -o jsonpath='{.spec.host}'
+```
+
+ACM 2.17 integrates as an OpenShift console plug-in (the **Fleet Management** perspective) rather than serving a separate `multicloud-console` route. To access ACM, open the OpenShift web console and switch to the **Fleet Management** perspective in the left navigation.
+
+Verify the console plug-in is active:
+
+```bash
+oc get consoleplugin acm -o jsonpath='{.status}'
 ```
 
 ### Enable Bare Metal Provisioning
 
-Enable bare metal provisioning for spoke cluster deployment:
+Enable bare metal provisioning for spoke cluster deployment. On Assisted Installer or bare-metal SNO hubs, the Provisioning CR usually already exists. Check first:
+
+```bash
+oc get provisioning provisioning-configuration
+```
+
+If it **exists**, patch it to watch all namespaces:
+
+```bash
+oc patch provisioning provisioning-configuration \
+  --type merge -p '{"spec":{"watchAllNamespaces": true}}'
+```
+
+If it **does not exist**, create it:
 
 ```yaml
 apiVersion: metal3.io/v1alpha1
@@ -349,22 +370,58 @@ To import an existing cluster (one not provisioned by ACM) into the hub:
   oc apply -f managed-cluster.yaml
   ```
 
-2. Wait for ACM to generate the import resources:
+2. Wait for ACM to generate the import secret:
 
   ```bash
   oc get secret -n {{ managed_cluster_name }} | grep import
   ```
 
-3. Extract the import YAML and apply it on the target cluster:
+3. Extract the klusterlet CRD and import YAML from the import secret:
 
   ```bash
   oc get secret {{ managed_cluster_name }}-import -n {{ managed_cluster_name }} \
-    -o jsonpath='{.data.import\.yaml}' | base64 -d > import.yaml
+    -o jsonpath='{.data.crds\.yaml}' | base64 --decode > klusterlet-crd.yaml
 
+  oc get secret {{ managed_cluster_name }}-import -n {{ managed_cluster_name }} \
+    -o jsonpath='{.data.import\.yaml}' | base64 --decode > import.yaml
+  ```
+
+4. Apply the klusterlet CRD **first** on the managed cluster, then apply the import YAML:
+
+  ```bash
+  oc apply -f klusterlet-crd.yaml --kubeconfig={{ managed_cluster_kubeconfig }}
   oc apply -f import.yaml --kubeconfig={{ managed_cluster_kubeconfig }}
   ```
 
-4. Verify the managed cluster is connected:
+  !!! warning
+      The klusterlet CRD must be applied before the import YAML. Applying them out of order will cause errors because the import resources depend on the CRD definitions.
+
+5. Create the KlusterletAddonConfig on the hub to enable ACM add-ons on the managed cluster:
+
+  ```yaml
+  apiVersion: agent.open-cluster-management.io/v1
+  kind: KlusterletAddonConfig
+  metadata:
+    name: {{ managed_cluster_name }}
+    namespace: {{ managed_cluster_name }}
+  spec:
+    clusterName: {{ managed_cluster_name }}
+    clusterNamespace: {{ managed_cluster_name }}
+    applicationManager:
+      enabled: true
+    certPolicyController:
+      enabled: true
+    policyController:
+      enabled: true
+    searchCollector:
+      enabled: true
+  ```
+
+  ```bash
+  oc apply -f klusterlet-addon-config.yaml
+  ```
+
+6. Verify the managed cluster is connected:
 
   ```bash
   oc get managedcluster {{ managed_cluster_name }}
@@ -563,7 +620,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       name: {{ hostname }}
       namespace: {{ spoke_cluster_name }}
       annotations:
-        inspect.metal3.io/disabled: ""
+        inspect.metal3.io: disabled
         bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
@@ -587,7 +644,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
         - **Enterprise/Datacenter license** — virtual media requires it. The Express license does not expose the virtual media endpoint.
 
     !!! tip "`idrac-virtualmedia` vs `redfish-virtualmedia`"
-        Ironic ships a Dell-optimized driver, `idrac-virtualmedia://`, which uses the same address format but handles Dell quirks (like boot-mode setting) more reliably. It is supported on OpenShift and is the recommended default for Dell hardware. Fall back to `redfish-virtualmedia://` only if you hit issues.
+        Ironic ships a Dell-optimized driver, `idrac-virtualmedia://`, which uses the same address format but handles Dell quirks (like boot-mode setting) more reliably. It is supported on OpenShift and is the recommended default for Dell hardware. `redfish-virtualmedia://` is not supported on Dell hardware.
 
     !!! tip "`rootDeviceHints` on Dell"
         If these are PERC RAID setups, `/dev/sda` is usually correct. On NVMe or multi-disk boxes, prefer matching by `wwn` or `serialNumber` so you don't install to the wrong disk if a reboot reorders device names.
@@ -601,7 +658,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       name: {{ hostname }}
       namespace: {{ spoke_cluster_name }}
       annotations:
-        inspect.metal3.io/disabled: ""
+        inspect.metal3.io: disabled
         bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
@@ -629,7 +686,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       name: {{ hostname }}
       namespace: {{ spoke_cluster_name }}
       annotations:
-        inspect.metal3.io/disabled: ""
+        inspect.metal3.io: disabled
         bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
@@ -657,7 +714,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
       name: {{ hostname }}
       namespace: {{ spoke_cluster_name }}
       annotations:
-        inspect.metal3.io/disabled: ""
+        inspect.metal3.io: disabled
         bmac.agent-install.openshift.io/hostname: {{ hostname }}
       labels:
         infraenvs.agent-install.openshift.io: {{ spoke_cluster_name }} # must match InfraEnv nmStateConfigLabelSelector
@@ -684,7 +741,7 @@ The `bmc.address` format is vendor-specific — use the correct scheme and syste
 ??? info "Field Reference"
     | Field                            | Description                                                                                                                                               |
     | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | `inspect.metal3.io/disabled`     | Annotation that skips Ironic hardware inspection. Required for ACM/InfraEnv host inventory so hosts register as agents instead of staying in `inspecting`. |
+    | `inspect.metal3.io: disabled`     | Annotation that skips Ironic hardware inspection. Required for ACM/InfraEnv host inventory so hosts register as agents instead of staying in `inspecting`. |
     | `bmac.agent-install.openshift.io/hostname` | Sets the hostname on the Agent that registers from this BareMetalHost. Without it, the agent may get a random or DHCP-assigned hostname.                   |
     | `bmc.address`                    | The `redfish-virtualmedia://` scheme avoids the provisioning-network requirement. The system ID at the end is vendor-specific (see tabs above).            |
     | `bootMACAddress`                 | MAC of the **data/production NIC** (e.g. `eno1`) — the interface used for cluster traffic. This is **not** the BMC/iDRAC management port MAC. For bonded/VLAN setups, use the first physical bond member's MAC. Using the wrong MAC is a common cause of hosts never getting an IP after booting the discovery ISO. |
@@ -714,10 +771,10 @@ oc get bmh -n {{ spoke_cluster_name }}
 oc get agents -n {{ spoke_cluster_name }} -w
 ```
 
-With `inspect.metal3.io/disabled` set, each host transitions through: `registering` → `available` (Ironic hardware inspection is skipped). ACM then boots the InfraEnv discovery ISO via virtual media so the host registers as an Agent. Once all hosts show as agents, you can create the cluster.
+With `inspect.metal3.io: disabled` set, each host transitions through: `registering` → `available` (Ironic hardware inspection is skipped). ACM then boots the InfraEnv discovery ISO via virtual media so the host registers as an Agent. Once all hosts show as agents, you can create the cluster.
 
 !!! warning
-    Do not omit `inspect.metal3.io/disabled` on ACM/InfraEnv BareMetalHosts. Without it, the host stays in Ironic `inspecting` waiting for the IPA ramdisk instead of registering as an assisted-installer agent.
+    Do not omit `inspect.metal3.io: disabled` on ACM/InfraEnv BareMetalHosts. Without it, the host stays in Ironic `inspecting` waiting for the IPA ramdisk instead of registering as an assisted-installer agent.
 
 ##### What happens during discovery boot
 
@@ -816,6 +873,7 @@ Once all agents are approved and showing `known` status, create the cluster reso
     name: {{ spoke_cluster_name }}
     namespace: {{ spoke_cluster_name }}
   spec:
+    platformType: BareMetal
     clusterDeploymentRef:
       name: {{ spoke_cluster_name }}
     imageSetRef:
@@ -913,7 +971,7 @@ Once all agents are approved and showing `known` status, create the cluster reso
 | Symptom                                      | Likely Cause                                                       | Fix                                                                                                           |
 | -------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
 | BMH stays in `registering`                   | BMC unreachable or credentials wrong                               | Verify `curl -sk https://{{ bmc_ip }}/redfish/v1/Systems/` works from the hub; check the Secret               |
-| BMH stays in `inspecting`                    | Missing `inspect.metal3.io/disabled` (Ironic IPA inspect path)     | Add annotation `inspect.metal3.io/disabled: ""` on the BareMetalHost; confirm InfraEnv label and `online: true` |
+| BMH stays in `inspecting`                    | Missing `inspect.metal3.io: disabled` (Ironic IPA inspect path)     | Add annotation `inspect.metal3.io: disabled` on the BareMetalHost; confirm InfraEnv label and `online: true` |
 | BMH `provisioning` but host doesn't boot ISO | Virtual media not supported or firmware too old                    | Check iDRAC/iLO firmware version; confirm Enterprise/Datacenter license (Dell)                                |
 | Agent shows `insufficient`                   | Host doesn't meet minimum requirements (CPU, RAM, disk)            | Check `oc get agent <name> -o jsonpath='{.status.conditions}'`; resolve the flagged validation                |
 | Agent shows `pending-for-input`              | Missing network config or role assignment                          | Approve the agent and assign a role (`master` or `worker`)                                                    |

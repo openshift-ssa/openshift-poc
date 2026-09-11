@@ -9,7 +9,7 @@ Persistent storage for OpenShift will be provided by a third-party storage vendo
 
 | Component         | Access Mode     | Minimum Size       | Provider                                 | Notes                                                                                                                 |
 | ----------------- | --------------- | ------------------ | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| etcd              | Local NVMe/SSD  | 40 GB              | Local disk                               | Not CSI                                                                                                               |
+| etcd              | Local NVMe/SSD  | —                  | Local disk                               | Requires `wal_fsync_duration_seconds` p99 < 10 ms and ≥ 50 sequential 8 KB write IOPS (with fdatasync). Size the control-plane install disk to at least 100 GB (120 GB for Agent-based HA). Not CSI. |
 | Internal Registry | RWX (preferred) | 100 GB             | CSI driver                               | RWO works if you set `replicas: 1` and `rolloutStrategy: Recreate` — see [Registry](../configure-the-cluster/registry.md) |
 | Monitoring        | RWO             | 50 GB              | CSI driver                               | Prometheus / Alertmanager PVCs                                                                                        |
 | Logging           | Object storage  | Sized by LokiStack | S3-compatible (NooBaa, StorageGRID, AWS) | Loki stores log chunks in **object storage**. Block RWO PVCs are only for Loki WAL/cache, not the 200 GB log data.    |

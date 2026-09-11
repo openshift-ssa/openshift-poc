@@ -21,7 +21,8 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 3. Select "From template" and choose "Red Hat Enterprise Linux 9"
 4. Give it a name (e.g., `failover-test-vm`)
 5. Ensure the VM is configured with:
-    - `runStrategy: Always` (required — tells the cluster to restart the VM after node loss)
+
+  - `runStrategy: Always` (required — tells the cluster to restart the VM after node loss)
 6. Click "Customize VirtualMachine" to edit the details before creating
 
 !!! note "Failover vs live migration"
@@ -32,12 +33,13 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
 7. Click on the "Disks" tab
 8. Click "Add disk"
 9. Configure the data disk:
-    - Name: `data-disk`
-    - Source: Blank
-    - Size: 10 GiB
-    - Type: Disk
-    - StorageClass: your RWX-capable StorageClass
-    - Access Mode: ReadWriteMany (RWX)
+
+  - Name: `data-disk`
+  - Source: Blank
+  - Size: 10 GiB
+  - Type: Disk
+  - StorageClass: your RWX-capable StorageClass
+  - Access Mode: ReadWriteMany (RWX)
 
 !!! warning
     Both the root disk and the data disk must use RWX access mode for failover to work. If either disk is RWO, the VM cannot start on a new node until the old node's lease expires (6+ minutes).
@@ -85,8 +87,9 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
       If you have configured a ClusterUserDefinedNetwork (CUDN) with persistent IPAM and attached the VM to it, the IP address is allocated to the VM itself (not the node) and will follow the VM to the new node. Without a CUDN, the VM gets a new pod network IP after failover — the VM still recovers, but clients connecting by IP will need to discover the new address.
 
 18. Optionally, open the VM console from the WebUI to confirm the guest OS is up:
-    - Virtualization -> VirtualMachines -> click `failover-test-vm` -> Console tab
-    - Log in as `cloud-user` / `Pass123!`
+
+  - Virtualization -> VirtualMachines -> click `failover-test-vm` -> Console tab
+  - Log in as `cloud-user` / `Pass123!`
 
 ## Simulate Node Failure
 
@@ -155,9 +158,10 @@ This guide walks through testing VM failover by creating a RHEL 9 virtual machin
   ```
 
 26. Open the VM console from the WebUI to confirm the guest OS has booted:
-    - Virtualization -> VirtualMachines -> click `failover-test-vm` -> Console tab
-    - Login and verify the data disk is mounted (if it was mounted in the guest)
-    - Run `ip addr` inside the guest to confirm the IP matches
+
+  - Virtualization -> VirtualMachines -> click `failover-test-vm` -> Console tab
+  - Login and verify the data disk is mounted (if it was mounted in the guest)
+  - Run `ip addr` inside the guest to confirm the IP matches
 
 27. Review the remediation events:
 

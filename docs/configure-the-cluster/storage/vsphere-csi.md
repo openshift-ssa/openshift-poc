@@ -32,126 +32,28 @@ When using the Assisted Installer with vSphere platform integration, the cluster
 !!! note
     If you installed using VMware vSphere IPI, this connection is already configured — skip to [Verify the Driver](#verify-the-driver).
 
-### Option 1: Web Console (Recommended)
+### Web Console (Assisted Installer)
 
-1. In the **Administrator** perspective, navigate to **Home > Overview**
-2. Under **Status**, click **vSphere connection** to open the configuration wizard
+On OCP 4.22, the vSphere CSI Driver Operator is installed by default when the cluster has `platform: vsphere`. For Assisted Installer installs, complete the vSphere connection through the web console wizard — no CLI patching or node tainting is required.
+
+1. In the **Administrator** perspective, navigate to **Administration → Home → Overview**
+2. Under **Status**, click **vSphere connection** to open the vSphere connection configuration wizard
 3. Fill in the following fields:
 
-    | Field                  | Value                                                                   |
-    | ---------------------- | ----------------------------------------------------------------------- |
-    | vCenter                | vCenter server FQDN or IP (e.g., `vcenter.example.com`)                 |
-    | Username               | vCenter service account username                                        |
-    | Password               | vCenter service account password                                        |
-    | Datacenter             | vSphere datacenter name (e.g., `SDDC-Datacenter`)                       |
-    | Default data store     | Full datastore path (e.g., `/SDDC-Datacenter/datastore/vsanDatastore`)  |
-    | Virtual Machine Folder | Folder containing cluster VMs (e.g., `/SDDC-Datacenter/vm/ocp-cluster`) |
-    | vCenter cluster        | vSphere cluster where OpenShift is installed                            |
+  | Field                  | Value                                                                   |
+  | ---------------------- | ----------------------------------------------------------------------- |
+  | vCenter                | vCenter server FQDN or IP (e.g., `vcenter.example.com`)                 |
+  | Username               | vCenter service account username                                        |
+  | Password               | vCenter service account password                                        |
+  | Datacenter             | vSphere datacenter name (e.g., `SDDC-Datacenter`)                       |
+  | Default data store     | Full datastore path (e.g., `/SDDC-Datacenter/datastore/vsanDatastore`)  |
+  | Virtual Machine Folder | Folder containing cluster VMs (e.g., `/SDDC-Datacenter/vm/ocp-cluster`) |
+  | vCenter cluster        | vSphere cluster where OpenShift is installed                            |
 
 4. Click **Save Configuration**
 
 !!! warning
     An incorrect username or password will make cluster nodes unschedulable. The credentials are stored in the `vsphere-creds` secret in the `kube-system` namespace.
-
-### Option 2: CLI
-
-1. Generate base64-encoded credentials:
-
-    ```bash
-    VCENTER_USER_B64=$(echo -n "{{ vcenter_username }}" | base64 -w0)
-    VCENTER_PASS_B64=$(echo -n "{{ vcenter_password }}" | base64 -w0)
-    ```
-
-2. Back up the secret, then copy it to a working file you will edit:
-
-    ```bash
-    oc get secret vsphere-creds -o yaml -n kube-system > vsphere-creds-backup.yaml
-    cp vsphere-creds-backup.yaml vsphere-creds.yaml
-    ```
-
-    Edit `vsphere-creds.yaml` to set your encoded credentials:
-
-    ```yaml
-    apiVersion: v1
-    data:
-      {{ vcenter_address }}.username: {{ base64_encoded_username }}
-      {{ vcenter_address }}.password: {{ base64_encoded_password }}
-    kind: Secret
-    metadata:
-      annotations:
-        cloudcredential.openshift.io/mode: passthrough
-      name: vsphere-creds
-      namespace: kube-system
-    type: Opaque
-    ```
-
-    ```bash
-    oc replace -f vsphere-creds.yaml
-    ```
-
-3. Redeploy the kube-controller-manager:
-
-    ```bash
-    oc patch kubecontrollermanager cluster \
-      -p='{"spec": {"forceRedeploymentReason": "recovery-'"$( date --rfc-3339=ns )"'"}}' \
-      --type=merge
-    ```
-
-4. Back up and update the cloud provider config:
-
-    ```bash
-    oc get cm cloud-provider-config -o yaml -n openshift-config > cloud-provider-config-backup.yaml
-    cp cloud-provider-config-backup.yaml cloud-provider-config.yaml
-    ```
-
-    Edit `cloud-provider-config.yaml`:
-
-    ```yaml
-    apiVersion: v1
-    data:
-      config: |
-        global:
-          insecureFlag: true
-          secretName: vsphere-creds
-          secretNamespace: kube-system
-        vcenter:
-          {{ vcenter_address }}:
-            server: "{{ vcenter_address }}"
-            port: 443
-            insecureFlag: true
-            datacenters:
-            - {{ datacenter }}
-    kind: ConfigMap
-    metadata:
-      name: cloud-provider-config
-      namespace: openshift-config
-    ```
-
-    ```bash
-    oc apply -f cloud-provider-config.yaml
-    ```
-
-5. Taint all nodes to trigger cloud provider initialization:
-
-    ```bash
-    for NODE in $(oc get nodes -o name); do
-      oc adm taint node ${NODE##*/} \
-        node.cloudprovider.kubernetes.io/uninitialized=true:NoSchedule
-    done
-    ```
-
-6. Update the infrastructure object with your vSphere topology:
-
-    ```bash
-    oc get infrastructure cluster -o yaml > infra-backup.yaml
-    cp infra-backup.yaml infra.yaml
-    ```
-
-    Edit `spec.platformSpec` in `infra.yaml` to include your vSphere details (vcenters, failureDomains, topology), then apply:
-
-    ```bash
-    oc apply -f infra.yaml
-    ```
 
 ### Wait for Configuration to Complete
 
@@ -322,9 +224,10 @@ You can encrypt dynamically provisioned PVs on vSphere. VMs must be encrypted fi
 1. In vCenter, create a category for tagging datastores (ensure `StoragePod`, `Datastore`, and `Folder` are selected as Associable Entities)
 2. Create a tag using that category and assign it to each target datastore
 3. Create a VM Storage Policy under **Policies and Profiles > VM Storage Policies**:
-    - Enable **host based rules** and **tag based placement rules**
-    - Select **Encryption and Default Encryption Properties**
-    - Select the tag category and tag from step 1-2
+
+  - Enable **host based rules** and **tag based placement rules**
+  - Select **Encryption and Default Encryption Properties**
+  - Select the tag category and tag from step 1-2
 4. Create a StorageClass referencing the policy:
 
 ```yaml

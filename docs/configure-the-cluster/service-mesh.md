@@ -155,6 +155,10 @@ The `PHASE` should show `Succeeded`.
   spec:
     namespace: istio-cni
     profile: ambient
+    values:
+      cni:
+        ambient:
+          reconcileIptablesOnStartup: true
   ```
 
   ```bash

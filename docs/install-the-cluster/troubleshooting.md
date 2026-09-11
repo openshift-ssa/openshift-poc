@@ -1,11 +1,12 @@
 # Install Troubleshooting
 
-## Collecting Bootstrap Logs
+## Collecting Bootstrap / Install Logs
 
-!!! note "When this applies"
-    `openshift-install gather bootstrap` is for **installer-provisioned (IPI)** installs that create a temporary bootstrap VM (for example [vSphere IPI](./other-installation-methods/vmware-install.md)). For Assisted Installer or Agent-Based Installer, use the installer/agent wait-for logs and [must-gather](../workloads-and-operations/day-2-operations/must-gather.md) instead — there is no separate bootstrap host to gather from after install.
+The right log-gathering command depends on which installer method you used.
 
-If an IPI installation times out during the bootstrap phase, gather diagnostic logs before the bootstrap node is destroyed:
+### IPI and UPI (with a distinct bootstrap machine)
+
+`openshift-install gather bootstrap` applies only to installs that create a **separate bootstrap VM** (IPI or UPI with an explicit bootstrap node). If the installation times out during the bootstrap phase, gather diagnostic logs before the bootstrap node is destroyed:
 
 ```bash
 openshift-install gather bootstrap --dir=install \
@@ -16,6 +17,28 @@ openshift-install gather bootstrap --dir=install \
 ```
 
 This creates a compressed archive containing journal logs, container logs, and bootstrap progress information.
+
+### Agent-based installer
+
+There is no separate bootstrap host to gather from. Instead, stream debug-level logs from the rendezvous host and collect the agent-gather archive:
+
+```bash
+# Stream bootstrap progress with debug output
+openshift-install agent wait-for bootstrap-complete --dir=install --log-level=debug
+
+# Collect the agent-gather diagnostic archive from the rendezvous host
+ssh core@<rendezvousIP> agent-gather -O > agent-gather.tar.xz
+```
+
+### Assisted Installer
+
+On the discovery host, inspect the agent journal for registration and installation errors:
+
+```bash
+sudo journalctl TAG=agent
+```
+
+For post-install issues, use [must-gather](../workloads-and-operations/day-2-operations/must-gather.md) instead.
 
 ## Booting in Debug Mode
 
@@ -29,11 +52,12 @@ If you need to troubleshoot boot issues, modify the boot parameters at the GRUB 
 
 ### Debug Parameters
 
-| Parameter                       | When to Use                                              |
-| ------------------------------- | -------------------------------------------------------- |
-| `rd.break`                      | Fix problems on root filesystem before systemd runs      |
-| `systemd.unit=emergency.target` | General system troubleshooting (corrupt fstab, services) |
-| `init=/bin/bash`                | Last resort when other methods fail                      |
+| Parameter                       | When to Use                                                                                                                                       |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `rd.break`                      | Fix problems on root filesystem before systemd runs                                                                                               |
+| `rd.break=initqueue`           | Interrupts at the dracut main loop — use for Assisted/Agent discovery ISO boot failures to inspect NMState/network from the initramfs shell       |
+| `systemd.unit=emergency.target` | General system troubleshooting (corrupt fstab, services) — applies to an already-installed RHCOS rootfs only                                      |
+| `init=/bin/bash`                | Last resort when other methods fail — applies to an already-installed RHCOS rootfs only                                                           |
 
 ## Known Issues
 
@@ -50,20 +74,26 @@ This usually happens when you are using a web proxy and the certificate being pr
 - Verify MAC addresses match between `agent-config.yaml` and actual hardware
 - Verify IP configuration is correct and on the expected subnet
 - Check BMC virtual media is properly mounted
+- Verify TCP 8090 is reachable from all hosts to the rendezvous host (the assisted-service API runs on this port)
 
 **Assisted Installer:**
 
 - Verify the host is booted from the correct discovery ISO
 - Check that the host can reach the Assisted Service API (`console.redhat.com` or on-prem endpoint)
 - Verify network connectivity on the provisioning interface
+- Check `sudo journalctl TAG=agent` on the discovery host for registration errors
 
 ### DNS Validation Fails
 
 {% raw %}
-- Verify `api.{{ cluster_name }}.{{ base_domain }}` and `*.apps.{{ cluster_name }}.{{ base_domain }}` A records exist
-- Test resolution from the same network: `dig +short api.{{ cluster_name }}.{{ base_domain }}`
+- Verify `api.{{ cluster_name }}.{{ base_domain }}`, `api-int.{{ cluster_name }}.{{ base_domain }}`, and `*.apps.{{ cluster_name }}.{{ base_domain }}` A records exist
+- `api-int` resolution is a **blocking pre-install validation** for user-managed networking — the install will not proceed if it cannot be resolved
+- Test resolution from the same network: `dig +short api.{{ cluster_name }}.{{ base_domain }}` and `dig +short api-int.{{ cluster_name }}.{{ base_domain }}`
 {% endraw %}
 - Verify reverse DNS (PTR) records for node IPs if hosts are registering with incorrect hostnames
+
+!!! warning "Wildcard DNS scope"
+    Do **not** create a wildcard at `*.{{ cluster_name }}.{{ base_domain }}` — this will match `api` and `api-int` but also catch traffic not intended for the cluster ingress. The wildcard must be scoped to `*.apps.{{ cluster_name }}.{{ base_domain }}` only.
 
 ### NTP Validation Fails
 

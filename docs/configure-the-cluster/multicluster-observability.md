@@ -15,7 +15,7 @@ MultiCluster Observability provides centralized monitoring and metrics collectio
 
   ```bash
   oc create namespace open-cluster-management-observability
-  DOCKER_CONFIG_JSON=$(oc extract secret/pull-secret -n openshift-config --to=-)
+  DOCKER_CONFIG_JSON=$(oc extract secret/multiclusterhub-operator-pull-secret -n open-cluster-management --to=- 2>/dev/null) || \
   oc create secret generic multiclusterhub-operator-pull-secret \
       -n open-cluster-management-observability \
       --from-literal=.dockerconfigjson="$DOCKER_CONFIG_JSON" \
@@ -218,7 +218,7 @@ Continue with [Create the MultiClusterObservability instance](#create-the-multic
   apiVersion: observability.open-cluster-management.io/v1beta2
   kind: MultiClusterObservability
   metadata:
-    name: multi-cluster-observability
+    name: observability
   spec:
     enableDownsampling: true
     imagePullPolicy: IfNotPresent
@@ -237,6 +237,9 @@ Continue with [Create the MultiClusterObservability instance](#create-the-multic
       storageClass: lvms-local-storage
       storeStorageSize: 10Gi
   ```
+
+  !!! note
+      The `storageClass` field is optional. If omitted, the platform default StorageClass is used. Set it explicitly only if your hub has no default StorageClass or you need a specific one.
 
   ```bash
   oc apply -f multiclusterobservability.yaml

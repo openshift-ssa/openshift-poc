@@ -56,22 +56,11 @@ The terminal comes pre-loaded with common CLI tools including `oc`, `kubectl`, `
 
 ## Configure Idle Timeout
 
-To change the default idle timeout, edit the `DevWorkspace` operator configuration:
+In OCP 4.22 and later, the supported cluster-wide method to configure the web terminal idle timeout is through the Console UI:
 
-```yaml
-apiVersion: controller.devfile.io/v1alpha1
-kind: DevWorkspaceOperatorConfig
-metadata:
-  name: devworkspace-operator-config
-  namespace: openshift-operators
-spec:
-  workspace:
-    idleTimeout: 30m
-```
-
-```bash
-oc apply -f devworkspace-config.yaml
-```
+1. Navigate to **Administration** → **Cluster Settings** → **Configuration** → **Console**
+2. Click **Customize** → **Web Terminal**
+3. Set the desired idle timeout value
 
 ## Configure Network Policies
 
@@ -81,20 +70,34 @@ If your cluster uses network policies that restrict pod communication, web termi
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-web-terminal-egress
-  namespace: {{ namespace }}
+  name: allow-from-openshift-console
 spec:
-  podSelector:
-    matchLabels:
-      controller.devfile.io/devworkspace_cr_owner: web-terminal
+  podSelector: {}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-console
   policyTypes:
-    - Egress
-  egress:
-    - {}
+    - Ingress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-from-openshift-operators
+spec:
+  podSelector: {}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-operators
+  policyTypes:
+    - Ingress
 ```
 
 ```bash
-oc apply -f web-terminal-egress.yaml
+oc apply -f web-terminal-networkpolicies.yaml
 ```
 
 If terminals fail to connect, also confirm DNS and that the project can reach the Kubernetes API service.

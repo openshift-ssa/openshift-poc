@@ -16,16 +16,11 @@ The Migration Toolkit for Virtualization (MTV) enables migration of virtual mach
 ## Obtaining the VDDK
 
 !!! warning "Action Required Before Migration"
-    Broadcom has restricted access to the VMware Virtual Disk Development Kit (VDDK). If you plan to migrate VMs from VMware vSphere to OpenShift Virtualization, you **must** open a support ticket with Broadcom to request access to the VDDK download. This can take several business days, so initiate the request early in your POC planning.
+    Broadcom withdrew public VDDK downloads in August 2026. Access is now available only through select TAP (Technology Alliance Program) partners. Customer support tickets are no longer a reliable path to obtain the archive. Confirm you already have a VDDK archive (or a TAP partner path) **before** scoping warm or vSAN migrations.
 
-To obtain the VDDK:
+VDDK is optional for cold migrations of non-vSAN VMs (transfer is slower without it) and required for warm migrations and vSAN-backed VMs. The `virt-v2v` tool always performs guest conversion regardless of whether VDDK is configured. Cold migrations of non-vSAN VMs can proceed without VDDK at reduced transfer speeds.
 
-1. Log in to the [Broadcom Support Portal](https://support.broadcom.com)
-2. Open a support ticket requesting the **VMware Virtual Disk Development Kit (VDDK)** for your licensed vSphere version
-3. Broadcom support will provide the VDDK archive directly — it is no longer available for self-service download from the developer portal
-4. Match the VDDK version to your source vSphere version (e.g., VDDK 8.0.x for vSphere 8.0)
-
-Without the VDDK, migrations fall back to a slower transfer method (`virt-v2v`). The VDDK is strongly recommended for all VMware migrations.
+Red Hat Engineering is currently working on an open source solution. (as of 9/10)
 
 ## Install the Operator via WebUI
 
@@ -120,12 +115,17 @@ A source provider is the hypervisor environment you are migrating VMs from. A de
 2. Click "Create Provider"
 3. Select "vSphere"
 4. Fill in the details:
-    - Name: a friendly name for this provider
-    - vCenter host or ESXi host: the FQDN or IP of the vCenter server
-    - Username: a vCenter user with at least read access to the VMs
-    - Password: the vCenter password
-    - SHA-1 fingerprint of the vCenter certificate (or skip verification for POC)
-    - VDDK init image: upload the VDDK archive or paste an existing image URL (see [Upload the VDDK Image via WebUI](#upload-the-vddk-image-via-webui))
+
+  - Name: a friendly name for this provider
+  - vCenter host or ESXi host: the FQDN or IP of the vCenter server
+  - Username: a vCenter user with at least read access to the VMs
+  - Password: the vCenter password
+  - Certificate validation — MTV 2.12 supports three options:
+    - **Use a custom CA certificate** — paste or upload the vCenter CA cert
+    - **Use the system CA certificate** — uses the cluster's trusted CA bundle
+    - **Skip certificate validation (recommended for POC)** — disables TLS verification for the vCenter connection
+  - VDDK init image: upload the VDDK archive or paste an existing image URL (see [Upload the VDDK Image via WebUI](#upload-the-vddk-image-via-webui))
+
 5. Click Create
 
 ### Add vSphere Provider via YAML
@@ -136,6 +136,8 @@ A source provider is the hypervisor environment you are migrating VMs from. A de
   oc create secret generic vsphere-credentials \
     --from-literal=user={{ vcenter_username }} \
     --from-literal=password={{ vcenter_password }} \
+    --from-literal=insecureSkipVerify="true" \
+    --from-literal=url="https://{{ vcenter_fqdn }}/sdk" \
     -n openshift-mtv
   ```
 
@@ -153,6 +155,9 @@ A source provider is the hypervisor environment you are migrating VMs from. A de
     secret:
       name: vsphere-credentials
       namespace: openshift-mtv
+    settings:
+      vddkInitImage: {{ registry_host }}/openshift-mtv/vddk:latest
+      sdkEndpoint: vcenter
   ```
 
   ```bash
@@ -254,23 +259,21 @@ oc get provider vsphere-source -n openshift-mtv -o jsonpath='{.status.conditions
 
 ## Set Up the VMware Virtual Disk Development Kit (VDDK)
 
-It is strongly recommended that MTV be used with the VMware Virtual Disk Development Kit (VDDK) SDK when transferring virtual disks from VMware vSphere. Without the VDDK, MTV falls back to the slower `virt-v2v` transfer path, which can result in significantly longer migration times.
+It is strongly recommended that MTV be used with the VMware Virtual Disk Development Kit (VDDK) SDK when transferring virtual disks from VMware vSphere. Without the VDDK, disk transfer is significantly slower. The `virt-v2v` tool always performs guest conversion regardless of whether VDDK is configured.
 
 Download the VDDK archive from VMware, then either upload it through the MTV WebUI (MTV builds the init image for you) or build and push the container image yourself with `podman`.
 
 !!! warning "VMware License"
     Storing the VDDK image in a public registry might violate the VMware license terms.
 
-### Obtain VDDK from Broadcom
+### Obtain VDDK
 
-Match the VDDK version to your source vSphere (vCenter/ESXi) version. Broadcom aligns VDDK version numbers with vSphere (for example, use VDDK **8.0.x** with vSphere **8.0**). Prefer the VDDK release that corresponds to your environment's major.minor version so disk-transfer features and compatibility stay aligned.
+Match the VDDK version to your source vSphere (vCenter/ESXi) version. Broadcom aligns VDDK version numbers with vSphere (for example, use VDDK **8.0.x** with vSphere **8.0**).
 
-!!! note
-    The VDDK is no longer available for self-service download from the Broadcom developer portal. You must open a support ticket and Broadcom will provide the archive directly. See [Obtaining the VDDK](#obtaining-the-vddk) above.
+!!! warning "VDDK Availability (September 2026)"
+    Public VDDK downloads were withdrawn by Broadcom in August 2026. Access is now limited to select TAP (Technology Alliance Program) partners. Customer support tickets are no longer a reliable path. If you do not already have a VDDK archive, confirm a TAP partner path before planning warm or vSAN migrations.
 
-1. Open a support ticket at the [Broadcom Support Portal](https://support.broadcom.com) requesting VDDK for your vSphere version
-2. Broadcom support will provide the `VMware-vix-disklib-<version>.x86_64.tar.gz` archive
-3. Save the archive locally (for example, into `/tmp/vddk`)
+If you have an existing VDDK archive (`VMware-vix-disklib-<version>.x86_64.tar.gz`), proceed to [Upload the VDDK Image via WebUI](#upload-the-vddk-image-via-webui) or [Build and Push the VDDK Image via CLI](#build-and-push-the-vddk-image-via-cli).
 
 ### Upload the VDDK Image via WebUI
 
@@ -281,12 +284,13 @@ The MTV console can upload the VDDK archive and build the init image when you cr
 3. Select **vSphere** / **VMware**
 4. Fill in the provider details (name, URL, credentials, certificate options)
 5. In the **VDDK init image** section, either:
-    - **Upload the archive (recommended for POC):**
-        1. Click **Browse** next to the VDDK init image archive field
-        2. Select your downloaded `VMware-vix-disklib-<version>.x86_64.tar.gz` and click **Select**
-        3. Click **Upload**
-        4. Wait for the upload to finish — MTV builds the init image and populates the image URL
-    - **Use an existing image:** paste the image path (for example, `image-registry.openshift-image-registry.svc:5000/openshift-mtv/vddk:latest`)
+
+  - **Upload the archive (recommended for POC):**
+    1. Click **Browse** next to the VDDK init image archive field
+    2. Select your downloaded `VMware-vix-disklib-<version>.x86_64.tar.gz` and click **Select**
+    3. Click **Upload**
+    4. Wait for the upload to finish — MTV builds the init image and populates the image URL
+  - **Use an existing image:** paste the image path (for example, `image-registry.openshift-image-registry.svc:5000/openshift-mtv/vddk:latest`)
 6. Click **Create provider** (or save the edit)
 7. Wait until the provider status is `Ready` (this can take a few minutes while the image is built)
 
@@ -323,11 +327,11 @@ ls   # should show vmware-vix-disklib-distrib/
 
 #### Create the VDDK Container Image
 
-Create a `Containerfile`:
+Create a `Dockerfile`:
 
 ```bash
-cat > Containerfile <<'EOF'
-FROM registry.redhat.io/ubi9/ubi-minimal
+cat > Dockerfile <<'EOF'
+FROM registry.access.redhat.com/ubi8/ubi-minimal
 USER 1001
 COPY vmware-vix-disklib-distrib /vmware-vix-disklib-distrib
 RUN mkdir -p /opt
@@ -372,23 +376,7 @@ podman push $REGISTRY/openshift-mtv/vddk:latest --tls-verify=false
 
 Ensure the image is accessible to your OpenShift Virtualization environment. If you are using an external registry, verify that OpenShift can pull from it.
 
-#### Configure MTV to Use the VDDK Image
-
-Update the `ForkliftController` to reference the VDDK init image:
-
-```bash
-oc patch forkliftcontroller forklift-controller -n openshift-mtv --type merge \
-  -p "{\"spec\":{\"controller_vddk_init_image\":\"$REGISTRY/openshift-mtv/vddk:latest\"}}"
-```
-
-Verify the patch:
-
-```bash
-oc get forkliftcontroller forklift-controller -n openshift-mtv \
-  -o jsonpath='{.spec.controller_vddk_init_image}'
-```
-
-You can also set the same image URL on a vSphere provider in the WebUI (**VDDK init image** field) instead of patching the controller.
+You can also set the VDDK image URL on a vSphere provider's `settings.vddkInitImage` field (see [Add vSphere Provider via YAML](#add-vsphere-provider-via-yaml)) instead of building a separate init image.
 
 ### Allow Target Namespaces to Pull the VDDK Image
 
@@ -444,6 +432,10 @@ Once providers are configured, create a migration plan using the WebUI wizard:
 3. Select the source provider (e.g., `vsphere-source`)
 4. Select the target provider (`host` — the local OpenShift Virtualization cluster)
 5. Select the VMs to migrate
+
+  !!! warning "ESXi NFC Connection Limit"
+      If migrating more than 10 VMs from the same ESXi host in a single plan, increase the NFC service memory on that host (`nfcsvc maxMemory` to `1000000000` in `/etc/vmware/hostd/config.xml`) and restart `hostd`. The default NFC service supports only 10 parallel connections.
+
 6. Configure network mappings (source network -> target network)
 7. Configure storage mappings (source datastore -> target StorageClass)
 8. Review and click "Create"
@@ -458,7 +450,14 @@ Once providers are configured, create a migration plan using the WebUI wizard:
 !!! tip "Start with Cold Migrations"
     For POC environments, start with cold migrations. They are simpler to troubleshoot and do not require VMware Changed Block Tracking (CBT).
 
-    Migrations can run without VDDK but will use the slower `virt-v2v` fallback. VDDK is strongly recommended for acceptable transfer speeds. See [Obtaining the VDDK](#obtaining-the-vddk).
+    Migrations can run without VDDK but will use a slower disk-transfer path. VDDK is strongly recommended for acceptable transfer speeds. See [Obtaining the VDDK](#obtaining-the-vddk).
+
+!!! info "Warm Migration Prerequisites"
+    Warm migrations pre-copy disk data while the VM is still running. They require:
+
+    - VDDK image must be configured on the vSphere Provider (`settings.vddkInitImage`)
+    - Changed Block Tracking (CBT) must be enabled on each source VM **and** each VM disk
+    - VMware Tools must be installed on the source VM
 
 ## Run the Migration
 
