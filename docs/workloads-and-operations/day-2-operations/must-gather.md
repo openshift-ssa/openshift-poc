@@ -101,7 +101,7 @@ oc adm must-gather \
 Limit collection to a single namespace:
 
 ```bash
-oc adm must-gather --dest-dir=<dir> -- oc adm inspect ns/{{ namespace }}
+oc adm must-gather --dest-dir=<dir> -- oc adm inspect ns/{{ ns }}
 ```
 
 ### Since a Specific Time

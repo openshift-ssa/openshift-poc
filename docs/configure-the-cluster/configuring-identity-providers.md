@@ -204,7 +204,7 @@ OpenShift can sync LDAP groups to OpenShift Groups, enabling role-based access c
 14. Grant edit access to a developer group in a specific namespace:
 
   ```bash
-  oc adm policy add-role-to-group edit {{ dev_group_name }} -n {{ namespace }}
+  oc adm policy add-role-to-group edit {{ dev_group_name }} -n {{ ns }}
   ```
 
 #### Automate Group Sync with a CronJob

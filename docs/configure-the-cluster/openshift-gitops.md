@@ -52,26 +52,15 @@ OpenShift GitOps provides ArgoCD for managing application deployments using GitO
     oc wait --for=condition=Ready pods --all -n openshift-gitops --timeout=300s
     ```
 
-## Verify the Installation
-
-```bash
-oc get pods -n openshift-gitops
-```
-
 ## Access the Argo CD Console
 
 1. In the WebUI, the Argo CD link will appear in the grid menu (top right) once the operator is installed
 2. You can log in using OpenShift OAuth
-3. To get the default `admin` password via CLI:
-
-```bash
-oc extract secret/openshift-gitops-cluster -n openshift-gitops --keys=admin.password --to=-
-```
 
 ## Grant Argo CD Access to a Namespace
 
 ```bash
-oc label namespace {{ namespace }} argocd.argoproj.io/managed-by=openshift-gitops
+oc label namespace {{ namespace_name }} argocd.argoproj.io/managed-by=openshift-gitops
 ```
 
 ## Create an Application

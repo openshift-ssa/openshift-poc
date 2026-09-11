@@ -451,7 +451,7 @@ spec:
   processor:
     advanced:
       secondaryNetworks:
-        - name: {{ namespace }}/{{ network_attachment_definition }}
+        - name: {{ ns }}/{{ network_attachment_definition }}
           index:
             - MAC
 ```
@@ -482,7 +482,7 @@ Per-namespace metrics for a developer:
 
 ```bash
 oc adm policy add-cluster-role-to-user netobserv-loki-reader {{ username }}
-oc adm policy add-role-to-user netobserv-metrics-reader {{ username }} -n {{ namespace }}
+oc adm policy add-role-to-user netobserv-metrics-reader {{ username }} -n {{ ns }}
 ```
 
 ## Uninstall

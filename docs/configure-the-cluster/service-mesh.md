@@ -222,7 +222,7 @@ All resources should show `Ready` and all pods should be `Running`.
 To add a namespace to the ambient mesh, label it:
 
 ```bash
-oc label namespace {{ namespace }} istio.io/dataplane-mode=ambient
+oc label namespace {{ ns }} istio.io/dataplane-mode=ambient
 ```
 
 All pods in that namespace will automatically have their traffic routed through the ZTunnel proxy with mTLS — no sidecar injection needed.
@@ -232,7 +232,7 @@ All pods in that namespace will automatically have their traffic routed through 
 If you need Layer 7 features (HTTP routing, retries, traffic splitting) for a specific service account or namespace:
 
 ```bash
-istioctl waypoint apply -n {{ namespace }}
+istioctl waypoint apply -n {{ ns }}
 ```
 
 Or create it declaratively:
@@ -242,7 +242,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: waypoint
-  namespace: {{ namespace }}
+  namespace: {{ ns }}
   labels:
     istio.io/waypoint-for: service
 spec:

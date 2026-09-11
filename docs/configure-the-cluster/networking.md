@@ -40,6 +40,8 @@ Examples below cover both patterns. Prefer the 2-bond + VLAN model for OpenShift
 
 ### xmit_hash_policy explanations
 
+The kernel default is `layer2`. All NNCP examples in this guide explicitly set `layer3+4` for better distribution with storage and virtualization workloads.
+
 The main xmit_hash_policy values for 802.3ad bonds:
 
 - layer2 — Hashes on source/destination MAC only. All traffic between two given MACs takes a single slave, so a single node-to-node flow can't spread across members. Standard 802.3ad compliant.
