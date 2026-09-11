@@ -72,60 +72,60 @@ The `PHASE` should show `Succeeded`.
 6. Click Install
 7. Wait for the Operator to install
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-1. Create the namespace and operator group:
+    1. Create the namespace and operator group:
 
-   ```yaml
-   apiVersion: v1
-   kind: Namespace
-   metadata:
-     name: openshift-operators-redhat
-     annotations:
-       openshift.io/node-selector: ""
-     labels:
-       openshift.io/cluster-monitoring: "true"
-   ---
-   apiVersion: operators.coreos.com/v1
-   kind: OperatorGroup
-   metadata:
-     name: loki-operator
-     namespace: openshift-operators-redhat
-   spec:
-     upgradeStrategy: Default
-   ```
+       ```yaml
+       apiVersion: v1
+       kind: Namespace
+       metadata:
+         name: openshift-operators-redhat
+         annotations:
+           openshift.io/node-selector: ""
+         labels:
+           openshift.io/cluster-monitoring: "true"
+       ---
+       apiVersion: operators.coreos.com/v1
+       kind: OperatorGroup
+       metadata:
+         name: loki-operator
+         namespace: openshift-operators-redhat
+       spec:
+         upgradeStrategy: Default
+       ```
 
-   ```bash
-   oc apply -f loki-operator-ns.yaml
-   ```
+       ```bash
+       oc apply -f loki-operator-ns.yaml
+       ```
 
-2. Create the subscription:
+    2. Create the subscription:
 
-   ```yaml
-   apiVersion: operators.coreos.com/v1alpha1
-   kind: Subscription
-   metadata:
-     name: loki-operator
-     namespace: openshift-operators-redhat
-   spec:
-     channel: stable-6.6
-     installPlanApproval: Automatic
-     name: loki-operator
-     source: redhat-operators
-     sourceNamespace: openshift-marketplace
-   ```
+       ```yaml
+       apiVersion: operators.coreos.com/v1alpha1
+       kind: Subscription
+       metadata:
+         name: loki-operator
+         namespace: openshift-operators-redhat
+       spec:
+         channel: stable-6.6
+         installPlanApproval: Automatic
+         name: loki-operator
+         source: redhat-operators
+         sourceNamespace: openshift-marketplace
+       ```
 
-   ```bash
-   oc apply -f loki-operator-sub.yaml
-   ```
+       ```bash
+       oc apply -f loki-operator-sub.yaml
+       ```
 
-3. Wait for the operator:
+    3. Wait for the operator:
 
-   ```bash
-   oc get csv -n openshift-operators-redhat -w
-   ```
+       ```bash
+       oc get csv -n openshift-operators-redhat -w
+       ```
 
-   The `PHASE` should show `Succeeded`.
+       The `PHASE` should show `Succeeded`.
 
 ## Configure Object Storage
 
@@ -269,50 +269,50 @@ The operator must be installed in `openshift-netobserv-operator`. Do not install
 6. Click Install
 7. Wait for the Operator to install
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-1. Create the namespace, operator group, and subscription:
+    1. Create the namespace, operator group, and subscription:
 
-   ```yaml
-   apiVersion: v1
-   kind: Namespace
-   metadata:
-     name: openshift-netobserv-operator
-     labels:
-       openshift.io/cluster-monitoring: "true"
-   ---
-   apiVersion: operators.coreos.com/v1
-   kind: OperatorGroup
-   metadata:
-     name: openshift-netobserv-operator
-     namespace: openshift-netobserv-operator
-   spec:
-     upgradeStrategy: Default
-   ---
-   apiVersion: operators.coreos.com/v1alpha1
-   kind: Subscription
-   metadata:
-     name: netobserv-operator
-     namespace: openshift-netobserv-operator
-   spec:
-     channel: stable
-     installPlanApproval: Automatic
-     name: netobserv-operator
-     source: redhat-operators
-     sourceNamespace: openshift-marketplace
-   ```
+       ```yaml
+       apiVersion: v1
+       kind: Namespace
+       metadata:
+         name: openshift-netobserv-operator
+         labels:
+           openshift.io/cluster-monitoring: "true"
+       ---
+       apiVersion: operators.coreos.com/v1
+       kind: OperatorGroup
+       metadata:
+         name: openshift-netobserv-operator
+         namespace: openshift-netobserv-operator
+       spec:
+         upgradeStrategy: Default
+       ---
+       apiVersion: operators.coreos.com/v1alpha1
+       kind: Subscription
+       metadata:
+         name: netobserv-operator
+         namespace: openshift-netobserv-operator
+       spec:
+         channel: stable
+         installPlanApproval: Automatic
+         name: netobserv-operator
+         source: redhat-operators
+         sourceNamespace: openshift-marketplace
+       ```
 
-   ```bash
-   oc apply -f netobserv-operator.yaml
-   ```
+       ```bash
+       oc apply -f netobserv-operator.yaml
+       ```
 
-2. Wait for the operator:
+    2. Wait for the operator:
 
-   ```bash
-   oc get csv -n openshift-netobserv-operator -w
-   ```
+       ```bash
+       oc get csv -n openshift-netobserv-operator -w
+       ```
 
-   The `PHASE` should show `Succeeded`.
+       The `PHASE` should show `Succeeded`.
 
 ## Create the FlowCollector
 

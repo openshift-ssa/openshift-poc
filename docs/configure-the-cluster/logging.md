@@ -57,58 +57,58 @@ The Loki Operator must be installed first, before the Logging Operator.
 6. Click Install
 7. Wait for the Operator to install
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-1. Create the namespace and operator group:
+    1. Create the namespace and operator group:
 
-   ```yaml
-   apiVersion: v1
-   kind: Namespace
-   metadata:
-     name: openshift-operators-redhat
-     annotations:
-       openshift.io/node-selector: ""
-     labels:
-       openshift.io/cluster-monitoring: "true"
-   ---
-   apiVersion: operators.coreos.com/v1
-   kind: OperatorGroup
-   metadata:
-     name: loki-operator
-     namespace: openshift-operators-redhat
-   spec:
-     upgradeStrategy: Default
-   ```
+       ```yaml
+       apiVersion: v1
+       kind: Namespace
+       metadata:
+         name: openshift-operators-redhat
+         annotations:
+           openshift.io/node-selector: ""
+         labels:
+           openshift.io/cluster-monitoring: "true"
+       ---
+       apiVersion: operators.coreos.com/v1
+       kind: OperatorGroup
+       metadata:
+         name: loki-operator
+         namespace: openshift-operators-redhat
+       spec:
+         upgradeStrategy: Default
+       ```
 
-   ```bash
-   oc apply -f loki-operator-ns.yaml
-   ```
-2. Create the subscription:
+       ```bash
+       oc apply -f loki-operator-ns.yaml
+       ```
+    2. Create the subscription:
 
-   ```yaml
-   apiVersion: operators.coreos.com/v1alpha1
-   kind: Subscription
-   metadata:
-     name: loki-operator
-     namespace: openshift-operators-redhat
-   spec:
-     channel: stable-6.6
-     installPlanApproval: Automatic
-     name: loki-operator
-     source: redhat-operators
-     sourceNamespace: openshift-marketplace
-   ```
+       ```yaml
+       apiVersion: operators.coreos.com/v1alpha1
+       kind: Subscription
+       metadata:
+         name: loki-operator
+         namespace: openshift-operators-redhat
+       spec:
+         channel: stable-6.6
+         installPlanApproval: Automatic
+         name: loki-operator
+         source: redhat-operators
+         sourceNamespace: openshift-marketplace
+       ```
 
-   ```bash
-   oc apply -f loki-operator-sub.yaml
-   ```
-3. Wait for the operator:
+       ```bash
+       oc apply -f loki-operator-sub.yaml
+       ```
+    3. Wait for the operator:
 
-   ```bash
-   oc get csv -n openshift-operators-redhat -w
-   ```
+       ```bash
+       oc get csv -n openshift-operators-redhat -w
+       ```
 
-   The `PHASE` should show `Succeeded`.
+       The `PHASE` should show `Succeeded`.
 
 ## Configure Object Storage
 
@@ -264,43 +264,43 @@ LokiStack requires an S3-compatible object storage secret. The secret must be na
 6. Click Install
 7. Wait for the Operator to install
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-1. Create the operator group and subscription:
+    1. Create the operator group and subscription:
 
-  ```yaml
-  apiVersion: operators.coreos.com/v1
-  kind: OperatorGroup
-  metadata:
-    name: cluster-logging
-    namespace: openshift-logging
-  spec:
-    upgradeStrategy: Default
-  ---
-  apiVersion: operators.coreos.com/v1alpha1
-  kind: Subscription
-  metadata:
-    name: cluster-logging
-    namespace: openshift-logging
-  spec:
-    channel: stable-6.6
-    installPlanApproval: Automatic
-    name: cluster-logging
-    source: redhat-operators
-    sourceNamespace: openshift-marketplace
-  ```
+      ```yaml
+      apiVersion: operators.coreos.com/v1
+      kind: OperatorGroup
+      metadata:
+        name: cluster-logging
+        namespace: openshift-logging
+      spec:
+        upgradeStrategy: Default
+      ---
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: cluster-logging
+        namespace: openshift-logging
+      spec:
+        channel: stable-6.6
+        installPlanApproval: Automatic
+        name: cluster-logging
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+      ```
 
-  ```bash
-  oc apply -f logging-operator.yaml
-  ```
+      ```bash
+      oc apply -f logging-operator.yaml
+      ```
 
-2. Wait for the operator:
+    2. Wait for the operator:
 
-  ```bash
-  oc get csv -n openshift-logging -w
-  ```
+      ```bash
+      oc get csv -n openshift-logging -w
+      ```
 
-  The `PHASE` should show `Succeeded`.
+      The `PHASE` should show `Succeeded`.
 
 ## Create the Collector Service Account and RBAC
 
@@ -446,50 +446,50 @@ The Cluster Observability Operator (COO) adds a **Logs** tab under **Observe** i
 3. Leave all defaults and click Install
 4. Wait for the Operator to install
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-1. Create the subscription:
+    1. Create the subscription:
 
-  ```yaml
-  apiVersion: operators.coreos.com/v1alpha1
-  kind: Subscription
-  metadata:
-    name: cluster-observability-operator
-    namespace: openshift-operators
-  spec:
-    channel: stable
-    installPlanApproval: Automatic
-    name: cluster-observability-operator
-    source: redhat-operators
-    sourceNamespace: openshift-marketplace
-  ```
+      ```yaml
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: cluster-observability-operator
+        namespace: openshift-operators
+      spec:
+        channel: stable
+        installPlanApproval: Automatic
+        name: cluster-observability-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+      ```
 
-  ```bash
-  oc apply -f coo-operator.yaml
-  ```
+      ```bash
+      oc apply -f coo-operator.yaml
+      ```
 
-2. Create the UIPlugin to enable the Logs tab:
+    2. Create the UIPlugin to enable the Logs tab:
 
-  ```yaml
-  apiVersion: observability.openshift.io/v1alpha1
-  kind: UIPlugin
-  metadata:
-    name: logging
-  spec:
-    type: Logging
-    logging:
-      lokiStack:
-        name: logging-loki
-  ```
+      ```yaml
+      apiVersion: observability.openshift.io/v1alpha1
+      kind: UIPlugin
+      metadata:
+        name: logging
+      spec:
+        type: Logging
+        logging:
+          lokiStack:
+            name: logging-loki
+      ```
 
-  ```bash
-  oc apply -f uiplugin-logging.yaml
-  ```
+      ```bash
+      oc apply -f uiplugin-logging.yaml
+      ```
 
-3. Verify the Logs tab is available:
+    3. Verify the Logs tab is available:
 
-  - Navigate to **Observe -> Logs** in the web console
-  - You should be able to query application and infrastructure logs
+      - Navigate to **Observe -> Logs** in the web console
+      - You should be able to query application and infrastructure logs
 
 ## Log Access Control
 

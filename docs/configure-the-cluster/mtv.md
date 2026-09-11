@@ -33,50 +33,50 @@ Red Hat Engineering is currently working on an open source solution. (as of 9/10
 7. Leave all the defaults and click Create
 8. Wait for all MTV pods to reach Running state
 
-## Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-mtv
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: migration
-  namespace: openshift-mtv
-spec:
-  targetNamespaces:
-    - openshift-mtv
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: mtv-operator
-  namespace: openshift-mtv
-spec:
-  channel: release-v2.12
-  installPlanApproval: Automatic
-  name: mtv-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: openshift-mtv
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: migration
+      namespace: openshift-mtv
+    spec:
+      targetNamespaces:
+        - openshift-mtv
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: mtv-operator
+      namespace: openshift-mtv
+    spec:
+      channel: release-v2.12
+      installPlanApproval: Automatic
+      name: mtv-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    ```
 
-!!! note
-    The MTV channel is version-specific and may not match your environment. Verify the default channel before applying: `oc get packagemanifest mtv-operator -o jsonpath='{.status.defaultChannel}'`
+    !!! note
+        The MTV channel is version-specific and may not match your environment. Verify the default channel before applying: `oc get packagemanifest mtv-operator -o jsonpath='{.status.defaultChannel}'`
 
-```bash
-oc apply -f mtv-operator.yaml
-```
+    ```bash
+    oc apply -f mtv-operator.yaml
+    ```
 
-Wait for the operator:
+    Wait for the operator:
 
-```bash
-oc get csv -n openshift-mtv -w
-```
+    ```bash
+    oc get csv -n openshift-mtv -w
+    ```
 
-The `PHASE` should show `Succeeded`.
+    The `PHASE` should show `Succeeded`.
 
 ## Create the ForkliftController
 

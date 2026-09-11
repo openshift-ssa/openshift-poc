@@ -194,50 +194,50 @@ Red Hat Advanced Cluster Management (ACM) provides multicluster lifecycle manage
 
 8. Wait for the status to show `Running`
 
-### Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: open-cluster-management
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: open-cluster-management
-  namespace: open-cluster-management
-spec:
-  targetNamespaces:
-    - open-cluster-management
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: acm-operator-subscription
-  namespace: open-cluster-management
-spec:
-  sourceNamespace: openshift-marketplace
-  source: redhat-operators
-  channel: release-2.17
-  installPlanApproval: Automatic
-  name: advanced-cluster-management
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: open-cluster-management
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: open-cluster-management
+      namespace: open-cluster-management
+    spec:
+      targetNamespaces:
+        - open-cluster-management
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: acm-operator-subscription
+      namespace: open-cluster-management
+    spec:
+      sourceNamespace: openshift-marketplace
+      source: redhat-operators
+      channel: release-2.17
+      installPlanApproval: Automatic
+      name: advanced-cluster-management
+    ```
 
-!!! warning "Verify the ACM Channel"
-    The `release-2.17` channel above corresponds to the ACM release stream, not your OCP version. Before applying, verify the default ACM channel: `oc get packagemanifest advanced-cluster-management -o jsonpath='{.status.defaultChannel}'`
+    !!! warning "Verify the ACM Channel"
+        The `release-2.17` channel above corresponds to the ACM release stream, not your OCP version. Before applying, verify the default ACM channel: `oc get packagemanifest advanced-cluster-management -o jsonpath='{.status.defaultChannel}'`
 
-```bash
-oc apply -f acm-operator.yaml
-```
+    ```bash
+    oc apply -f acm-operator.yaml
+    ```
 
-Wait for the operator to install:
+    Wait for the operator to install:
 
-```bash
-oc get csv -n open-cluster-management -w
-```
+    ```bash
+    oc get csv -n open-cluster-management -w
+    ```
 
-The `PHASE` should show `Succeeded`.
+    The `PHASE` should show `Succeeded`.
 
 ### Create the MultiClusterHub
 

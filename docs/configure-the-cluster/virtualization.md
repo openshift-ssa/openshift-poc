@@ -28,56 +28,56 @@
 7. Leave all the defaults and click Create
 8. Wait for the deployment to complete — the Virtualization menu item will appear in the left navigation
 
-## Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-cnv
-  labels:
-    openshift.io/cluster-monitoring: "true"
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: kubevirt-hyperconverged-group
-  namespace: openshift-cnv
-spec:
-  targetNamespaces:
-    - openshift-cnv
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: hco-operatorhub
-  namespace: openshift-cnv
-spec:
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  name: kubevirt-hyperconverged
-  channel: stable
-  installPlanApproval: Automatic
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: openshift-cnv
+      labels:
+        openshift.io/cluster-monitoring: "true"
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: kubevirt-hyperconverged-group
+      namespace: openshift-cnv
+    spec:
+      targetNamespaces:
+        - openshift-cnv
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: hco-operatorhub
+      namespace: openshift-cnv
+    spec:
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+      name: kubevirt-hyperconverged
+      channel: stable
+      installPlanApproval: Automatic
+    ```
 
-```bash
-oc apply -f virt-operator.yaml
-```
+    ```bash
+    oc apply -f virt-operator.yaml
+    ```
 
-Wait for the operator, then create the HyperConverged instance:
+    Wait for the operator, then create the HyperConverged instance:
 
-```yaml
-apiVersion: hco.kubevirt.io/v1beta1
-kind: HyperConverged
-metadata:
-  name: kubevirt-hyperconverged
-  namespace: openshift-cnv
-spec: {}
-```
+    ```yaml
+    apiVersion: hco.kubevirt.io/v1beta1
+    kind: HyperConverged
+    metadata:
+      name: kubevirt-hyperconverged
+      namespace: openshift-cnv
+    spec: {}
+    ```
 
-```bash
-oc apply -f hyperconverged.yaml
-```
+    ```bash
+    oc apply -f hyperconverged.yaml
+    ```
 
 ## Verify
 

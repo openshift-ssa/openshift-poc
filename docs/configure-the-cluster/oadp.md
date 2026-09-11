@@ -17,47 +17,47 @@ OADP provides backup and restore capabilities for applications, virtual machines
 3. Leave all the defaults (installs to `openshift-adp` namespace) and click Install
 4. Wait for the Operator to install
 
-## Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-adp
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-adp
-  namespace: openshift-adp
-spec:
-  targetNamespaces:
-    - openshift-adp
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: redhat-oadp-operator
-  namespace: openshift-adp
-spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: redhat-oadp-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: openshift-adp
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: openshift-adp
+      namespace: openshift-adp
+    spec:
+      targetNamespaces:
+        - openshift-adp
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: redhat-oadp-operator
+      namespace: openshift-adp
+    spec:
+      channel: stable
+      installPlanApproval: Automatic
+      name: redhat-oadp-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    ```
 
-```bash
-oc apply -f oadp-operator.yaml
-```
+    ```bash
+    oc apply -f oadp-operator.yaml
+    ```
 
-Wait for the operator:
+    Wait for the operator:
 
-```bash
-oc get csv -n openshift-adp -w
-```
+    ```bash
+    oc get csv -n openshift-adp -w
+    ```
 
-The `PHASE` should show `Succeeded`.
+    The `PHASE` should show `Succeeded`.
 
 ## Create the Object Storage Bucket
 

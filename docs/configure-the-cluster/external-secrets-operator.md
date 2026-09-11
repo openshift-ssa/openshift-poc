@@ -14,44 +14,44 @@ The External Secrets Operator integrates external secret management systems (AWS
 3. Leave all the defaults and click Install
 4. Wait for the Operator to install
 
-## Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: external-secrets-operator
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-external-secrets-operator
-  namespace: external-secrets-operator
-spec:
-  targetNamespaces: []
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: openshift-external-secrets-operator
-  namespace: external-secrets-operator
-spec:
-  channel: stable-v1
-  name: openshift-external-secrets-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: external-secrets-operator
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: openshift-external-secrets-operator
+      namespace: external-secrets-operator
+    spec:
+      targetNamespaces: []
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: openshift-external-secrets-operator
+      namespace: external-secrets-operator
+    spec:
+      channel: stable-v1
+      name: openshift-external-secrets-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+      installPlanApproval: Automatic
+    ```
 
-```bash
-oc apply -f external-secrets-operator.yaml
-```
+    ```bash
+    oc apply -f external-secrets-operator.yaml
+    ```
 
-Wait for the operator:
+    Wait for the operator:
 
-```bash
-oc get csv -n external-secrets-operator -w
-```
+    ```bash
+    oc get csv -n external-secrets-operator -w
+    ```
 
 ## Deploy the Operand
 

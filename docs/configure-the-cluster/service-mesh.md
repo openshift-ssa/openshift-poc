@@ -74,33 +74,33 @@ Ambient mode requires OVN-Kubernetes to use local gateway mode. This must be don
 4. Leave all other defaults and click Install
 5. Wait for the Operator to install
 
-## Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: servicemeshoperator3
-  namespace: openshift-operators
-spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: servicemeshoperator3
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-```
+    ```yaml
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: servicemeshoperator3
+      namespace: openshift-operators
+    spec:
+      channel: stable
+      installPlanApproval: Automatic
+      name: servicemeshoperator3
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    ```
 
-```bash
-oc apply -f servicemesh-operator.yaml
-```
+    ```bash
+    oc apply -f servicemesh-operator.yaml
+    ```
 
-Wait for the operator:
+    Wait for the operator:
 
-```bash
-oc get csv -n openshift-operators | grep servicemesh
-```
+    ```bash
+    oc get csv -n openshift-operators | grep servicemesh
+    ```
 
-The `PHASE` should show `Succeeded`.
+    The `PHASE` should show `Succeeded`.
 
 ## Deploy Istio Ambient Mode
 

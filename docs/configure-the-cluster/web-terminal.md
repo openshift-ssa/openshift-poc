@@ -14,33 +14,33 @@ The Web Terminal Operator provides an embedded command-line terminal in the Open
 3. Leave all the defaults and click Install
 4. Wait for the Operator to install
 
-## Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: web-terminal
-  namespace: openshift-operators
-spec:
-  channel: fast  # Web Terminal only publishes on 'fast' — there is no 'stable' channel for this operator
-  name: web-terminal
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
-```
+    ```yaml
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: web-terminal
+      namespace: openshift-operators
+    spec:
+      channel: fast  # Web Terminal only publishes on 'fast' — there is no 'stable' channel for this operator
+      name: web-terminal
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+      installPlanApproval: Automatic
+    ```
 
-```bash
-oc apply -f web-terminal-operator.yaml
-```
+    ```bash
+    oc apply -f web-terminal-operator.yaml
+    ```
 
-Wait for the operator:
+    Wait for the operator:
 
-```bash
-oc get csv -n openshift-operators -w
-```
+    ```bash
+    oc get csv -n openshift-operators -w
+    ```
 
-The `PHASE` should show `Succeeded`.
+    The `PHASE` should show `Succeeded`.
 
 ## Using the Web Terminal
 

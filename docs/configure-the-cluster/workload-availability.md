@@ -55,36 +55,36 @@ Monitors node conditions and creates remediation requests when nodes become unhe
 3. Leave all the defaults (installs to `openshift-workload-availability` namespace) and click Install
 4. Wait for the Operator to install — it will also install the Self Node Remediation Operator automatically
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-workload-availability
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: workload-availability-operator-group
-  namespace: openshift-workload-availability
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: node-health-check-operator
-  namespace: openshift-workload-availability
-spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: node-health-check-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: openshift-workload-availability
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: workload-availability-operator-group
+      namespace: openshift-workload-availability
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: node-health-check-operator
+      namespace: openshift-workload-availability
+    spec:
+      channel: stable
+      installPlanApproval: Automatic
+      name: node-health-check-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    ```
 
-```bash
-oc apply -f nhc-operator.yaml
-```
+    ```bash
+    oc apply -f nhc-operator.yaml
+    ```
 
 ### Configure NodeHealthCheck for Workers
 
@@ -276,41 +276,41 @@ Runs periodically and evicts pods that violate scheduling rules so the default s
 4. Leave the remaining defaults and click Install
 5. Wait for the Operator to install
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-kube-descheduler-operator
-  labels:
-    openshift.io/cluster-monitoring: "true"
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-kube-descheduler-operator
-  namespace: openshift-kube-descheduler-operator
-spec:
-  targetNamespaces:
-    - openshift-kube-descheduler-operator
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: cluster-kube-descheduler-operator
-  namespace: openshift-kube-descheduler-operator
-spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: cluster-kube-descheduler-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: openshift-kube-descheduler-operator
+      labels:
+        openshift.io/cluster-monitoring: "true"
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: openshift-kube-descheduler-operator
+      namespace: openshift-kube-descheduler-operator
+    spec:
+      targetNamespaces:
+        - openshift-kube-descheduler-operator
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: cluster-kube-descheduler-operator
+      namespace: openshift-kube-descheduler-operator
+    spec:
+      channel: stable
+      installPlanApproval: Automatic
+      name: cluster-kube-descheduler-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    ```
 
-```bash
-oc apply -f descheduler-operator.yaml
-```
+    ```bash
+    oc apply -f descheduler-operator.yaml
+    ```
 
 ### Enable PSI
 
@@ -482,42 +482,42 @@ This achieves the same result as `oc adm cordon` and `oc adm drain`, but through
 4. Leave the remaining defaults and click Install
 5. Wait for the Operator to install
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-workload-availability
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: workload-availability-operator-group
-  namespace: openshift-workload-availability
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: node-maintenance-operator
-  namespace: openshift-workload-availability
-spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: node-maintenance-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: openshift-workload-availability
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: workload-availability-operator-group
+      namespace: openshift-workload-availability
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: node-maintenance-operator
+      namespace: openshift-workload-availability
+    spec:
+      channel: stable
+      installPlanApproval: Automatic
+      name: node-maintenance-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    ```
 
-```bash
-oc apply -f node-maintenance-operator.yaml
-```
+    ```bash
+    oc apply -f node-maintenance-operator.yaml
+    ```
 
-Wait for the operator to install:
+    Wait for the operator to install:
 
-```bash
-oc get csv -n openshift-workload-availability -w
-```
+    ```bash
+    oc get csv -n openshift-workload-availability -w
+    ```
 
 ### Place a Node in Maintenance Mode
 

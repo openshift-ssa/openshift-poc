@@ -223,45 +223,45 @@ Trident can be installed using the Trident operator (manually or via Helm) or wi
 3. Leave all the defaults and click Install
 4. Wait for the Operator to install
 
-### Install via YAML
+??? note "Install via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: trident
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: trident-operator
-  namespace: trident
-spec: {}
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: trident-operator
-  namespace: trident
-spec:
-  channel: stable
-  name: trident-operator
-  source: certified-operators
-  sourceNamespace: openshift-marketplace
-  installPlanApproval: Automatic
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: trident
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: trident-operator
+      namespace: trident
+    spec: {}
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: trident-operator
+      namespace: trident
+    spec:
+      channel: stable
+      name: trident-operator
+      source: certified-operators
+      sourceNamespace: openshift-marketplace
+      installPlanApproval: Automatic
+    ```
 
-```bash
-oc apply -f trident-operator.yaml
-```
+    ```bash
+    oc apply -f trident-operator.yaml
+    ```
 
-Wait for the operator:
+    Wait for the operator:
 
-```bash
-oc get csv -n trident -w
-```
+    ```bash
+    oc get csv -n trident -w
+    ```
 
-The `PHASE` should show `Succeeded`.
+    The `PHASE` should show `Succeeded`.
 
 ### Configure the TridentOrchestrator
 

@@ -12,45 +12,45 @@ OpenShift GitOps provides ArgoCD for managing application deployments using GitO
 4. Wait for the Operator to install
 5. The operator automatically creates a default Argo CD instance in the `openshift-gitops` namespace
 
-## Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-gitops-operator
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-gitops-operator
-  namespace: openshift-gitops-operator
-spec:
-  upgradeStrategy: Default
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: openshift-gitops-operator
-  namespace: openshift-gitops-operator
-spec:
-  channel: latest
-  installPlanApproval: Automatic
-  name: openshift-gitops-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: openshift-gitops-operator
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: openshift-gitops-operator
+      namespace: openshift-gitops-operator
+    spec:
+      upgradeStrategy: Default
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: openshift-gitops-operator
+      namespace: openshift-gitops-operator
+    spec:
+      channel: latest
+      installPlanApproval: Automatic
+      name: openshift-gitops-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    ```
 
-```bash
-oc apply -f gitops-operator.yaml
-```
+    ```bash
+    oc apply -f gitops-operator.yaml
+    ```
 
-Wait for the operator CSV, then for the Argo CD pods (they run in `openshift-gitops`, not in the operator namespace):
+    Wait for the operator CSV, then for the Argo CD pods (they run in `openshift-gitops`, not in the operator namespace):
 
-```bash
-oc get csv -n openshift-gitops-operator
-oc wait --for=condition=Ready pods --all -n openshift-gitops --timeout=300s
-```
+    ```bash
+    oc get csv -n openshift-gitops-operator
+    oc wait --for=condition=Ready pods --all -n openshift-gitops --timeout=300s
+    ```
 
 ## Verify the Installation
 

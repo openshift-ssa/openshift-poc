@@ -16,45 +16,45 @@ The Kubernetes NMState Operator manages node network configuration on the cluste
 7. The screen will refresh because of the updated console plugin for NMState. 
 8. Check the Networking menu item has been updated with a bunch of new options. Click on "Node network configuration" to view your cluster network setup. If the option is not present, do a browser refresh (F5) for the GUI and the items will be present. 
 
-## Install the Operator via YAML
+??? note "Install the Operator via YAML (click to expand)"
 
-```yaml
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: openshift-nmstate
----
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  name: openshift-nmstate
-  namespace: openshift-nmstate
-spec:
-  targetNamespaces:
-    - openshift-nmstate
----
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: kubernetes-nmstate-operator
-  namespace: openshift-nmstate
-spec:
-  channel: stable
-  installPlanApproval: Automatic
-  name: kubernetes-nmstate-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-```
+    ```yaml
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: openshift-nmstate
+    ---
+    apiVersion: operators.coreos.com/v1
+    kind: OperatorGroup
+    metadata:
+      name: openshift-nmstate
+      namespace: openshift-nmstate
+    spec:
+      targetNamespaces:
+        - openshift-nmstate
+    ---
+    apiVersion: operators.coreos.com/v1alpha1
+    kind: Subscription
+    metadata:
+      name: kubernetes-nmstate-operator
+      namespace: openshift-nmstate
+    spec:
+      channel: stable
+      installPlanApproval: Automatic
+      name: kubernetes-nmstate-operator
+      source: redhat-operators
+      sourceNamespace: openshift-marketplace
+    ```
 
-```bash
-oc apply -f nmstate-operator.yaml
-```
+    ```bash
+    oc apply -f nmstate-operator.yaml
+    ```
 
-Wait for the operator to install:
+    Wait for the operator to install:
 
-```bash
-oc wait --for=condition=Available deployment/nmstate-operator -n openshift-nmstate --timeout=120s
-```
+    ```bash
+    oc wait --for=condition=Available deployment/nmstate-operator -n openshift-nmstate --timeout=120s
+    ```
 
 ## Create the NMState Instance
 
