@@ -33,6 +33,7 @@
 *[NFS]: Network File System
 *[NIC]: Network Interface Controller
 *[NNCP]: NodeNetworkConfigurationPolicy
+*[NNCPs]: NodeNetworkConfigurationPolicy
 *[NTP]: Network Time Protocol
 *[OADP]: OpenShift API for Data Protection
 *[OCP]: OpenShift Container Platform
