@@ -13,7 +13,7 @@ Choose one registry approach based on your environment:
 
 ## Mirror Registry
 
-[About disconnected installation mirroring](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/about-disconnected-installation-mirroring) | [oc-mirror plugin v2](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2)
+[About disconnected installation mirroring](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/disconnected_environments/about-disconnected-environments) | [oc-mirror plugin v2](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/disconnected_environments/about-installing-oc-mirror-v2)
 
 Use this approach when **no system on the cluster network has outbound internet access** (fully air-gapped). You download content on a connected host, then transfer it to an internal registry.
 
@@ -51,7 +51,7 @@ You need a container registry on the disconnected network. Options include:
 
 | Registry                                                                                                                                                                                                                                                        | Notes                                          |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [Mirror registry for Red Hat OpenShift](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2#mirror-registry-for-red-hat-openshift) | Purpose-built, minimal setup, runs with Podman |
+| [Mirror registry for Red Hat OpenShift](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/disconnected_environments/installing-mirroring-creating-registry) | Purpose-built, minimal setup, runs with Podman |
 | [Red Hat Quay](https://docs.redhat.com/en/documentation/red_hat_quay)                                                                                                                                                                                          | Full-featured, enterprise-grade                |
 | JFrog Artifactory                                                                                                                                                                                                                                               | If already available in-house                  |
 | Harbor                                                                                                                                                                                                                                                          | Open-source alternative                        |
@@ -59,7 +59,7 @@ You need a container registry on the disconnected network. Options include:
 To install the mirror registry for Red Hat OpenShift:
 
 ```bash
-wget https://developers.redhat.com/content-gateway/rest/mirror/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz -P /tmp
+wget https://mirror.openshift.com/pub/openshift-v4/clients/mirror-registry/latest/mirror-registry.tar.gz -P /tmp
 tar -xvzf /tmp/mirror-registry.tar.gz -C /tmp
 sudo /tmp/mirror-registry install --quayHostname {{ mirror_host }} --quayRoot /opt/quay
 ```
@@ -361,7 +361,10 @@ The resulting file looks like:
 }
 ```
 
-!!! note
+!!! note "Token Contents"
+    The auth contents is just a base64 endoded string - "user:password"
+
+!!! note "Which Credentials?"
     The Red Hat credentials remain in the pull secret for install-time use. Upstream authentication from Artifactory to Red Hat registries is configured separately on each remote repository (see [Configure Upstream Authentication](#configure-upstream-authentication)).
 
 ### Pre-Warm the Cache (Recommended)
@@ -933,6 +936,6 @@ For common installation issues, see [Troubleshooting](../troubleshooting.md).
 
 ## Documentation
 
-- [About disconnected installation mirroring](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/about-disconnected-installation-mirroring)
-- [oc-mirror plugin v2](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2)
-- [Mirror registry for Red Hat OpenShift](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/disconnected_environments/mirroring-in-disconnected-environments-using-the-oc-mirror-plugin-v2#mirror-registry-for-red-hat-openshift)
+- [About disconnected installation mirroring](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/disconnected_environments/about-disconnected-environments)
+- [oc-mirror plugin v2](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/disconnected_environments/about-installing-oc-mirror-v2)
+- [Mirror registry for Red Hat OpenShift](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/disconnected_environments/installing-mirroring-creating-registry)

@@ -1,6 +1,6 @@
 # Dell
 
-[Dell Technologies Container Storage Modules Administrator Guide](https://www.dell.com/support/manuals/en-us/container-storage-modules/csm_installation)
+[Dell Technologies Container Storage Modules Administrator Guide](https://dell.github.io/csm-docs/docs/getting-started/)
 
 !!! important "Use the Official Documentation"
     Always refer to the official vendor documentation for the latest installation and configuration guidance. The examples below are field notes from POC engagements and may not reflect the most current driver versions or recommended settings.

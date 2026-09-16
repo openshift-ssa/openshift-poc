@@ -183,7 +183,7 @@ spec:
 ```
 
 !!! danger "Do Not Patch MTU Directly on a Running Cluster"
-    The YAML above is shown for reference only. On an already-installed cluster, **do not** directly patch the `mtu` field — doing so can cause a cluster-wide network outage. Post-install MTU changes require the official migration procedure using `spec.migration` fields to safely roll out the new MTU across all nodes. See the [Official MTU migration procedure](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/networking/changing-cluster-network-mtu) for the correct steps.
+    The YAML above is shown for reference only. On an already-installed cluster, **do not** directly patch the `mtu` field — doing so can cause a cluster-wide network outage. Post-install MTU changes require the official migration procedure using `spec.migration` fields to safely roll out the new MTU across all nodes. See the [Official MTU migration procedure](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/advanced_networking/changing-cluster-network-mtu) for the correct steps.
 
 !!! warning
     Changing the cluster MTU requires a rolling reboot of all nodes. Plan for maintenance downtime.

@@ -74,7 +74,7 @@ oc adm upgrade channel stable-4.23
     - `eus-4.22` and `eus-4.24` channels enable a **Control Plane Only** update path (4.22 → 4.24). The control plane serializes through 4.22 → 4.23 → 4.24, but workers reboot only once (at the 4.24 target).
     - Keep `stable-4.23` for a standard 4.22 → 4.23 minor upgrade.
 
-    See [Performing an EUS-to-EUS update](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/updating_clusters/updating-eus-to-eus) for the full procedure.
+    See [Performing a Control Plane Only (EUS-to-EUS) update](https://docs.redhat.com/en/documentation/openshift_container_platform/4.22/html/postinstallation_configuration/day-2-operations-for-openshift-container-platform-clusters) for the full procedure.
 
 Then check available updates again:
 

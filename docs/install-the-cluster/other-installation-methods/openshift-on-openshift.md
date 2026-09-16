@@ -57,7 +57,7 @@ sudo mv hcp /usr/local/bin/
 hcp version
 ```
 
-Alternatively, download from the [OpenShift mirror](https://mirror.openshift.com/pub/openshift-v4/clients/hcp/).
+Alternatively, download from the [HCP CLI installation docs](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/cli_tools/hcp-cli-ref).
 
 !!! note
     Do not use `oc extract configmap/hcp-cli-download`. That ConfigMap is not a reliable source for the 4.22 CLI.

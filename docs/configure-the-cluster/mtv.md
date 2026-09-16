@@ -220,7 +220,7 @@ Seeing every VM in the vSphere Client with a service account does **not** mean M
 
 ### Recommended Permission Layout
 
-Do not grant Admin on the whole datacenter if other clusters must stay hidden. Use a dedicated MTV role with the [documented VMware privileges](https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/latest/html/installing_and_using_the_migration_toolkit_for_virtualization/prerequisites#vmware-privileges_mtv) (interaction, provisioning, snapshot, datastore browse/low-level file, session validate, crypto if disks are encrypted).
+Do not grant Admin on the whole datacenter if other clusters must stay hidden. Use a dedicated MTV role with the [documented VMware privileges](https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.12/html/planning_your_migration_to_red_hat_openshift_virtualization/assembly_planning-migration-vmware_mtv) (interaction, provisioning, snapshot, datastore browse/low-level file, session validate, crypto if disks are encrypted).
 
 | vCenter object                                | Permission          | Propagate                                                                               |
 | --------------------------------------------- | ------------------- | --------------------------------------------------------------------------------------- |

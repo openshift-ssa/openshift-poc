@@ -148,7 +148,7 @@ Then apply with the replace workflow shown above.
 | PagerDuty | `pagerduty_configs` | Trigger incidents for on-call rotation |
 | Webhook | `webhook_configs` | Forward to any HTTP endpoint |
 
-See the [Alertmanager configuration documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/monitoring/configuring-alert-notifications) for full receiver configuration options.
+See the [Alertmanager configuration documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/4.21/html/postinstallation_configuration/configuring-alert-notifications) for full receiver configuration options.
 
 ## Configure Persistent Storage for Metrics
 
