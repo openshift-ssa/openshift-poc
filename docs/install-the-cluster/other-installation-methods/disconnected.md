@@ -356,7 +356,7 @@ The resulting file looks like:
     "quay.io": {"auth": "<redhat-token>"},
     "registry.redhat.io": {"auth": "<redhat-token>"},
     "registry.connect.redhat.com": {"auth": "<redhat-token>"},
-    "{{ artifactory_host }}": {"auth": ""}
+    "{{ artifactory_host }}": {"auth": "base64->user:password"}
   }
 }
 ```
