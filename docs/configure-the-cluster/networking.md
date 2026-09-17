@@ -74,7 +74,44 @@ Do not place VM (or pod) traffic on the same VLAN used for cluster management (A
 
 ## NodeNetworkConfigurationPolicy Examples
 
-### Bonds and Vlans
+### Single NIC (No Bond)
+
+A single ethernet interface with a static IP — the simplest possible configuration. No bonding, no VLANs, no switch-side configuration required. Suitable for POC environments or hosts with a single NIC.
+
+```yaml
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: single-nic-{{ hostname }}
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: {{ hostname }}
+  desiredState:
+    interfaces:
+      - name: {{ interface_name }}
+        type: ethernet
+        state: up
+        ipv4:
+          enabled: true
+          address:
+            - ip: {{ ip_address }}
+              prefix-length: 28
+          dhcp: false
+        ipv6:
+          enabled: false
+    dns-resolver:
+      config:
+        server:
+          - {{ nameserver_ip }}
+    routes:
+      config:
+        - destination: 0.0.0.0/0
+          next-hop-address: {{ gateway_ip }}
+          next-hop-interface: {{ interface_name }}
+          table-id: 254
+```
+
+### Bonds and VLANs
 
 #### 2-eth Bond1 (LACP) with IP
 

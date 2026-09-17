@@ -115,7 +115,7 @@ Get-VM ocp-master-* | New-AdvancedSetting -Name disk.EnableUUID -Value TRUE -Con
 
 ## agent-config.yaml
 
-The `agent-config.yaml` defines host-level configurations. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN.
+The `agent-config.yaml` defines host-level configurations. Below is an example with two ethernet connections bonded together in an LACP bond with a VLAN. The `networkConfig` is based on NMState. There is a full explanation and robust examples on the [Networking](../configure-the-cluster/networking.md) page. 
 
 !!! note "rootDeviceHints and interface names"
     If you do not know what the `rootDeviceHint` or your NIC's interface names are, do not guess. They will follow RHEL naming standards. Boot an example machine with a RHEL ISO and it will tell you how they show up. [Documentation](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html-single/installing_an_on-premise_cluster_with_the_agent-based_installer/index#root-device-hints_preparing-to-install-with-agent-based-installer)
@@ -190,49 +190,6 @@ Repeat the host entry for each control plane and worker node, updating hostname,
 !!! note
     Notice the inconsistent labels and spellings in the OpenShift configs: 
     - `macAddress` in the interfaces stanza, but `mac-address` in the networkConfig stanza.
-
-### Active-Backup Bond (No VLAN)
-
-If your environment uses active-backup bonding instead of LACP:
-
-```yaml
-    interfaces:
-      - name: eno1
-        macAddress: A1:B2:3C:4D:1E:11
-      - name: eno2
-        macAddress: A1:B2:3C:4D:2E:11
-    networkConfig:
-      interfaces:
-        - name: bond0
-          type: bond
-          state: up
-          ipv4:
-            enabled: true
-            address:
-              - ip: 10.0.0.7
-                prefix-length: 28
-            dhcp: false
-          link-aggregation:
-            mode: active-backup
-            port:
-              - eno1
-              - eno2
-            options:
-              miimon: '100'
-              primary: eno1
-          ipv6:
-            enabled: false
-      dns-resolver:
-        config:
-          server:
-            - {{ nameserver_ip }}
-      routes:
-        config:
-          - destination: 0.0.0.0/0
-            next-hop-address: 10.0.0.1
-            next-hop-interface: bond0
-            table-id: 254
-```
 
 ### Single NIC (No Bond)
 
