@@ -27,6 +27,7 @@ After the cluster is installed, complete storage and registry configuration befo
 - [Identity Providers](./configuring-identity-providers.md) — LDAP, OIDC, or other authentication (recommended before demo day)
 - [OpenShift GitOps](./openshift-gitops.md) — ArgoCD for GitOps workflows
 - [External Secrets Operator](./external-secrets-operator.md) — Integrate external secret management (Vault, AWS, etc.)
+- [cert-manager](./cert-manager.md) — Install cert-manager and replace the default ingress and API certificates
 - [Service Mesh](./service-mesh.md) — Istio ambient mode (out of POC baseline unless explicitly in scope)
 - [Operators from Artifactory](./operators-from-artifactory.md) — Install operators from a private Artifactory registry
 

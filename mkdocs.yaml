@@ -112,6 +112,7 @@ nav:
       - Identity Providers: configure-the-cluster/configuring-identity-providers.md
       - OpenShift GitOps: configure-the-cluster/openshift-gitops.md
       - External Secrets Operator: configure-the-cluster/external-secrets-operator.md
+      - cert-manager: configure-the-cluster/cert-manager.md
       - Service Mesh: configure-the-cluster/service-mesh.md
       - Operators from Artifactory: configure-the-cluster/operators-from-artifactory.md
       - Web Terminal: configure-the-cluster/web-terminal.md
