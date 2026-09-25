@@ -71,6 +71,7 @@ nav:
   - Home:
       - home/index.md
       - Architecture: home/architecture.md
+      - VMware to OpenShift Virtualization: home/vmware-to-openshift-virtualization.md
   - Prerequisites:
       - prerequisites/index.md
       - POC Checklist: prerequisites/poc-checklist.md
