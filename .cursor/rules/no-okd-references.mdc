@@ -1,0 +1,33 @@
+---
+description: Ban all OKD and okd.io references; use OpenShift / docs.redhat.com only
+alwaysApply: true
+---
+
+# No OKD References
+
+This project documents **Red Hat OpenShift** only. Never mention OKD, link to okd.io, or copy OKD-branded wording.
+
+## Forbidden
+
+- The string `OKD` (any casing: OKD, Okd, okd) in prose, titles, comments, or metadata
+- Any URL or hostname containing `okd.io` (including `docs.okd.io`, subpaths, and redirects)
+- Phrases that treat OKD as this guide's product (e.g. "In OKD…", "OKD cluster")
+
+## Required instead
+
+- Product name: **OpenShift** / **OpenShift Container Platform**
+- Official docs: `https://docs.redhat.com/...` (prefer `openshift_container_platform/latest/...` paths used elsewhere in this repo)
+
+```markdown
+<!-- ❌ BAD -->
+[About network policy](https://docs.okd.io/latest/networking/network_security/network_policy/about-network-policy.html)
+
+<!-- ✅ GOOD -->
+[About network policy](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/network_security/about-network-policy)
+```
+
+## When writing or editing
+
+1. Do not use content that still says OKD.
+2. If a search or fetch returns okd.io pages, translate links to the matching docs.redhat.com topic before citing them in the repo.
+3. If you find an existing OKD / okd.io reference while editing, replace it in the same change.

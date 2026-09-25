@@ -6,8 +6,9 @@ After the cluster is installed, complete storage and registry configuration befo
 
 1. **[NMState Operator](./nmstate.md)** — Required when you need bonds, VLANs, or OVS bridges after install (skip if install-time static networking / single NIC is enough)
 2. **[Configure Networking](./networking.md)** — NNCPs, OVS bridges, CUDNs, and underlay networking (when using NMState)
-3. **[Storage](./storage/index.md)** — Install your CSI driver and create StorageClasses
-4. **[Registry](./registry.md)** — Configure persistent storage for the internal image registry
+3. **[Network Policy and Microsegmentation](./network-policy.md)** — NetworkPolicy for pods; MultiNetworkPolicy for secondary networks and VMs
+4. **[Storage](./storage/index.md)** — Install your CSI driver and create StorageClasses
+5. **[Registry](./registry.md)** — Configure persistent storage for the internal image registry
 
 ## Additional Configuration
 

@@ -60,7 +60,7 @@ OpenShift GitOps provides ArgoCD for managing application deployments using GitO
 ## Grant Argo CD Access to a Namespace
 
 ```bash
-oc label namespace {{ namespace_name }} argocd.argoproj.io/managed-by=openshift-gitops
+oc label namespace {{ ns }} argocd.argoproj.io/managed-by=openshift-gitops
 ```
 
 ## Create an Application
