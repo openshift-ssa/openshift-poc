@@ -1,11 +1,12 @@
-# cert-manager
+# Certificate Management
 
 [cert-manager Operator for Red Hat OpenShift](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/security_and_compliance/cert-manager-operator-for-red-hat-openshift)
 
-The cert-manager Operator for Red Hat OpenShift issues and renews TLS certificates in the cluster. This page installs that operator, creates a certificate authority, and uses it to replace two certificates:
+The cert-manager Operator for Red Hat OpenShift issues and renews TLS certificates in the cluster. This page installs that operator, creates a certificate authority, and uses it for:
 
 - The **default ingress certificate**, which the router presents for the web console and for routes that use the default certificate
 - The **external API server certificate**, which clients receive when they connect to `api.{{ cluster_name }}.{{ base_domain }}`
+- **Application workload certificates**, which apps request as Kubernetes `Certificate` resources for Routes, Ingresses, and in-pod TLS
 
 | Hostname                                       | What serves it                                    |
 | ---------------------------------------------- | ------------------------------------------------- |
@@ -454,6 +455,209 @@ oc get clusteroperators kube-apiserver -w
 ```
 
 Leave the trusted CA config map in place. An extra trusted root does not change which certificate the router or the API server presents.
+
+## Workload certificate use cases
+
+After `cluster-ca` is Ready, any project can request certificates from that same `ClusterIssuer`. cert-manager writes a TLS secret; the workload mounts it, or a Route / Ingress references it. Renewals update the secret in place — no new secret name to chase.
+
+These examples assume the issuer from [Create an issuer](#create-an-issuer) is already in place. Replace `{{ ns }}`, hostnames, and app names with values from your environment. Import `ca.crt` on clients that must trust a self-signed root (same as for the console).
+
+### Route with a dedicated certificate (re-encrypt)
+
+Issue a cert for an application hostname, then create a re-encrypt Route that presents that secret to external clients while the router still speaks TLS to the pod.
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: shop-tls
+  namespace: {{ ns }}
+spec:
+  secretName: shop-tls
+  commonName: shop.apps.{{ cluster_name }}.{{ base_domain }}
+  dnsNames:
+    - shop.apps.{{ cluster_name }}.{{ base_domain }}
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days
+  privateKey:
+    algorithm: RSA
+    size: 2048
+    encoding: PKCS1
+  issuerRef:
+    name: cluster-ca
+    kind: ClusterIssuer
+```
+
+```bash
+oc apply -f shop-tls.yaml
+oc wait --for=condition=Ready certificate/shop-tls -n {{ ns }} --timeout=180s
+```
+
+```yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: shop
+  namespace: {{ ns }}
+spec:
+  host: shop.apps.{{ cluster_name }}.{{ base_domain }}
+  to:
+    kind: Service
+    name: shop
+  port:
+    targetPort: https
+  tls:
+    termination: reencrypt
+    # Paste tls.crt / tls.key from secret/shop-tls, or create the Route in the
+    # console and select the shop-tls secret under Custom certificates.
+```
+
+??? note "Copy cert material into the Route (click to expand)"
+
+    OpenShift Routes store certificate PEM in the Route object (they do not reference a Secret name for custom certs). After the Certificate is Ready:
+
+    ```bash
+    TLS_CRT=$(oc get secret shop-tls -n {{ ns }} -o jsonpath='{.data.tls\.crt}' | base64 -d)
+    TLS_KEY=$(oc get secret shop-tls -n {{ ns }} -o jsonpath='{.data.tls\.key}' | base64 -d)
+    CA_CRT=$(oc get secret shop-tls -n {{ ns }} -o jsonpath='{.data.ca\.crt}' | base64 -d)
+
+    oc create route reencrypt shop \
+      --service=shop \
+      --hostname=shop.apps.{{ cluster_name }}.{{ base_domain }} \
+      --cert=<(echo "$TLS_CRT") \
+      --key=<(echo "$TLS_KEY") \
+      --ca-cert=<(echo "$CA_CRT") \
+      --dest-ca-cert=<(echo "$CA_CRT") \
+      -n {{ ns }}
+    ```
+
+    On renewal, cert-manager updates `secret/shop-tls` but does **not** rewrite the Route. Re-run the `oc create route` (or patch `spec.tls`) after renewal, or prefer the Ingress annotation pattern below so the controller keeps the edge certificate in sync.
+
+### Ingress annotated for automatic certificates
+
+Annotate an Ingress with the ClusterIssuer. cert-manager creates a Certificate and a TLS secret that match `spec.tls`, and keeps them renewed. On OpenShift the Ingress Controller still serves the traffic; this is useful when the app team owns Ingress manifests rather than Routes.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shop
+  namespace: {{ ns }}
+  annotations:
+    cert-manager.io/cluster-issuer: cluster-ca
+spec:
+  tls:
+    - hosts:
+        - shop.apps.{{ cluster_name }}.{{ base_domain }}
+      secretName: shop-ingress-tls
+  rules:
+    - host: shop.apps.{{ cluster_name }}.{{ base_domain }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: shop
+                port:
+                  number: 8080
+```
+
+```bash
+oc apply -f shop-ingress.yaml
+oc wait --for=condition=Ready certificate/shop-ingress-tls -n {{ ns }} --timeout=180s
+oc get certificate,secret -n {{ ns }} | grep shop
+```
+
+The Certificate name often matches `secretName`. Confirm with `oc get certificate -n {{ ns }}`.
+
+### Mount a certificate in a pod (in-cluster TLS)
+
+Use when the process terminates TLS itself (HTTPS server, Kafka listener, database with `ssl_cert_file`) or when two services need a shared trust material. Mount the secret as files; set the app config to those paths.
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: shop-api-tls
+  namespace: {{ ns }}
+spec:
+  secretName: shop-api-tls
+  commonName: shop-api.{{ ns }}.svc
+  dnsNames:
+    - shop-api.{{ ns }}.svc
+    - shop-api.{{ ns }}.svc.cluster.local
+  duration: 2160h
+  renewBefore: 360h
+  privateKey:
+    algorithm: RSA
+    size: 2048
+    encoding: PKCS1
+  issuerRef:
+    name: cluster-ca
+    kind: ClusterIssuer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shop-api
+  namespace: {{ ns }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop-api
+  template:
+    metadata:
+      labels:
+        app: shop-api
+    spec:
+      containers:
+        - name: shop-api
+          image: {{ image }}
+          ports:
+            - containerPort: 8443
+              name: https
+          volumeMounts:
+            - name: tls
+              mountPath: /etc/tls/private
+              readOnly: true
+          env:
+            - name: TLS_CERT
+              value: /etc/tls/private/tls.crt
+            - name: TLS_KEY
+              value: /etc/tls/private/tls.key
+            - name: TLS_CA
+              value: /etc/tls/private/ca.crt
+      volumes:
+        - name: tls
+          secret:
+            secretName: shop-api-tls
+```
+
+```bash
+oc apply -f shop-api-tls.yaml
+oc wait --for=condition=Ready certificate/shop-api-tls -n {{ ns }} --timeout=180s
+```
+
+For Service DNS names (`*.svc.cluster.local`), clients inside the cluster must trust `ca.crt` (already in the cluster proxy trust bundle after [Trust the CA in the cluster](#trust-the-ca-in-the-cluster), or mount `ca.crt` into the client pod).
+
+### Namespace-scoped Issuer (optional)
+
+A `ClusterIssuer` is cluster-wide. If a team should only use a project-local CA or a different signing path, create an `Issuer` in that namespace and point Certificates at `kind: Issuer` instead of `ClusterIssuer`:
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: project-ca
+  namespace: {{ ns }}
+spec:
+  ca:
+    secretName: project-ca
+```
+
+The CA secret for an `Issuer` must live in the **same** namespace as the Issuer (`{{ ns }}` here), not in `cert-manager`.
 
 ## Troubleshooting
 
