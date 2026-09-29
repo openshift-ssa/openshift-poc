@@ -35,6 +35,7 @@ Demonstrate cluster lifecycle management:
 
 - [Day-2 Overview](./day-2-operations/index.md) — Summary of operational procedures
 - [Cluster Upgrade](./day-2-operations/cluster-upgrade.md) — Apply a z-stream or minor version update
+- [Hardware Firmware Updates](./day-2-operations/firmware-updates.md) — Update BIOS, BMC, and adapter firmware on bare metal
 - [Add Worker Node](./day-2-operations/add-worker-node.md) — Expand cluster capacity with a new worker
 - [Rotate SSH Keys](./day-2-operations/rotate-ssh-keys.md) — Replace SSH keys on all cluster nodes
 - [Machine Config](./day-2-operations/machine-config.md) — Apply node-level configuration changes

@@ -46,7 +46,7 @@ docs/
 │   ├── container-workloads/      # Hello World, PetClinic, Kafka, S2I, PostgreSQL, Bookinfo
 │   ├── virtual-machine-workloads/  # RHEL httpd VM, OVA virtual appliances
 │   ├── operational-validation/   # Failover tests, backup/restore
-│   └── day-2-operations/         # Cluster upgrade, must-gather, add worker, SSH keys, MachineConfig, MTU debug
+│   └── day-2-operations/         # Cluster upgrade, firmware updates, must-gather, add worker, SSH keys, MachineConfig, MTU debug
 └── assets/
     ├── downloads/                # Generated POC checklist .docx (created at build/deploy)
     ├── images/                   # Logos and diagrams

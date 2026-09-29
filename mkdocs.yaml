@@ -142,6 +142,7 @@ nav:
       - Day-2 Operations:
           - workloads-and-operations/day-2-operations/index.md
           - Cluster Upgrade: workloads-and-operations/day-2-operations/cluster-upgrade.md
+          - Hardware Firmware Updates: workloads-and-operations/day-2-operations/firmware-updates.md
           - Add Worker Node: workloads-and-operations/day-2-operations/add-worker-node.md
           - Rotate SSH Keys: workloads-and-operations/day-2-operations/rotate-ssh-keys.md
           - Machine Config: workloads-and-operations/day-2-operations/machine-config.md

@@ -75,6 +75,7 @@ Complete these before scheduling the installation.
 | Compute nodes provisioned and meet minimum specs                       |        |       |
 | Management access to nodes confirmed (BMC, vCenter, cloud API)         |        |       |
 | Firmware/BIOS settings validated (UEFI, virtualization extensions)     |        |       |
+| BIOS, BMC, NIC, and HBA firmware at the validated baseline             |        |       |
 | Node details collected (MAC addresses, BMC IPs, disk hints, NIC names) |        |       |
 
 ### Networking

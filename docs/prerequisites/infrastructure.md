@@ -467,6 +467,9 @@ Ensure the following on all nodes:
 - Before mounting the discovery/agent ISO, clear stale OS UEFI boot table entries (leftover entries from previous installations can cause the node to boot the wrong target). Use a one-time virtual-media/CD boot override for the first boot, then set boot order back to local disk after installation completes.
 - Hardware clock set to UTC
 
+!!! tip "Firmware versions"
+    The list above is how the firmware is configured. Flashing a new BIOS, BMC, NIC, or HBA image is a separate procedure. Bring those versions to a vendor-validated baseline before imaging, and update one node at a time after installation. See [Hardware Firmware Updates](../workloads-and-operations/day-2-operations/firmware-updates.md).
+
 ### Disable POST Memory Test
 
 Servers with large amounts of RAM (512 GB+) can spend 5–10 minutes running full memory diagnostics during every boot. For a POC where clusters are built and torn down frequently, disabling the POST memory test cuts each reboot cycle significantly with no reliability trade-off.
