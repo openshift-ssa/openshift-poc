@@ -20,6 +20,8 @@ The Migration Toolkit for Virtualization (MTV) enables migration of virtual mach
 
 VDDK is optional for cold migrations of non-vSAN VMs (transfer is slower without it) and required for warm migrations and vSAN-backed VMs. The `virt-v2v` tool always performs guest conversion regardless of whether VDDK is configured. Cold migrations of non-vSAN VMs can proceed without VDDK at reduced transfer speeds.
 
+If you cannot obtain VDDK and the source VMs sit on a supported SAN that OpenShift also reaches via CSI, [storage copy offload](#storage-copy-offload) can migrate those disks without VDDK (and usually much faster than the non-VDDK network path). Offload does **not** cover vSAN-backed VMs.
+
 Red Hat Engineering is currently working on an open source solution. (as of 9/10)
 
 ## Install the Operator via WebUI
@@ -271,7 +273,7 @@ Download the VDDK archive from VMware, then either upload it through the MTV Web
 Match the VDDK version to your source vSphere (vCenter/ESXi) version. Broadcom aligns VDDK version numbers with vSphere (for example, use VDDK **8.0.x** with vSphere **8.0**).
 
 !!! warning "VDDK Availability (September 2026)"
-    Public VDDK downloads were withdrawn by Broadcom in August 2026. Access is now limited to select TAP (Technology Alliance Program) partners. Customer support tickets are no longer a reliable path. If you do not already have a VDDK archive, confirm a TAP partner path before planning warm or vSAN migrations.
+    Public VDDK downloads were withdrawn by Broadcom in August 2026. Access is now limited to select TAP (Technology Alliance Program) partners. Customer support tickets are no longer a reliable path. If you do not already have a VDDK archive, confirm a TAP partner path before planning warm or vSAN migrations. For supported SAN-backed cold migrations, [storage copy offload](#storage-copy-offload) is an alternative that does not require VDDK.
 
 If you have an existing VDDK archive (`VMware-vix-disklib-<version>.x86_64.tar.gz`), proceed to [Upload the VDDK Image via WebUI](#upload-the-vddk-image-via-webui) or [Build and Push the VDDK Image via CLI](#build-and-push-the-vddk-image-via-cli).
 
@@ -423,6 +425,102 @@ Verify the role bindings:
 oc get rolebinding -n openshift-mtv | grep image-puller
 ```
 
+## Storage Copy Offload
+
+Storage copy offload migrates vSphere disks by cloning on the storage array (VAAI / `vmkfstools` / `XCOPY`) instead of streaming disk data over the IP network through VDDK or the slower non-VDDK path. MTV uses the `vsphere-xcopy-volume-populator` Volume Populator for this path.
+
+Use offload when:
+
+- You cannot obtain a VDDK archive, **or** you want faster SAN-backed migrations
+- Source VMs are on a supported array that OpenShift Virtualization also consumes via CSI
+- You are not migrating vSAN-backed VMs (vSAN still requires VDDK)
+
+!!! note "When offload does not apply"
+    Many POC labs place OpenShift on different storage than vSphere (for example local disks or ODF-only). Offload needs the **same** supported array (or array family with a working CSI path) reachable from both ESXi and the OpenShift workers. If that is not true, stay on the network transfer path (with or without VDDK).
+
+### Prerequisites
+
+- MTV 2.9+ with copy offload available (this guide uses the `release-v2.12` channel)
+- A configured vSphere provider
+- A working CSI driver on OpenShift for one of the supported products:
+
+| Vendor                      | `storageVendorProduct` value |
+| --------------------------- | ---------------------------- |
+| Hitachi Vantara             | `vantara`                    |
+| NetApp ONTAP                | `ontap`                      |
+| Pure Storage FlashArray     | `pureFlashArray`             |
+| Dell PowerMax               | `powermax`                   |
+| Dell PowerFlex              | `powerflex`                  |
+| Dell PowerStore             | `powerstore`                 |
+| HPE 3PAR / Primera          | `primera3par`                |
+| Infinidat InfiniBox         | `infinibox`                  |
+| IBM FlashSystem             | `flashsystem`                |
+
+- Extra vSphere privileges for offload (suggested role name `StorageOffloader`): Global Settings; Datastore Browse / Low level file operations; Host Configuration Advanced settings, Query patch, and Storage partition configuration
+- Delete preexisting snapshots on source VMs before performance-sensitive offload runs (warm-migration snapshots created by MTV itself are fine; older snapshots force a slower software clone)
+
+Official planning and procedure: [About storage copy offload](https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.12/html/planning_your_migration_to_red_hat_openshift_virtualization/assembly_planning-migration-vmware_mtv#con_about-storage-copy-offload_vmware) and [Running a VMware vSphere migration by using storage copy offload](https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.12/html/migrating_your_virtual_machines_to_red_hat_openshift_virtualization/assembly_migrating-from-vmware_mtv#proc_storage-copy-offload-cli_vmware).
+
+### Enable the Feature
+
+```bash
+oc patch forkliftcontrollers.forklift.konveyor.io forklift-controller \
+  --type merge -p '{"spec":{"feature_copy_offload":"true"}}' -n openshift-mtv
+```
+
+Or set `feature_copy_offload: "true"` when you create the `ForkliftController`.
+
+### Configure a Storage Map for Offload
+
+1. Create a `Secret` in `openshift-mtv` with the vendor-specific keys from the MTV docs (hostname, credentials, and product fields such as `ONTAP_SVM` or `POWERMAX_SYMMETRIX_ID`).
+2. Create a `StorageMap` that references that secret and product:
+
+```yaml
+apiVersion: forklift.konveyor.io/v1beta1
+kind: StorageMap
+metadata:
+  name: copy-offload
+  namespace: openshift-mtv
+spec:
+  map:
+  - destination:
+      accessMode: ReadWriteMany
+      storageClass: {{ storage_class }}
+    offloadPlugin:
+      vsphereXcopyConfig:
+        secretRef: {{ storage_offload_secret }}
+        storageVendorProduct: {{ storage_vendor_product }}
+    source:
+      id: {{ datastore_moref }}
+  provider:
+    destination:
+      apiVersion: forklift.konveyor.io/v1beta1
+      kind: Provider
+      name: host
+      namespace: openshift-mtv
+    source:
+      apiVersion: forklift.konveyor.io/v1beta1
+      kind: Provider
+      name: vsphere-source
+      namespace: openshift-mtv
+```
+
+In the WebUI, the same options appear when you create or edit a storage map: **Offload plugin** = `vSphere XCOPY`, plus the storage secret and storage product.
+
+3. Point the migration plan at that `StorageMap` (do not add a second mapping that uses VDDK/CDI for the same plan).
+
+!!! warning "Do not mix VDDK and offload in one plan"
+    Every storage pair in a plan must either include copy-offload details (`Secret` + product) or omit them entirely. Mixing CDI/VDDK mappings with Volume Populator offload mappings causes the plan to fail.
+
+### ESXi Access for Offload
+
+Offload runs `vmkfstools` on the ESXi hosts. MTV supports:
+
+- **VIB (default)** — install the MTV `vmkfstools` wrapper VIB on every ESXi host used for offload
+- **SSH** — configure automatic or manually generated offload SSH keys for the vSphere provider
+
+Follow the VIB or SSH setup steps in the [official offload planning topic](https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.12/html/planning_your_migration_to_red_hat_openshift_virtualization/assembly_planning-migration-vmware_mtv#con_about-storage-copy-offload_vmware). Prefer VIB for POC unless SSH is already required by site policy.
+
 ## Create a Migration Plan
 
 Once providers are configured, create a migration plan using the WebUI wizard:
@@ -450,7 +548,7 @@ Once providers are configured, create a migration plan using the WebUI wizard:
 !!! tip "Start with Cold Migrations"
     For POC environments, start with cold migrations. They are simpler to troubleshoot and do not require VMware Changed Block Tracking (CBT).
 
-    Migrations can run without VDDK but will use a slower disk-transfer path. VDDK is strongly recommended for acceptable transfer speeds. See [Obtaining the VDDK](#obtaining-the-vddk).
+    Migrations can run without VDDK but will use a slower disk-transfer path. VDDK is strongly recommended for acceptable transfer speeds. See [Obtaining the VDDK](#obtaining-the-vddk). On a supported SAN shared with OpenShift, prefer [storage copy offload](#storage-copy-offload) instead of the slow non-VDDK path.
 
 !!! info "Warm Migration Prerequisites"
     Warm migrations pre-copy disk data while the VM is still running. They require:

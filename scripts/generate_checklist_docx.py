@@ -393,8 +393,9 @@ add_checklist_table([
 
 add_section_heading('VM migration prerequisites')
 add_checklist_table([
-    'VDDK access requested from Broadcom (support ticket required)',
+    'VDDK access confirmed (TAP partner path or existing archive)',
     'VDDK archive downloaded and version matched to vSphere version',
+    'Storage copy offload evaluated (supported SAN + CSI shared with OpenShift; skip if N/A)',
 ])
 
 # Phase 3
@@ -456,6 +457,7 @@ add_section_heading('Migration')
 add_checklist_table([
     'Migration Toolkit for Virtualization (MTV) operator installed',
     'VDDK image built and pushed to registry',
+    'Storage copy offload enabled and StorageMap configured (if applicable)',
     'Source virtualization provider added and healthy',
     'Network and storage mappings configured',
 ])

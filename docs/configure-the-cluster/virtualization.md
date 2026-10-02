@@ -15,7 +15,7 @@
 - Optional: a dedicated live-migration network on a separate VLAN to isolate migration traffic from workload traffic. Create the VLAN with the [Live Migration Network VLAN](./networking.md#live-migration-network-vlan-openshift-virtualization) NNCP example, then configure the `HyperConverged` CR to use it (see [OpenShift Virtualization docs — live migration network](https://docs.redhat.com/en/documentation/openshift_container_platform/latest/html/virtualization/live-migration)).
 
 !!! note "Planning VM Migrations from VMware?"
-    If you plan to migrate VMs from VMware vSphere using the [Migration Toolkit for Virtualization](./mtv.md), you must obtain the VDDK image from Broadcom ahead of time. Broadcom has restricted access and requires a support ticket. See [Obtaining the VDDK](./mtv.md#obtaining-the-vddk) for details.
+    If you plan to migrate VMs from VMware vSphere using the [Migration Toolkit for Virtualization](./mtv.md), you must obtain the VDDK image from Broadcom ahead of time. Broadcom has restricted access (TAP partners). See [Obtaining the VDDK](./mtv.md#obtaining-the-vddk). If VDDK is unavailable and VMs are on a supported SAN shared with OpenShift, see [storage copy offload](./mtv.md#storage-copy-offload).
 
 ## Install the Operator via WebUI
 

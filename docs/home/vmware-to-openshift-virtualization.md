@@ -51,18 +51,18 @@ Before the first production VM lands:
 3. Install [NMState](../configure-the-cluster/nmstate.md) and any [underlay / CUDN networks](../configure-the-cluster/networking.md) VMs need for IP sameness.
 4. Install [OpenShift Virtualization](../configure-the-cluster/virtualization.md).
 5. If you will test node-loss failover, install [Workload Availability](../configure-the-cluster/workload-availability.md) **before** Virtualization.
-6. Install [MTV](../configure-the-cluster/mtv.md) and obtain the VDDK image early (required for warm and vSAN migrations).
+6. Install [MTV](../configure-the-cluster/mtv.md) and obtain the VDDK image early (required for warm and vSAN migrations). If VDDK is unavailable and VMs are on a supported SAN shared with OpenShift, use [storage copy offload](../configure-the-cluster/mtv.md#storage-copy-offload) instead.
 7. Align identity, [network policy](../configure-the-cluster/network-policy.md), [monitoring](../configure-the-cluster/monitoring.md), and [backup](../configure-the-cluster/oadp.md) with how you will operate after cutover.
 
 ### 3. Migrate with MTV
 
 [Migration Toolkit for Virtualization (MTV)](../configure-the-cluster/mtv.md) is the supported path from vSphere (and other hypervisors) into OpenShift Virtualization:
 
-| Migration mode | When to use it                        | Notes                                            |
-| -------------- | ------------------------------------- | ------------------------------------------------ |
-| Cold           | Maintenance windows OK; simplest path | VM powered off; VDDK optional (faster with VDDK) |
-| Warm           | Minimize downtime for large disks     | Precopy while running; cutover; VDDK required    |
-| OVA            | Appliances / offline images           | Useful when live vCenter access is constrained   |
+| Migration mode | When to use it                        | Notes                                                                  |
+| -------------- | ------------------------------------- | ---------------------------------------------------------------------- |
+| Cold           | Maintenance windows OK; simplest path | VM powered off; VDDK optional (faster with VDDK or storage offload)    |
+| Warm           | Minimize downtime for large disks     | Precopy while running; cutover; VDDK required                          |
+| OVA            | Appliances / offline images           | Useful when live vCenter access is constrained                         |
 
 Typical wave plan:
 

@@ -140,8 +140,9 @@ Complete these before scheduling the installation.
 
 | Item                                                                                        | Status | Notes |
 | ------------------------------------------------------------------------------------------- | ------ | ----- |
-| VDDK access requested from Broadcom (support ticket required — allow several business days) |        |       |
+| VDDK access confirmed (TAP partner path or existing archive — allow several business days)  |        |       |
 | VDDK archive downloaded and version matched to vSphere version                              |        |       |
+| Storage copy offload evaluated (supported SAN + CSI shared with OpenShift; skip if N/A)     |        |       |
 
 ---
 
@@ -217,6 +218,7 @@ Install based on your POC goals. Each subsection is independent.
 | ------------------------------------------------------------- | ------ | ----- |
 | Migration Toolkit for Virtualization (MTV) operator installed |        |       |
 | VDDK image built and pushed to registry                       |        |       |
+| Storage copy offload enabled and StorageMap configured (if applicable) |        |       |
 | Source virtualization provider added and healthy              |        |       |
 | Network and storage mappings configured                       |        |       |
 
